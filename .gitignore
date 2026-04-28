@@ -1,0 +1,7 @@
+node_modules
+tmp
+.DS_Store
+*.log
+# dist/ is committed so `npm i -g github:Sasitilak/strait` works without
+# devDeps. We ship the bundle + wasm but exclude noisy source maps.
+dist/*.map

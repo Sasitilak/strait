@@ -1,0 +1,98 @@
+# strait
+
+> Move your AI agent sessions between Claude Code, Codex, and OpenCode.
+
+Hit a Claude rate limit mid-task? Want to swap to Codex without losing context? Stuck in OpenCode and want your history elsewhere? `strait` translates sessions between agents, one shot, with full conversation history preserved.
+
+**Status:** alpha. Claude ↔ Codex is bidirectional and resume-verified end-to-end. OpenCode is read-only (export only).
+
+## Demo (30s)
+
+```
+$ strait sync claude codex --latest --dry-run
+strait v0.0.1 — session portability for AI agents
+✔ Found: 5f1e23a6-… (103 messages, 2026-04-28)
+✔ Translated 103 messages ↦ 44 tool calls
+  ⚠ dropped 10 thinking blocks (no Codex equivalent)
+✔ Wrote tmp/dry-run-….jsonl
+
+✓ Done. Resume with: codex resume f2fca69c-…
+```
+
+## Install
+
+Install globally straight from GitHub — no npm registry:
+
+```bash
+npm install -g github:Sasitilak/strait
+strait                            # interactive menu
+strait sync claude codex --latest # or use flags
+```
+
+Requires Node 18+. Pure JavaScript / WASM only — no native compilation needed.
+
+## Usage
+
+```bash
+# pick a session interactively (recommended)
+strait
+
+# or specify everything via flags
+strait sync claude   codex   --latest [--dry-run] [--verbose]
+strait sync codex    claude  --latest
+strait sync opencode claude  --latest
+strait sync opencode codex   --latest
+
+strait sync <from> <to> --session <id>     # specific session
+
+strait list claude     # 10 most recent, color-coded UUIDs
+strait list codex
+strait list opencode
+```
+
+`--dry-run` writes to `./tmp/` instead of the real target dir so you can inspect output before committing it. `--verbose` logs each message as it's translated.
+
+After a sync, strait can launch the resume command for you (in the original session's cwd) — pick "Run resume now" in interactive mode.
+
+## Supported runtimes
+
+| Runtime       | Read | Write | Resume verified |
+|---------------|:----:|:-----:|:---------------:|
+| Claude Code   |  ✓   |   ✓   |       ✓         |
+| Codex         |  ✓   |   ✓   |       ✓         |
+| OpenCode      |  ✓   |   —   |       n/a       |
+
+## What works
+
+- Text user messages, assistant text replies
+- Tool calls + tool results (any tool name — passed through verbatim)
+- Multi-block assistant messages (text + tool_use + text + tool_use, in order)
+- `tool_result` content as either string or array of text parts
+- Streaming line-by-line read (Claude/Codex) and indexed SQLite read (OpenCode)
+- Auto-cd into the imported session's original cwd when launching resume
+- Filters out Codex's `<environment_context>` synthetic user turns
+
+## What's coming
+
+- OpenCode write-back (Claude/Codex → OpenCode)
+- Aider, Cline (other local-first agents — cloud-only ones can't be supported)
+- Tool name remapping (`Bash` ↔ `exec_command`) so resumed tool calls re-execute
+- MCP server tool parity
+- Image and thinking block translation
+
+## Known limitations
+
+- **Thinking blocks are dropped.** Both Claude and Codex store reasoning in formats the other can't reconstruct (Codex uses encrypted blobs, Claude requires a valid signature). Tool calls and final outputs are preserved; the model just doesn't see its own prior chain-of-thought.
+- **Tool names pass through verbatim.** Resume will display the original tool calls (e.g. `Bash`), but the receiving runtime won't re-execute them unless that name is also one of its registered tools. The transcript is intact; new turns use the receiving runtime's own tools.
+- **Codex resume logs a non-fatal "thread not found" warning** on imported sessions. This is a Codex-internal cache issue for rollouts it didn't create itself — the conversation context still loads correctly and new turns persist.
+- **Cloud-only agents are not supported** — Antigravity, Cursor cloud agents, ChatGPT, Devin, Replit Agent, etc. don't store sessions on disk, so there's nothing for `strait` to read.
+- **Format is unstable.** Schemas change between releases. v1 targets Claude 2.1.x, Codex 0.114–0.125, OpenCode current.
+- **No tests yet.** Verified by running against real sessions.
+
+## Contributing
+
+Issues and PRs welcome — this is alpha. The most valuable bug reports are real Claude sessions that fail to resume in Codex.
+
+## License
+
+MIT.

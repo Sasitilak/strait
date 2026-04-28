@@ -1,0 +1,8 @@
+src
+scripts
+tmp
+docs
+tests
+tsconfig.json
+tsup.config.ts
+.gitignore

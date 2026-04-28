@@ -1,0 +1,49 @@
+{
+  "name": "strait",
+  "version": "0.0.1",
+  "description": "Move your AI agent sessions between Claude Code and Codex",
+  "type": "module",
+  "bin": {
+    "strait": "./dist/index.js"
+  },
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsup",
+    "test:parser": "tsx scripts/test-parser.ts",
+    "test:emitter": "tsx scripts/test-emitter.ts"
+  },
+  "files": ["dist", "src", "tsup.config.ts", "tsconfig.json", "README.md", "LICENSE"],
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@inquirer/prompts": "^5.5.0",
+    "chalk": "^5.3.0",
+    "citty": "^0.1.6",
+    "ora": "^8.1.0",
+    "sql.js": "^1.14.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "tsup": "^8.3.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  },
+  "keywords": [
+    "claude",
+    "codex",
+    "cli",
+    "ai",
+    "session",
+    "translate"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sasitilak/strait.git"
+  },
+  "homepage": "https://github.com/Sasitilak/strait#readme",
+  "bugs": {
+    "url": "https://github.com/Sasitilak/strait/issues"
+  }
+}
