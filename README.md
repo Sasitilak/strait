@@ -97,13 +97,6 @@ codex    ↔  opencode
 - Auto-launch with the right resume flag per runtime (`codex resume <id>`, `claude --resume <id>`, `opencode --session <id>`)
 - Filters out Codex's `<environment_context>` synthetic user turns
 
-## What's coming
-
-- Aider, Cline (other local-first agents — cloud-only ones can't be supported)
-- Tool name remapping (`Bash` ↔ `exec_command`) so resumed tool calls re-execute
-- MCP server tool parity
-- Image and thinking block translation
-
 ## Known limitations
 
 - **Thinking blocks are dropped.** Both Claude and Codex store reasoning in formats the other can't reconstruct (Codex uses encrypted blobs, Claude requires a valid signature). Tool calls and final outputs are preserved; the model just doesn't see its own prior chain-of-thought.
