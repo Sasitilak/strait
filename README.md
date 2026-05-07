@@ -4,7 +4,7 @@
 
 Hit a Claude rate limit mid-task? Want to swap to Codex without losing context? Stuck in OpenCode and want your history elsewhere? `strait` translates sessions between agents, one shot, with full conversation history preserved.
 
-**Status:** alpha. Claude ↔ Codex is bidirectional and resume-verified end-to-end. OpenCode is read-only (export only).
+**Status:** alpha. All three runtimes (Claude Code, Codex, OpenCode) are bidirectional and resume-verified end-to-end.
 
 ```
 strait v0.0.1 — session portability for AI agents
@@ -75,7 +75,15 @@ After a sync, strait can launch the resume command for you (in the original sess
 |---------------|:----:|:-----:|:---------------:|
 | Claude Code   |  ✓   |   ✓   |       ✓         |
 | Codex         |  ✓   |   ✓   |       ✓         |
-| OpenCode      |  ✓   |   —   |       n/a       |
+| OpenCode      |  ✓   |   ✓   |       ✓         |
+
+All six directions work:
+
+```
+claude   ↔  codex
+claude   ↔  opencode
+codex    ↔  opencode
+```
 
 ## What works
 
@@ -83,13 +91,14 @@ After a sync, strait can launch the resume command for you (in the original sess
 - Tool calls + tool results (any tool name — passed through verbatim)
 - Multi-block assistant messages (text + tool_use + text + tool_use, in order)
 - `tool_result` content as either string or array of text parts
-- Streaming line-by-line read (Claude/Codex) and indexed SQLite read (OpenCode)
+- Streaming line-by-line read (Claude/Codex) and indexed SQLite read/write (OpenCode)
+- Atomic write to OpenCode's SQLite DB with WAL checkpoint, integrity check, and sidecar cleanup — refuses to write if OpenCode is running
 - Auto-cd into the imported session's original cwd when launching resume
+- Auto-launch with the right resume flag per runtime (`codex resume <id>`, `claude --resume <id>`, `opencode --session <id>`)
 - Filters out Codex's `<environment_context>` synthetic user turns
 
 ## What's coming
 
-- OpenCode write-back (Claude/Codex → OpenCode)
 - Aider, Cline (other local-first agents — cloud-only ones can't be supported)
 - Tool name remapping (`Bash` ↔ `exec_command`) so resumed tool calls re-execute
 - MCP server tool parity
