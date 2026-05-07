@@ -1,7 +1,7 @@
 {
-  "name": "strait",
-  "version": "0.0.1",
-  "description": "Move your AI agent sessions between Claude Code and Codex",
+  "name": "strait-cli",
+  "version": "0.0.2",
+  "description": "Move your AI agent sessions between Claude Code, Codex, and OpenCode",
   "type": "module",
   "bin": {
     "strait": "./dist/index.js"
@@ -9,10 +9,11 @@
   "scripts": {
     "dev": "tsx src/index.ts",
     "build": "tsup",
+    "prepublishOnly": "npm run build",
     "test:parser": "tsx scripts/test-parser.ts",
     "test:emitter": "tsx scripts/test-emitter.ts"
   },
-  "files": ["dist", "src", "tsup.config.ts", "tsconfig.json", "README.md", "LICENSE"],
+  "files": ["dist/index.js", "dist/sql-wasm.wasm", "README.md", "LICENSE"],
   "engines": {
     "node": ">=18"
   },
@@ -31,11 +32,15 @@
   },
   "keywords": [
     "claude",
+    "claude-code",
     "codex",
+    "opencode",
     "cli",
     "ai",
+    "agent",
     "session",
-    "translate"
+    "translate",
+    "portability"
   ],
   "license": "MIT",
   "repository": {
