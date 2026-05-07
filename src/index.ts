@@ -9,6 +9,7 @@ import { parseCodexSession } from "./parsers/codex.js";
 import { parseOpencodeSession } from "./parsers/opencode.js";
 import { writeCodexSession } from "./emitters/codex.js";
 import { writeClaudeSession } from "./emitters/claude.js";
+import { writeOpencodeSession } from "./emitters/opencode.js";
 import { runInteractive } from "./interactive.js";
 import { ferry } from "./anim.js";
 import {
@@ -46,22 +47,24 @@ function reportError(spinner: ReturnType<typeof ora> | null, err: unknown, msg: 
 const sync = defineCommand({
   meta: { name: "sync", description: "Translate a session between two runtimes" },
   args: {
-    from: { type: "positional", required: true, description: "source: claude | codex" },
-    to: { type: "positional", required: true, description: "target: claude | codex" },
+    from: { type: "positional", required: true, description: "source: claude | codex | opencode" },
+    to: { type: "positional", required: true, description: "target: claude | codex | opencode" },
     session: { type: "string", description: "specific source session UUID" },
     latest: { type: "boolean", description: "use most recent source session" },
     "dry-run": { type: "boolean", description: "write to ./tmp/ instead of the real target dir" },
     verbose: { type: "boolean", description: "log each translation step" },
+    force: { type: "boolean", description: "skip OpenCode-running safety check (dangerous)" },
   },
   async run({ args }) {
     console.log(BANNER);
     const validDirs = new Set([
       "claude->codex", "codex->claude",
       "opencode->claude", "opencode->codex",
+      "claude->opencode", "codex->opencode",
     ]);
     const dir = `${args.from}->${args.to}`;
     if (!validDirs.has(dir)) {
-      console.error(chalk.red(`Supported directions: claude↔codex, opencode→claude, opencode→codex`));
+      console.error(chalk.red(`Supported directions: claude↔codex, claude↔opencode, codex↔opencode`));
       process.exit(1);
     }
 
@@ -128,25 +131,35 @@ const sync = defineCommand({
     let outputPath: string | undefined;
     if (args["dry-run"]) {
       fs.mkdirSync("tmp", { recursive: true });
-      outputPath = path.join("tmp", `dry-run-${args.to}-${Date.now()}.jsonl`);
+      const ext = args.to === "opencode" ? "db" : "jsonl";
+      outputPath = path.join("tmp", `dry-run-${args.to}-${Date.now()}.${ext}`);
+      // For OpenCode dry-run, seed the tmp file from the real DB so the
+      // emitter has the schema + project_id to insert against.
+      if (args.to === "opencode") {
+        const real = path.join(os.homedir(), ".local", "share", "opencode", "opencode.db");
+        if (fs.existsSync(real)) fs.copyFileSync(real, outputPath);
+      }
     }
 
     let result;
     try {
-      const writePromise = args.to === "codex"
-        ? writeCodexSession(parseRes!.session, { outputPath })
-        : writeClaudeSession(parseRes!.session, { outputPath });
+      const writePromise =
+        args.to === "codex" ? writeCodexSession(parseRes!.session, { outputPath }) :
+        args.to === "claude" ? writeClaudeSession(parseRes!.session, { outputPath }) :
+        writeOpencodeSession(parseRes!.session, { outputPath, force: !!args.force });
       await ferry({ fromLabel, toLabel });
       result = await writePromise;
     } catch (e) { reportError(null, e, "Write failed"); }
     const tgtTint = colorForRuntime(args.to);
     console.log(chalk.dim(`  wrote ${tgtTint(result!.outputPath)}`));
 
-    const resumeCmd = args.to === "codex"
-      ? `codex resume ${tgtTint(result!.sessionId)}`
-      : `claude --resume ${tgtTint(result!.sessionId)}`;
+    const resumeCmd =
+      args.to === "codex" ? `codex resume ${tgtTint(result!.sessionId)}` :
+      args.to === "claude" ? `claude --resume ${tgtTint(result!.sessionId)}` :
+      `opencode --session ${tgtTint(result!.sessionId)}`;
     console.log("");
     console.log(`${chalk.green("✓")} Done. Resume with: ${chalk.bold(resumeCmd)}`);
+    console.log(chalk.dim(`  session id: ${tgtTint(result!.sessionId)}`));
     if (args["dry-run"]) {
       console.log(chalk.dim(`  (dry-run: not in the real target dir, copy it there to actually resume)`));
     }

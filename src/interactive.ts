@@ -6,9 +6,10 @@ import ora from "ora";
 import { select, confirm } from "@inquirer/prompts";
 import { parseClaudeSession } from "./parsers/claude.js";
 import { parseCodexSession } from "./parsers/codex.js";
-import { parseOpencodeSession } from "./parsers/opencode.js";
+import { parseOpencodeSession, OPENCODE_DB } from "./parsers/opencode.js";
 import { writeCodexSession } from "./emitters/codex.js";
 import { writeClaudeSession } from "./emitters/claude.js";
+import { writeOpencodeSession } from "./emitters/opencode.js";
 import { ferry } from "./anim.js";
 import { listAllClaudeSessions, listAllCodexSessions, listAllOpencodeSessions } from "./discover.js";
 
@@ -98,6 +99,8 @@ async function runInteractiveLoop(): Promise<void> {
       choices: [
         { name: "Sync Claude → Codex", value: "claude->codex" },
         { name: "Sync Codex → Claude", value: "codex->claude" },
+        { name: "Sync Claude → OpenCode", value: "claude->opencode" },
+        { name: "Sync Codex → OpenCode", value: "codex->opencode" },
         { name: "Sync OpenCode → Claude", value: "opencode->claude" },
         { name: "Sync OpenCode → Codex", value: "opencode->codex" },
         { name: "List recent Claude sessions", value: "list-claude" },
@@ -199,14 +202,22 @@ async function runSync(opts: {
   let outputPath: string | undefined;
   if (dryRun) {
     fs.mkdirSync("tmp", { recursive: true });
-    outputPath = path.join("tmp", `dry-run-${to}-${Date.now()}.jsonl`);
+    const ext = to === "opencode" ? "db" : "jsonl";
+    outputPath = path.join("tmp", `dry-run-${to}-${Date.now()}.${ext}`);
+    if (to === "opencode") {
+      // Seed the dry-run DB from the real one so the emitter has schema +
+      // project rows to insert against.
+      const real = OPENCODE_DB;
+      if (fs.existsSync(real)) fs.copyFileSync(real, outputPath);
+    }
   }
 
   let result;
   try {
-    const writePromise = to === "codex"
-      ? writeCodexSession(parseRes.session, { outputPath })
-      : writeClaudeSession(parseRes.session, { outputPath });
+    const writePromise =
+      to === "codex" ? writeCodexSession(parseRes.session, { outputPath }) :
+      to === "claude" ? writeClaudeSession(parseRes.session, { outputPath }) :
+      writeOpencodeSession(parseRes.session, { outputPath });
     await ferry({ fromLabel: cap(from), toLabel: cap(to) });
     result = await writePromise;
   } catch (e) {
@@ -215,9 +226,10 @@ async function runSync(opts: {
   }
   const targetTint = colorFor(to);
   console.log(chalk.dim(`  wrote ${targetTint(result.outputPath)}`));
-  const resumeCmd = to === "codex"
-    ? `codex resume ${targetTint(result.sessionId)}`
-    : `claude --resume ${targetTint(result.sessionId)}`;
+  const resumeCmd =
+    to === "codex" ? `codex resume ${targetTint(result.sessionId)}` :
+    to === "claude" ? `claude --resume ${targetTint(result.sessionId)}` :
+    `opencode --session ${targetTint(result.sessionId)}`;
   console.log("");
   console.log(`${chalk.green("✓")} Done. Resume command: ${chalk.bold(resumeCmd)}`);
   if (dryRun) {
@@ -227,10 +239,12 @@ async function runSync(opts: {
   }
   const sessionCwd = parseRes.session.workingDirectory ?? process.cwd();
 
+  const launchLabel = `Run "${resumeCmd}" now (in ${sessionCwd})`;
+
   const next = await select({
     message: "What now?",
     choices: [
-      { name: `Run "${resumeCmd}" now (in ${sessionCwd})`, value: "run" },
+      { name: launchLabel, value: "run" },
       { name: "Skip — I'll run it myself later", value: "skip" },
     ],
   });
@@ -238,15 +252,21 @@ async function runSync(opts: {
   if (next === "run") {
     console.log(chalk.dim(`→ launching ${to}...`));
     await runResume(to, result.sessionId, sessionCwd);
+  } else {
+    console.log("");
+    console.log(chalk.dim("  When you're ready, run:"));
+    console.log(`    ${chalk.bold(resumeCmd)}`);
+    console.log(chalk.dim(`    (from ${sessionCwd})`));
   }
   console.log("");
 }
 
 async function runResume(to: Runtime, sessionId: string, cwd: string): Promise<void> {
-  const cmd = to === "codex" ? "codex" : "claude";
-  const args = to === "codex"
-    ? ["resume", sessionId]
-    : ["--resume", sessionId];
+  const cmd = to === "codex" ? "codex" : to === "claude" ? "claude" : "opencode";
+  const args =
+    to === "codex" ? ["resume", sessionId] :
+    to === "claude" ? ["--resume", sessionId] :
+    ["--session", sessionId];  // opencode --session <id> resumes that session in the TUI
 
   await new Promise<void>((resolve) => {
     const child = spawn(cmd, args, { stdio: "inherit", cwd });

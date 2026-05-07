@@ -2979,15 +2979,15 @@ var require_sql_wasm = __commonJS({
         "undefined" != typeof __filename ? ya = __filename : ba && (ya = self.location.href);
         var za = "", Aa, Ba;
         if (ca) {
-          var fs9 = __require("fs");
+          var fs10 = __require("fs");
           za = __dirname + "/";
           Ba = (a2) => {
             a2 = Ca(a2) ? new URL(a2) : a2;
-            return fs9.readFileSync(a2);
+            return fs10.readFileSync(a2);
           };
           Aa = async (a2) => {
             a2 = Ca(a2) ? new URL(a2) : a2;
-            return fs9.readFileSync(a2, void 0);
+            return fs10.readFileSync(a2, void 0);
           };
           1 < process.argv.length && (wa = process.argv[1].replace(/\\/g, "/"));
           process.argv.slice(2);
@@ -3269,7 +3269,7 @@ var require_sql_wasm = __commonJS({
               if (ca) {
                 var b2 = Buffer.alloc(256), c3 = 0, d2 = process.stdin.fd;
                 try {
-                  c3 = fs9.readSync(d2, b2, 0, 256);
+                  c3 = fs10.readSync(d2, b2, 0, 256);
                 } catch (e2) {
                   if (e2.toString().includes("EOF")) c3 = 0;
                   else throw e2;
@@ -9298,8 +9298,9 @@ function ora(options) {
 }
 
 // src/index.ts
-import * as fs8 from "fs";
+import * as fs9 from "fs";
 import * as path9 from "path";
+import * as os6 from "os";
 
 // src/parsers/claude.ts
 import * as fs from "fs";
@@ -10003,8 +10004,235 @@ function defaultClaudePath(cwd, sessionId) {
   return path6.join(os4.homedir(), ".claude", "projects", dashed, `${sessionId}.jsonl`);
 }
 
+// src/emitters/opencode.ts
+import * as fs6 from "fs";
+import { execSync, execFileSync } from "child_process";
+async function writeOpencodeSession(session, options = {}) {
+  const dbPath = options.outputPath ?? OPENCODE_DB;
+  if (!fs6.existsSync(dbPath)) {
+    throw new Error(
+      `OpenCode database not found at ${dbPath}. Open OpenCode at least once before importing.`
+    );
+  }
+  if (!options.force && isDatabaseInUse(dbPath)) {
+    throw new Error(
+      `OpenCode appears to be running (database is open by another process). Quit OpenCode and try again, or pass --force.`
+    );
+  }
+  checkpointWal(dbPath);
+  const db = await openDatabase(dbPath);
+  const stats = {
+    messagesIn: session.messages.length,
+    messageRows: 0,
+    partRows: 0,
+    toolCalls: 0,
+    toolResultsFolded: 0,
+    droppedImages: 0
+  };
+  try {
+    const sessionId = generateId("ses");
+    const now = Date.now();
+    const projectId = pickProjectId(db);
+    const cwd = session.workingDirectory ?? process.cwd();
+    const title = pickTitle(session);
+    const slug = makeSlug();
+    db.run(
+      `INSERT INTO session
+       (id, project_id, slug, directory, title, version, time_created, time_updated)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [sessionId, projectId, slug, cwd, title, "1.2.27", now, now]
+    );
+    let lastAssistantMsgId;
+    let timeCursor = now;
+    const resultsByCallId = /* @__PURE__ */ new Map();
+    for (const m2 of session.messages) {
+      for (const b2 of m2.blocks) {
+        if (b2.type === "tool_result") {
+          resultsByCallId.set(b2.toolCallId, { content: b2.content, isError: b2.isError });
+        }
+      }
+    }
+    for (const msg of session.messages) {
+      if (msg.blocks.every((b2) => b2.type === "tool_result")) {
+        stats.toolResultsFolded += msg.blocks.length;
+        continue;
+      }
+      const messageId = generateId("msg");
+      const role = msg.role === "assistant" ? "assistant" : "user";
+      const messageTime = ++timeCursor;
+      const messageData = role === "user" ? { role: "user", time: { created: messageTime } } : {
+        role: "assistant",
+        time: { created: messageTime, completed: messageTime + 1 },
+        parentID: lastAssistantMsgId,
+        modelID: session.model ?? "imported-from-strait",
+        providerID: "strait",
+        mode: "build",
+        agent: "build",
+        path: { cwd, root: "/" },
+        cost: 0,
+        tokens: { total: 0, input: 0, output: 0, reasoning: 0, cache: { read: 0, write: 0 } },
+        finish: "stop"
+      };
+      db.run(
+        `INSERT INTO message (id, session_id, time_created, time_updated, data)
+         VALUES (?, ?, ?, ?, ?)`,
+        [messageId, sessionId, messageTime, messageTime, JSON.stringify(messageData)]
+      );
+      stats.messageRows++;
+      if (role === "assistant") lastAssistantMsgId = messageId;
+      for (const block of msg.blocks) {
+        if (block.type === "tool_result") continue;
+        const partRow = blockToPart(block, resultsByCallId, stats);
+        if (!partRow) continue;
+        const partId = generateId("prt");
+        const partTime = ++timeCursor;
+        db.run(
+          `INSERT INTO part (id, message_id, session_id, time_created, time_updated, data)
+           VALUES (?, ?, ?, ?, ?, ?)`,
+          [partId, messageId, sessionId, partTime, partTime, JSON.stringify(partRow)]
+        );
+        stats.partRows++;
+      }
+    }
+    db.run(`UPDATE session SET time_updated = ? WHERE id = ?`, [timeCursor, sessionId]);
+    const exported = Buffer.from(db.export());
+    const tmp = dbPath + ".strait-tmp";
+    fs6.writeFileSync(tmp, exported);
+    const fd = fs6.openSync(tmp, "r+");
+    try {
+      fs6.fsyncSync(fd);
+    } finally {
+      fs6.closeSync(fd);
+    }
+    if (!verifyIntegrity(tmp)) {
+      try {
+        fs6.unlinkSync(tmp);
+      } catch {
+      }
+      throw new Error(
+        "Exported DB failed integrity check; original left untouched. (This usually means sql.js produced an invalid serialization.)"
+      );
+    }
+    fs6.renameSync(tmp, dbPath);
+    for (const sidecar of [dbPath + "-wal", dbPath + "-shm"]) {
+      try {
+        fs6.unlinkSync(sidecar);
+      } catch {
+      }
+    }
+    return { outputPath: dbPath, sessionId, stats };
+  } finally {
+    db.close();
+  }
+}
+function blockToPart(block, results, stats) {
+  switch (block.type) {
+    case "text":
+      return { type: "text", text: block.text, tool: null, callID: null };
+    case "thinking":
+      return { type: "reasoning", text: block.text, tool: null, callID: null };
+    case "tool_call": {
+      stats.toolCalls++;
+      const result = results.get(block.id);
+      const state = result ? {
+        status: result.isError ? "error" : "completed",
+        input: block.arguments ?? {},
+        ...result.isError ? { error: result.content } : { output: result.content }
+      } : { status: "pending", input: block.arguments ?? {} };
+      if (result) stats.toolResultsFolded++;
+      return {
+        type: "tool",
+        callID: block.id,
+        tool: block.name,
+        state,
+        text: ""
+      };
+    }
+    case "image":
+      stats.droppedImages++;
+      return null;
+    case "tool_result":
+      return null;
+  }
+}
+function checkpointWal(dbPath) {
+  if (!fs6.existsSync(dbPath + "-wal")) return;
+  try {
+    execFileSync("sqlite3", [dbPath, "PRAGMA wal_checkpoint(TRUNCATE);"], {
+      stdio: ["ignore", "ignore", "ignore"]
+    });
+  } catch {
+  }
+}
+function verifyIntegrity(dbPath) {
+  try {
+    const out = execFileSync("sqlite3", ["-readonly", dbPath, "PRAGMA integrity_check;"], {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"]
+    });
+    return out.trim() === "ok";
+  } catch {
+    return true;
+  }
+}
+function isDatabaseInUse(dbPath) {
+  try {
+    const out = execSync(`lsof -- ${JSON.stringify(dbPath)} 2>/dev/null`, {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"]
+    });
+    return out.split("\n").slice(1).some((l2) => l2.trim().length > 0);
+  } catch {
+    return false;
+  }
+}
+function pickProjectId(db) {
+  const stmt = db.prepare("SELECT id FROM project WHERE id = 'global' LIMIT 1");
+  try {
+    if (stmt.step()) return "global";
+  } finally {
+    stmt.free();
+  }
+  const any = db.prepare("SELECT id FROM project LIMIT 1");
+  try {
+    if (any.step()) return any.getAsObject().id;
+  } finally {
+    any.free();
+  }
+  const now = Date.now();
+  db.run(
+    `INSERT INTO project (id, worktree, time_created, time_updated, sandboxes) VALUES (?, ?, ?, ?, ?)`,
+    ["global", "/", now, now, "[]"]
+  );
+  return "global";
+}
+function pickTitle(session) {
+  for (const m2 of session.messages) {
+    if (m2.role !== "user") continue;
+    for (const b2 of m2.blocks) {
+      if (b2.type === "text" && b2.text.trim()) {
+        return b2.text.replace(/\s+/g, " ").slice(0, 60).trim();
+      }
+    }
+  }
+  return `Imported from ${session.sourceRuntime} via strait`;
+}
+function makeSlug() {
+  const a2 = ["bright", "glowing", "calm", "swift", "quiet", "wild", "ancient", "hidden", "open", "rolling"];
+  const b2 = ["harbor", "strait", "passage", "tide", "channel", "sound", "current", "wake", "shore", "horizon"];
+  return a2[Math.floor(Math.random() * a2.length)] + "-" + b2[Math.floor(Math.random() * b2.length)];
+}
+var ID_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+function generateId(prefix) {
+  let out = prefix + "_";
+  for (let i2 = 0; i2 < 25; i2++) {
+    out += ID_ALPHABET[Math.floor(Math.random() * ID_ALPHABET.length)];
+  }
+  return out;
+}
+
 // src/interactive.ts
-import * as fs7 from "fs";
+import * as fs8 from "fs";
 import * as path8 from "path";
 import { spawn } from "child_process";
 
@@ -11086,31 +11314,31 @@ process.on("SIGINT", () => {
 });
 
 // src/discover.ts
-import * as fs6 from "fs";
+import * as fs7 from "fs";
 import * as path7 from "path";
 import * as os5 from "os";
 var CLAUDE_PROJECTS = path7.join(os5.homedir(), ".claude", "projects");
 var CODEX_SESSIONS = path7.join(os5.homedir(), ".codex", "sessions");
 function listAllClaudeSessions() {
-  if (!fs6.existsSync(CLAUDE_PROJECTS)) return [];
+  if (!fs7.existsSync(CLAUDE_PROJECTS)) return [];
   const out = [];
-  for (const proj of fs6.readdirSync(CLAUDE_PROJECTS)) {
+  for (const proj of fs7.readdirSync(CLAUDE_PROJECTS)) {
     const dir = path7.join(CLAUDE_PROJECTS, proj);
     let stat;
     try {
-      stat = fs6.statSync(dir);
+      stat = fs7.statSync(dir);
     } catch {
       continue;
     }
     if (!stat.isDirectory()) continue;
-    for (const f3 of fs6.readdirSync(dir)) {
+    for (const f3 of fs7.readdirSync(dir)) {
       if (f3.endsWith(".jsonl")) out.push(path7.join(dir, f3));
     }
   }
   return out;
 }
 function listAllCodexSessions() {
-  if (!fs6.existsSync(CODEX_SESSIONS)) return [];
+  if (!fs7.existsSync(CODEX_SESSIONS)) return [];
   const out = [];
   walkRollouts(CODEX_SESSIONS, out);
   return out;
@@ -11118,7 +11346,7 @@ function listAllCodexSessions() {
 function walkRollouts(dir, out) {
   let entries;
   try {
-    entries = fs6.readdirSync(dir, { withFileTypes: true });
+    entries = fs7.readdirSync(dir, { withFileTypes: true });
   } catch {
     return;
   }
@@ -11136,7 +11364,7 @@ function findLatestCodexSession() {
 }
 function latestOf(files) {
   if (!files.length) return null;
-  return files.map((f3) => ({ f: f3, m: fs6.statSync(f3).mtimeMs })).sort((a2, b2) => b2.m - a2.m)[0].f;
+  return files.map((f3) => ({ f: f3, m: fs7.statSync(f3).mtimeMs })).sort((a2, b2) => b2.m - a2.m)[0].f;
 }
 function findClaudeSessionById(id) {
   for (const f3 of listAllClaudeSessions()) {
@@ -11152,7 +11380,7 @@ function findCodexSessionById(id) {
   return null;
 }
 async function listAllOpencodeSessions() {
-  if (!fs6.existsSync(OPENCODE_DB)) return [];
+  if (!fs7.existsSync(OPENCODE_DB)) return [];
   const db = await openDatabase(OPENCODE_DB);
   try {
     const stmt = db.prepare(
@@ -11204,7 +11432,7 @@ async function buildEntries(runtime, limit) {
     }));
   }
   const all = runtime === "claude" ? listAllClaudeSessions() : listAllCodexSessions();
-  const files = all.map((f3) => ({ f: f3, m: fs7.statSync(f3).mtimeMs })).sort((a2, b2) => b2.m - a2.m).slice(0, limit);
+  const files = all.map((f3) => ({ f: f3, m: fs8.statSync(f3).mtimeMs })).sort((a2, b2) => b2.m - a2.m).slice(0, limit);
   const entries = [];
   for (const { f: f3, m: m2 } of files) {
     const base = path8.basename(f3, ".jsonl");
@@ -11251,6 +11479,8 @@ async function runInteractiveLoop() {
       choices: [
         { name: "Sync Claude \u2192 Codex", value: "claude->codex" },
         { name: "Sync Codex \u2192 Claude", value: "codex->claude" },
+        { name: "Sync Claude \u2192 OpenCode", value: "claude->opencode" },
+        { name: "Sync Codex \u2192 OpenCode", value: "codex->opencode" },
         { name: "Sync OpenCode \u2192 Claude", value: "opencode->claude" },
         { name: "Sync OpenCode \u2192 Codex", value: "opencode->codex" },
         { name: "List recent Claude sessions", value: "list-claude" },
@@ -11350,12 +11580,17 @@ async function runSync(opts) {
   for (const w2 of parseRes.warnings) console.log(source_default.yellow.dim(`  \u26A0 ${w2}`));
   let outputPath;
   if (dryRun) {
-    fs7.mkdirSync("tmp", { recursive: true });
-    outputPath = path8.join("tmp", `dry-run-${to}-${Date.now()}.jsonl`);
+    fs8.mkdirSync("tmp", { recursive: true });
+    const ext = to === "opencode" ? "db" : "jsonl";
+    outputPath = path8.join("tmp", `dry-run-${to}-${Date.now()}.${ext}`);
+    if (to === "opencode") {
+      const real = OPENCODE_DB;
+      if (fs8.existsSync(real)) fs8.copyFileSync(real, outputPath);
+    }
   }
   let result;
   try {
-    const writePromise = to === "codex" ? writeCodexSession(parseRes.session, { outputPath }) : writeClaudeSession(parseRes.session, { outputPath });
+    const writePromise = to === "codex" ? writeCodexSession(parseRes.session, { outputPath }) : to === "claude" ? writeClaudeSession(parseRes.session, { outputPath }) : writeOpencodeSession(parseRes.session, { outputPath });
     await ferry({ fromLabel: cap(from), toLabel: cap(to) });
     result = await writePromise;
   } catch (e2) {
@@ -11364,7 +11599,7 @@ async function runSync(opts) {
   }
   const targetTint = colorFor2(to);
   console.log(source_default.dim(`  wrote ${targetTint(result.outputPath)}`));
-  const resumeCmd = to === "codex" ? `codex resume ${targetTint(result.sessionId)}` : `claude --resume ${targetTint(result.sessionId)}`;
+  const resumeCmd = to === "codex" ? `codex resume ${targetTint(result.sessionId)}` : to === "claude" ? `claude --resume ${targetTint(result.sessionId)}` : `opencode --session ${targetTint(result.sessionId)}`;
   console.log("");
   console.log(`${source_default.green("\u2713")} Done. Resume command: ${source_default.bold(resumeCmd)}`);
   if (dryRun) {
@@ -11373,22 +11608,28 @@ async function runSync(opts) {
     return;
   }
   const sessionCwd = parseRes.session.workingDirectory ?? process.cwd();
+  const launchLabel = `Run "${resumeCmd}" now (in ${sessionCwd})`;
   const next = await esm_default3({
     message: "What now?",
     choices: [
-      { name: `Run "${resumeCmd}" now (in ${sessionCwd})`, value: "run" },
+      { name: launchLabel, value: "run" },
       { name: "Skip \u2014 I'll run it myself later", value: "skip" }
     ]
   });
   if (next === "run") {
     console.log(source_default.dim(`\u2192 launching ${to}...`));
     await runResume(to, result.sessionId, sessionCwd);
+  } else {
+    console.log("");
+    console.log(source_default.dim("  When you're ready, run:"));
+    console.log(`    ${source_default.bold(resumeCmd)}`);
+    console.log(source_default.dim(`    (from ${sessionCwd})`));
   }
   console.log("");
 }
 async function runResume(to, sessionId, cwd) {
-  const cmd = to === "codex" ? "codex" : "claude";
-  const args = to === "codex" ? ["resume", sessionId] : ["--resume", sessionId];
+  const cmd = to === "codex" ? "codex" : to === "claude" ? "claude" : "opencode";
+  const args = to === "codex" ? ["resume", sessionId] : to === "claude" ? ["--resume", sessionId] : ["--session", sessionId];
   await new Promise((resolve) => {
     const child = spawn(cmd, args, { stdio: "inherit", cwd });
     child.on("exit", () => resolve());
@@ -11419,12 +11660,13 @@ function reportError(spinner, err, msg) {
 var sync = defineCommand({
   meta: { name: "sync", description: "Translate a session between two runtimes" },
   args: {
-    from: { type: "positional", required: true, description: "source: claude | codex" },
-    to: { type: "positional", required: true, description: "target: claude | codex" },
+    from: { type: "positional", required: true, description: "source: claude | codex | opencode" },
+    to: { type: "positional", required: true, description: "target: claude | codex | opencode" },
     session: { type: "string", description: "specific source session UUID" },
     latest: { type: "boolean", description: "use most recent source session" },
     "dry-run": { type: "boolean", description: "write to ./tmp/ instead of the real target dir" },
-    verbose: { type: "boolean", description: "log each translation step" }
+    verbose: { type: "boolean", description: "log each translation step" },
+    force: { type: "boolean", description: "skip OpenCode-running safety check (dangerous)" }
   },
   async run({ args }) {
     console.log(BANNER);
@@ -11432,11 +11674,13 @@ var sync = defineCommand({
       "claude->codex",
       "codex->claude",
       "opencode->claude",
-      "opencode->codex"
+      "opencode->codex",
+      "claude->opencode",
+      "codex->opencode"
     ]);
     const dir = `${args.from}->${args.to}`;
     if (!validDirs.has(dir)) {
-      console.error(source_default.red(`Supported directions: claude\u2194codex, opencode\u2192claude, opencode\u2192codex`));
+      console.error(source_default.red(`Supported directions: claude\u2194codex, claude\u2194opencode, codex\u2194opencode`));
       process.exit(1);
     }
     const lookup = ora(`Looking up ${args.from} session...`).start();
@@ -11496,12 +11740,17 @@ var sync = defineCommand({
     }
     let outputPath;
     if (args["dry-run"]) {
-      fs8.mkdirSync("tmp", { recursive: true });
-      outputPath = path9.join("tmp", `dry-run-${args.to}-${Date.now()}.jsonl`);
+      fs9.mkdirSync("tmp", { recursive: true });
+      const ext = args.to === "opencode" ? "db" : "jsonl";
+      outputPath = path9.join("tmp", `dry-run-${args.to}-${Date.now()}.${ext}`);
+      if (args.to === "opencode") {
+        const real = path9.join(os6.homedir(), ".local", "share", "opencode", "opencode.db");
+        if (fs9.existsSync(real)) fs9.copyFileSync(real, outputPath);
+      }
     }
     let result;
     try {
-      const writePromise = args.to === "codex" ? writeCodexSession(parseRes.session, { outputPath }) : writeClaudeSession(parseRes.session, { outputPath });
+      const writePromise = args.to === "codex" ? writeCodexSession(parseRes.session, { outputPath }) : args.to === "claude" ? writeClaudeSession(parseRes.session, { outputPath }) : writeOpencodeSession(parseRes.session, { outputPath, force: !!args.force });
       await ferry({ fromLabel, toLabel });
       result = await writePromise;
     } catch (e2) {
@@ -11509,9 +11758,10 @@ var sync = defineCommand({
     }
     const tgtTint = colorForRuntime(args.to);
     console.log(source_default.dim(`  wrote ${tgtTint(result.outputPath)}`));
-    const resumeCmd = args.to === "codex" ? `codex resume ${tgtTint(result.sessionId)}` : `claude --resume ${tgtTint(result.sessionId)}`;
+    const resumeCmd = args.to === "codex" ? `codex resume ${tgtTint(result.sessionId)}` : args.to === "claude" ? `claude --resume ${tgtTint(result.sessionId)}` : `opencode --session ${tgtTint(result.sessionId)}`;
     console.log("");
     console.log(`${source_default.green("\u2713")} Done. Resume with: ${source_default.bold(resumeCmd)}`);
+    console.log(source_default.dim(`  session id: ${tgtTint(result.sessionId)}`));
     if (args["dry-run"]) {
       console.log(source_default.dim(`  (dry-run: not in the real target dir, copy it there to actually resume)`));
     }
@@ -11546,7 +11796,7 @@ var list = defineCommand({
       console.error(source_default.yellow(`No ${rt} sessions found.`));
       return;
     }
-    const ranked = files.map((f3) => ({ f: f3, m: fs8.statSync(f3).mtimeMs })).sort((a2, b2) => b2.m - a2.m).slice(0, 10);
+    const ranked = files.map((f3) => ({ f: f3, m: fs9.statSync(f3).mtimeMs })).sort((a2, b2) => b2.m - a2.m).slice(0, 10);
     for (const { f: f3, m: m2 } of ranked) {
       const id = path9.basename(f3, ".jsonl").replace(/^rollout-[\d\-T]+-/, "");
       const date = new Date(m2).toISOString().slice(0, 16).replace("T", " ");

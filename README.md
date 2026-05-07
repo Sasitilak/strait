@@ -6,18 +6,19 @@ Hit a Claude rate limit mid-task? Want to swap to Codex without losing context? 
 
 **Status:** alpha. Claude ↔ Codex is bidirectional and resume-verified end-to-end. OpenCode is read-only (export only).
 
-## Demo (30s)
-
 ```
-$ strait sync claude codex --latest --dry-run
 strait v0.0.1 — session portability for AI agents
-✔ Found: 5f1e23a6-… (103 messages, 2026-04-28)
+? What do you want to do? Sync Claude → Codex
+? Pick a claude session: 5f1e23a6  2026-04-28 (103 msgs)  # the build plan
+? Where should the translated session be written? Real
 ✔ Translated 103 messages ↦ 44 tool calls
   ⚠ dropped 10 thinking blocks (no Codex equivalent)
-✔ Wrote tmp/dry-run-….jsonl
-
-✓ Done. Resume with: codex resume f2fca69c-…
+ Claude ~~~~~~~~~~~⛵~~~~~~~~~~~ Codex
+✓ Done. Resume command: codex resume f2fca69c-…
+? What now? Run "codex resume f2fca69c-…" now (in /Users/me/proj)
 ```
+
+Or skip the menu and pass flags directly: `strait sync claude codex --latest --dry-run`.
 
 ## Install
 
