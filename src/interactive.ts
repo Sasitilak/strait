@@ -12,6 +12,7 @@ import { writeClaudeSession } from "./emitters/claude.js";
 import { writeOpencodeSession } from "./emitters/opencode.js";
 import { ferry } from "./anim.js";
 import { listAllClaudeSessions, listAllCodexSessions, listAllOpencodeSessions } from "./discover.js";
+import { appendHistory } from "./history.js";
 
 type Runtime = "claude" | "codex" | "opencode";
 
@@ -226,6 +227,18 @@ async function runSync(opts: {
   }
   const targetTint = colorFor(to);
   console.log(chalk.dim(`  wrote ${targetTint(result.outputPath)}`));
+
+  appendHistory({
+    ts: new Date().toISOString(),
+    from,
+    to,
+    srcId: entry.id,
+    tgtId: result.sessionId,
+    messages: parseRes.session.messages.length,
+    toolCalls,
+    dryRun,
+    outputPath: result.outputPath,
+  });
   const resumeCmd =
     to === "codex" ? `codex resume ${targetTint(result.sessionId)}` :
     to === "claude" ? `claude --resume ${targetTint(result.sessionId)}` :

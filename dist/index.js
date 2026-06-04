@@ -116,9 +116,9 @@ function requirePicocolors() {
   hasRequiredPicocolors = 1;
   let p = process || {}, argv2 = p.argv || [], env3 = p.env || {};
   let isColorSupported2 = !(!!env3.NO_COLOR || argv2.includes("--no-color")) && (!!env3.FORCE_COLOR || argv2.includes("--color") || p.platform === "win32" || (p.stdout || {}).isTTY && env3.TERM !== "dumb" || !!env3.CI);
-  let formatter = (open, close, replace = open) => (input) => {
-    let string = "" + input, index = string.indexOf(close, open.length);
-    return ~index ? open + replaceClose2(string, close, replace, index) + close : open + string + close;
+  let formatter = (open2, close, replace = open2) => (input) => {
+    let string = "" + input, index = string.indexOf(close, open2.length);
+    return ~index ? open2 + replaceClose2(string, close, replace, index) + close : open2 + string + close;
   };
   let replaceClose2 = (string, close, replace, index) => {
     let result = "", cursor = 0;
@@ -2446,6 +2446,1739 @@ var require_cli_spinners = __commonJS({
   }
 });
 
+// node_modules/yoctocolors-cjs/index.js
+var require_yoctocolors_cjs = __commonJS({
+  "node_modules/yoctocolors-cjs/index.js"(exports, module) {
+    "use strict";
+    var tty3 = __require("tty");
+    var hasColors = tty3?.WriteStream?.prototype?.hasColors?.() ?? false;
+    var format = (open2, close) => {
+      if (!hasColors) {
+        return (input) => input;
+      }
+      const openCode = `\x1B[${open2}m`;
+      const closeCode = `\x1B[${close}m`;
+      return (input) => {
+        const string = input + "";
+        let index = string.indexOf(closeCode);
+        if (index === -1) {
+          return openCode + string + closeCode;
+        }
+        let result = openCode;
+        let lastIndex = 0;
+        const reopenOnNestedClose = close === 22;
+        const replaceCode = (reopenOnNestedClose ? closeCode : "") + openCode;
+        while (index !== -1) {
+          result += string.slice(lastIndex, index) + replaceCode;
+          lastIndex = index + closeCode.length;
+          index = string.indexOf(closeCode, lastIndex);
+        }
+        result += string.slice(lastIndex) + closeCode;
+        return result;
+      };
+    };
+    var colors5 = {};
+    colors5.reset = format(0, 0);
+    colors5.bold = format(1, 22);
+    colors5.dim = format(2, 22);
+    colors5.italic = format(3, 23);
+    colors5.underline = format(4, 24);
+    colors5.overline = format(53, 55);
+    colors5.inverse = format(7, 27);
+    colors5.hidden = format(8, 28);
+    colors5.strikethrough = format(9, 29);
+    colors5.black = format(30, 39);
+    colors5.red = format(31, 39);
+    colors5.green = format(32, 39);
+    colors5.yellow = format(33, 39);
+    colors5.blue = format(34, 39);
+    colors5.magenta = format(35, 39);
+    colors5.cyan = format(36, 39);
+    colors5.white = format(37, 39);
+    colors5.gray = format(90, 39);
+    colors5.bgBlack = format(40, 49);
+    colors5.bgRed = format(41, 49);
+    colors5.bgGreen = format(42, 49);
+    colors5.bgYellow = format(43, 49);
+    colors5.bgBlue = format(44, 49);
+    colors5.bgMagenta = format(45, 49);
+    colors5.bgCyan = format(46, 49);
+    colors5.bgWhite = format(47, 49);
+    colors5.bgGray = format(100, 49);
+    colors5.redBright = format(91, 39);
+    colors5.greenBright = format(92, 39);
+    colors5.yellowBright = format(93, 39);
+    colors5.blueBright = format(94, 39);
+    colors5.magentaBright = format(95, 39);
+    colors5.cyanBright = format(96, 39);
+    colors5.whiteBright = format(97, 39);
+    colors5.bgRedBright = format(101, 49);
+    colors5.bgGreenBright = format(102, 49);
+    colors5.bgYellowBright = format(103, 49);
+    colors5.bgBlueBright = format(104, 49);
+    colors5.bgMagentaBright = format(105, 49);
+    colors5.bgCyanBright = format(106, 49);
+    colors5.bgWhiteBright = format(107, 49);
+    module.exports = colors5;
+  }
+});
+
+// node_modules/cli-width/index.js
+var require_cli_width = __commonJS({
+  "node_modules/cli-width/index.js"(exports, module) {
+    "use strict";
+    module.exports = cliWidth2;
+    function normalizeOpts(options) {
+      const defaultOpts = {
+        defaultWidth: 0,
+        output: process.stdout,
+        tty: __require("tty")
+      };
+      if (!options) {
+        return defaultOpts;
+      }
+      Object.keys(defaultOpts).forEach(function(key) {
+        if (!options[key]) {
+          options[key] = defaultOpts[key];
+        }
+      });
+      return options;
+    }
+    function cliWidth2(options) {
+      const opts = normalizeOpts(options);
+      if (opts.output.getWindowSize) {
+        return opts.output.getWindowSize()[0] || opts.defaultWidth;
+      }
+      if (opts.tty.getWindowSize) {
+        return opts.tty.getWindowSize()[1] || opts.defaultWidth;
+      }
+      if (opts.output.columns) {
+        return opts.output.columns;
+      }
+      if (process.env.CLI_WIDTH) {
+        const width = parseInt(process.env.CLI_WIDTH, 10);
+        if (!isNaN(width) && width !== 0) {
+          return width;
+        }
+      }
+      return opts.defaultWidth;
+    }
+  }
+});
+
+// node_modules/wrap-ansi/node_modules/ansi-regex/index.js
+var require_ansi_regex = __commonJS({
+  "node_modules/wrap-ansi/node_modules/ansi-regex/index.js"(exports, module) {
+    "use strict";
+    module.exports = ({ onlyFirst = false } = {}) => {
+      const pattern = [
+        "[\\u001B\\u009B][[\\]()#;?]*(?:(?:(?:(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]+)*|[a-zA-Z\\d]+(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]*)*)?\\u0007)",
+        "(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PR-TZcf-ntqry=><~]))"
+      ].join("|");
+      return new RegExp(pattern, onlyFirst ? void 0 : "g");
+    };
+  }
+});
+
+// node_modules/wrap-ansi/node_modules/strip-ansi/index.js
+var require_strip_ansi = __commonJS({
+  "node_modules/wrap-ansi/node_modules/strip-ansi/index.js"(exports, module) {
+    "use strict";
+    var ansiRegex4 = require_ansi_regex();
+    module.exports = (string) => typeof string === "string" ? string.replace(ansiRegex4(), "") : string;
+  }
+});
+
+// node_modules/is-fullwidth-code-point/index.js
+var require_is_fullwidth_code_point = __commonJS({
+  "node_modules/is-fullwidth-code-point/index.js"(exports, module) {
+    "use strict";
+    var isFullwidthCodePoint = (codePoint) => {
+      if (Number.isNaN(codePoint)) {
+        return false;
+      }
+      if (codePoint >= 4352 && (codePoint <= 4447 || // Hangul Jamo
+      codePoint === 9001 || // LEFT-POINTING ANGLE BRACKET
+      codePoint === 9002 || // RIGHT-POINTING ANGLE BRACKET
+      // CJK Radicals Supplement .. Enclosed CJK Letters and Months
+      11904 <= codePoint && codePoint <= 12871 && codePoint !== 12351 || // Enclosed CJK Letters and Months .. CJK Unified Ideographs Extension A
+      12880 <= codePoint && codePoint <= 19903 || // CJK Unified Ideographs .. Yi Radicals
+      19968 <= codePoint && codePoint <= 42182 || // Hangul Jamo Extended-A
+      43360 <= codePoint && codePoint <= 43388 || // Hangul Syllables
+      44032 <= codePoint && codePoint <= 55203 || // CJK Compatibility Ideographs
+      63744 <= codePoint && codePoint <= 64255 || // Vertical Forms
+      65040 <= codePoint && codePoint <= 65049 || // CJK Compatibility Forms .. Small Form Variants
+      65072 <= codePoint && codePoint <= 65131 || // Halfwidth and Fullwidth Forms
+      65281 <= codePoint && codePoint <= 65376 || 65504 <= codePoint && codePoint <= 65510 || // Kana Supplement
+      110592 <= codePoint && codePoint <= 110593 || // Enclosed Ideographic Supplement
+      127488 <= codePoint && codePoint <= 127569 || // CJK Unified Ideographs Extension B .. Tertiary Ideographic Plane
+      131072 <= codePoint && codePoint <= 262141)) {
+        return true;
+      }
+      return false;
+    };
+    module.exports = isFullwidthCodePoint;
+    module.exports.default = isFullwidthCodePoint;
+  }
+});
+
+// node_modules/wrap-ansi/node_modules/emoji-regex/index.js
+var require_emoji_regex = __commonJS({
+  "node_modules/wrap-ansi/node_modules/emoji-regex/index.js"(exports, module) {
+    "use strict";
+    module.exports = function() {
+      return /\uD83C\uDFF4\uDB40\uDC67\uDB40\uDC62(?:\uDB40\uDC65\uDB40\uDC6E\uDB40\uDC67|\uDB40\uDC73\uDB40\uDC63\uDB40\uDC74|\uDB40\uDC77\uDB40\uDC6C\uDB40\uDC73)\uDB40\uDC7F|\uD83D\uDC68(?:\uD83C\uDFFC\u200D(?:\uD83E\uDD1D\u200D\uD83D\uDC68\uD83C\uDFFB|\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFF\u200D(?:\uD83E\uDD1D\u200D\uD83D\uDC68(?:\uD83C[\uDFFB-\uDFFE])|\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFE\u200D(?:\uD83E\uDD1D\u200D\uD83D\uDC68(?:\uD83C[\uDFFB-\uDFFD])|\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFD\u200D(?:\uD83E\uDD1D\u200D\uD83D\uDC68(?:\uD83C[\uDFFB\uDFFC])|\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\u200D(?:\u2764\uFE0F\u200D(?:\uD83D\uDC8B\u200D)?\uD83D\uDC68|(?:\uD83D[\uDC68\uDC69])\u200D(?:\uD83D\uDC66\u200D\uD83D\uDC66|\uD83D\uDC67\u200D(?:\uD83D[\uDC66\uDC67]))|\uD83D\uDC66\u200D\uD83D\uDC66|\uD83D\uDC67\u200D(?:\uD83D[\uDC66\uDC67])|(?:\uD83D[\uDC68\uDC69])\u200D(?:\uD83D[\uDC66\uDC67])|[\u2695\u2696\u2708]\uFE0F|\uD83D[\uDC66\uDC67]|\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|(?:\uD83C\uDFFB\u200D[\u2695\u2696\u2708]|\uD83C\uDFFF\u200D[\u2695\u2696\u2708]|\uD83C\uDFFE\u200D[\u2695\u2696\u2708]|\uD83C\uDFFD\u200D[\u2695\u2696\u2708]|\uD83C\uDFFC\u200D[\u2695\u2696\u2708])\uFE0F|\uD83C\uDFFB\u200D(?:\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C[\uDFFB-\uDFFF])|(?:\uD83E\uDDD1\uD83C\uDFFB\u200D\uD83E\uDD1D\u200D\uD83E\uDDD1|\uD83D\uDC69\uD83C\uDFFC\u200D\uD83E\uDD1D\u200D\uD83D\uDC69)\uD83C\uDFFB|\uD83E\uDDD1(?:\uD83C\uDFFF\u200D\uD83E\uDD1D\u200D\uD83E\uDDD1(?:\uD83C[\uDFFB-\uDFFF])|\u200D\uD83E\uDD1D\u200D\uD83E\uDDD1)|(?:\uD83E\uDDD1\uD83C\uDFFE\u200D\uD83E\uDD1D\u200D\uD83E\uDDD1|\uD83D\uDC69\uD83C\uDFFF\u200D\uD83E\uDD1D\u200D(?:\uD83D[\uDC68\uDC69]))(?:\uD83C[\uDFFB-\uDFFE])|(?:\uD83E\uDDD1\uD83C\uDFFC\u200D\uD83E\uDD1D\u200D\uD83E\uDDD1|\uD83D\uDC69\uD83C\uDFFD\u200D\uD83E\uDD1D\u200D\uD83D\uDC69)(?:\uD83C[\uDFFB\uDFFC])|\uD83D\uDC69(?:\uD83C\uDFFE\u200D(?:\uD83E\uDD1D\u200D\uD83D\uDC68(?:\uD83C[\uDFFB-\uDFFD\uDFFF])|\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFC\u200D(?:\uD83E\uDD1D\u200D\uD83D\uDC68(?:\uD83C[\uDFFB\uDFFD-\uDFFF])|\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFB\u200D(?:\uD83E\uDD1D\u200D\uD83D\uDC68(?:\uD83C[\uDFFC-\uDFFF])|\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFD\u200D(?:\uD83E\uDD1D\u200D\uD83D\uDC68(?:\uD83C[\uDFFB\uDFFC\uDFFE\uDFFF])|\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\u200D(?:\u2764\uFE0F\u200D(?:\uD83D\uDC8B\u200D(?:\uD83D[\uDC68\uDC69])|\uD83D[\uDC68\uDC69])|\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFF\u200D(?:\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD]))|\uD83D\uDC69\u200D\uD83D\uDC69\u200D(?:\uD83D\uDC66\u200D\uD83D\uDC66|\uD83D\uDC67\u200D(?:\uD83D[\uDC66\uDC67]))|(?:\uD83E\uDDD1\uD83C\uDFFD\u200D\uD83E\uDD1D\u200D\uD83E\uDDD1|\uD83D\uDC69\uD83C\uDFFE\u200D\uD83E\uDD1D\u200D\uD83D\uDC69)(?:\uD83C[\uDFFB-\uDFFD])|\uD83D\uDC69\u200D\uD83D\uDC66\u200D\uD83D\uDC66|\uD83D\uDC69\u200D\uD83D\uDC69\u200D(?:\uD83D[\uDC66\uDC67])|(?:\uD83D\uDC41\uFE0F\u200D\uD83D\uDDE8|\uD83D\uDC69(?:\uD83C\uDFFF\u200D[\u2695\u2696\u2708]|\uD83C\uDFFE\u200D[\u2695\u2696\u2708]|\uD83C\uDFFC\u200D[\u2695\u2696\u2708]|\uD83C\uDFFB\u200D[\u2695\u2696\u2708]|\uD83C\uDFFD\u200D[\u2695\u2696\u2708]|\u200D[\u2695\u2696\u2708])|(?:(?:\u26F9|\uD83C[\uDFCB\uDFCC]|\uD83D\uDD75)\uFE0F|\uD83D\uDC6F|\uD83E[\uDD3C\uDDDE\uDDDF])\u200D[\u2640\u2642]|(?:\u26F9|\uD83C[\uDFCB\uDFCC]|\uD83D\uDD75)(?:\uD83C[\uDFFB-\uDFFF])\u200D[\u2640\u2642]|(?:\uD83C[\uDFC3\uDFC4\uDFCA]|\uD83D[\uDC6E\uDC71\uDC73\uDC77\uDC81\uDC82\uDC86\uDC87\uDE45-\uDE47\uDE4B\uDE4D\uDE4E\uDEA3\uDEB4-\uDEB6]|\uD83E[\uDD26\uDD37-\uDD39\uDD3D\uDD3E\uDDB8\uDDB9\uDDCD-\uDDCF\uDDD6-\uDDDD])(?:(?:\uD83C[\uDFFB-\uDFFF])\u200D[\u2640\u2642]|\u200D[\u2640\u2642])|\uD83C\uDFF4\u200D\u2620)\uFE0F|\uD83D\uDC69\u200D\uD83D\uDC67\u200D(?:\uD83D[\uDC66\uDC67])|\uD83C\uDFF3\uFE0F\u200D\uD83C\uDF08|\uD83D\uDC15\u200D\uD83E\uDDBA|\uD83D\uDC69\u200D\uD83D\uDC66|\uD83D\uDC69\u200D\uD83D\uDC67|\uD83C\uDDFD\uD83C\uDDF0|\uD83C\uDDF4\uD83C\uDDF2|\uD83C\uDDF6\uD83C\uDDE6|[#\*0-9]\uFE0F\u20E3|\uD83C\uDDE7(?:\uD83C[\uDDE6\uDDE7\uDDE9-\uDDEF\uDDF1-\uDDF4\uDDF6-\uDDF9\uDDFB\uDDFC\uDDFE\uDDFF])|\uD83C\uDDF9(?:\uD83C[\uDDE6\uDDE8\uDDE9\uDDEB-\uDDED\uDDEF-\uDDF4\uDDF7\uDDF9\uDDFB\uDDFC\uDDFF])|\uD83C\uDDEA(?:\uD83C[\uDDE6\uDDE8\uDDEA\uDDEC\uDDED\uDDF7-\uDDFA])|\uD83E\uDDD1(?:\uD83C[\uDFFB-\uDFFF])|\uD83C\uDDF7(?:\uD83C[\uDDEA\uDDF4\uDDF8\uDDFA\uDDFC])|\uD83D\uDC69(?:\uD83C[\uDFFB-\uDFFF])|\uD83C\uDDF2(?:\uD83C[\uDDE6\uDDE8-\uDDED\uDDF0-\uDDFF])|\uD83C\uDDE6(?:\uD83C[\uDDE8-\uDDEC\uDDEE\uDDF1\uDDF2\uDDF4\uDDF6-\uDDFA\uDDFC\uDDFD\uDDFF])|\uD83C\uDDF0(?:\uD83C[\uDDEA\uDDEC-\uDDEE\uDDF2\uDDF3\uDDF5\uDDF7\uDDFC\uDDFE\uDDFF])|\uD83C\uDDED(?:\uD83C[\uDDF0\uDDF2\uDDF3\uDDF7\uDDF9\uDDFA])|\uD83C\uDDE9(?:\uD83C[\uDDEA\uDDEC\uDDEF\uDDF0\uDDF2\uDDF4\uDDFF])|\uD83C\uDDFE(?:\uD83C[\uDDEA\uDDF9])|\uD83C\uDDEC(?:\uD83C[\uDDE6\uDDE7\uDDE9-\uDDEE\uDDF1-\uDDF3\uDDF5-\uDDFA\uDDFC\uDDFE])|\uD83C\uDDF8(?:\uD83C[\uDDE6-\uDDEA\uDDEC-\uDDF4\uDDF7-\uDDF9\uDDFB\uDDFD-\uDDFF])|\uD83C\uDDEB(?:\uD83C[\uDDEE-\uDDF0\uDDF2\uDDF4\uDDF7])|\uD83C\uDDF5(?:\uD83C[\uDDE6\uDDEA-\uDDED\uDDF0-\uDDF3\uDDF7-\uDDF9\uDDFC\uDDFE])|\uD83C\uDDFB(?:\uD83C[\uDDE6\uDDE8\uDDEA\uDDEC\uDDEE\uDDF3\uDDFA])|\uD83C\uDDF3(?:\uD83C[\uDDE6\uDDE8\uDDEA-\uDDEC\uDDEE\uDDF1\uDDF4\uDDF5\uDDF7\uDDFA\uDDFF])|\uD83C\uDDE8(?:\uD83C[\uDDE6\uDDE8\uDDE9\uDDEB-\uDDEE\uDDF0-\uDDF5\uDDF7\uDDFA-\uDDFF])|\uD83C\uDDF1(?:\uD83C[\uDDE6-\uDDE8\uDDEE\uDDF0\uDDF7-\uDDFB\uDDFE])|\uD83C\uDDFF(?:\uD83C[\uDDE6\uDDF2\uDDFC])|\uD83C\uDDFC(?:\uD83C[\uDDEB\uDDF8])|\uD83C\uDDFA(?:\uD83C[\uDDE6\uDDEC\uDDF2\uDDF3\uDDF8\uDDFE\uDDFF])|\uD83C\uDDEE(?:\uD83C[\uDDE8-\uDDEA\uDDF1-\uDDF4\uDDF6-\uDDF9])|\uD83C\uDDEF(?:\uD83C[\uDDEA\uDDF2\uDDF4\uDDF5])|(?:\uD83C[\uDFC3\uDFC4\uDFCA]|\uD83D[\uDC6E\uDC71\uDC73\uDC77\uDC81\uDC82\uDC86\uDC87\uDE45-\uDE47\uDE4B\uDE4D\uDE4E\uDEA3\uDEB4-\uDEB6]|\uD83E[\uDD26\uDD37-\uDD39\uDD3D\uDD3E\uDDB8\uDDB9\uDDCD-\uDDCF\uDDD6-\uDDDD])(?:\uD83C[\uDFFB-\uDFFF])|(?:\u26F9|\uD83C[\uDFCB\uDFCC]|\uD83D\uDD75)(?:\uD83C[\uDFFB-\uDFFF])|(?:[\u261D\u270A-\u270D]|\uD83C[\uDF85\uDFC2\uDFC7]|\uD83D[\uDC42\uDC43\uDC46-\uDC50\uDC66\uDC67\uDC6B-\uDC6D\uDC70\uDC72\uDC74-\uDC76\uDC78\uDC7C\uDC83\uDC85\uDCAA\uDD74\uDD7A\uDD90\uDD95\uDD96\uDE4C\uDE4F\uDEC0\uDECC]|\uD83E[\uDD0F\uDD18-\uDD1C\uDD1E\uDD1F\uDD30-\uDD36\uDDB5\uDDB6\uDDBB\uDDD2-\uDDD5])(?:\uD83C[\uDFFB-\uDFFF])|(?:[\u231A\u231B\u23E9-\u23EC\u23F0\u23F3\u25FD\u25FE\u2614\u2615\u2648-\u2653\u267F\u2693\u26A1\u26AA\u26AB\u26BD\u26BE\u26C4\u26C5\u26CE\u26D4\u26EA\u26F2\u26F3\u26F5\u26FA\u26FD\u2705\u270A\u270B\u2728\u274C\u274E\u2753-\u2755\u2757\u2795-\u2797\u27B0\u27BF\u2B1B\u2B1C\u2B50\u2B55]|\uD83C[\uDC04\uDCCF\uDD8E\uDD91-\uDD9A\uDDE6-\uDDFF\uDE01\uDE1A\uDE2F\uDE32-\uDE36\uDE38-\uDE3A\uDE50\uDE51\uDF00-\uDF20\uDF2D-\uDF35\uDF37-\uDF7C\uDF7E-\uDF93\uDFA0-\uDFCA\uDFCF-\uDFD3\uDFE0-\uDFF0\uDFF4\uDFF8-\uDFFF]|\uD83D[\uDC00-\uDC3E\uDC40\uDC42-\uDCFC\uDCFF-\uDD3D\uDD4B-\uDD4E\uDD50-\uDD67\uDD7A\uDD95\uDD96\uDDA4\uDDFB-\uDE4F\uDE80-\uDEC5\uDECC\uDED0-\uDED2\uDED5\uDEEB\uDEEC\uDEF4-\uDEFA\uDFE0-\uDFEB]|\uD83E[\uDD0D-\uDD3A\uDD3C-\uDD45\uDD47-\uDD71\uDD73-\uDD76\uDD7A-\uDDA2\uDDA5-\uDDAA\uDDAE-\uDDCA\uDDCD-\uDDFF\uDE70-\uDE73\uDE78-\uDE7A\uDE80-\uDE82\uDE90-\uDE95])|(?:[#\*0-9\xA9\xAE\u203C\u2049\u2122\u2139\u2194-\u2199\u21A9\u21AA\u231A\u231B\u2328\u23CF\u23E9-\u23F3\u23F8-\u23FA\u24C2\u25AA\u25AB\u25B6\u25C0\u25FB-\u25FE\u2600-\u2604\u260E\u2611\u2614\u2615\u2618\u261D\u2620\u2622\u2623\u2626\u262A\u262E\u262F\u2638-\u263A\u2640\u2642\u2648-\u2653\u265F\u2660\u2663\u2665\u2666\u2668\u267B\u267E\u267F\u2692-\u2697\u2699\u269B\u269C\u26A0\u26A1\u26AA\u26AB\u26B0\u26B1\u26BD\u26BE\u26C4\u26C5\u26C8\u26CE\u26CF\u26D1\u26D3\u26D4\u26E9\u26EA\u26F0-\u26F5\u26F7-\u26FA\u26FD\u2702\u2705\u2708-\u270D\u270F\u2712\u2714\u2716\u271D\u2721\u2728\u2733\u2734\u2744\u2747\u274C\u274E\u2753-\u2755\u2757\u2763\u2764\u2795-\u2797\u27A1\u27B0\u27BF\u2934\u2935\u2B05-\u2B07\u2B1B\u2B1C\u2B50\u2B55\u3030\u303D\u3297\u3299]|\uD83C[\uDC04\uDCCF\uDD70\uDD71\uDD7E\uDD7F\uDD8E\uDD91-\uDD9A\uDDE6-\uDDFF\uDE01\uDE02\uDE1A\uDE2F\uDE32-\uDE3A\uDE50\uDE51\uDF00-\uDF21\uDF24-\uDF93\uDF96\uDF97\uDF99-\uDF9B\uDF9E-\uDFF0\uDFF3-\uDFF5\uDFF7-\uDFFF]|\uD83D[\uDC00-\uDCFD\uDCFF-\uDD3D\uDD49-\uDD4E\uDD50-\uDD67\uDD6F\uDD70\uDD73-\uDD7A\uDD87\uDD8A-\uDD8D\uDD90\uDD95\uDD96\uDDA4\uDDA5\uDDA8\uDDB1\uDDB2\uDDBC\uDDC2-\uDDC4\uDDD1-\uDDD3\uDDDC-\uDDDE\uDDE1\uDDE3\uDDE8\uDDEF\uDDF3\uDDFA-\uDE4F\uDE80-\uDEC5\uDECB-\uDED2\uDED5\uDEE0-\uDEE5\uDEE9\uDEEB\uDEEC\uDEF0\uDEF3-\uDEFA\uDFE0-\uDFEB]|\uD83E[\uDD0D-\uDD3A\uDD3C-\uDD45\uDD47-\uDD71\uDD73-\uDD76\uDD7A-\uDDA2\uDDA5-\uDDAA\uDDAE-\uDDCA\uDDCD-\uDDFF\uDE70-\uDE73\uDE78-\uDE7A\uDE80-\uDE82\uDE90-\uDE95])\uFE0F|(?:[\u261D\u26F9\u270A-\u270D]|\uD83C[\uDF85\uDFC2-\uDFC4\uDFC7\uDFCA-\uDFCC]|\uD83D[\uDC42\uDC43\uDC46-\uDC50\uDC66-\uDC78\uDC7C\uDC81-\uDC83\uDC85-\uDC87\uDC8F\uDC91\uDCAA\uDD74\uDD75\uDD7A\uDD90\uDD95\uDD96\uDE45-\uDE47\uDE4B-\uDE4F\uDEA3\uDEB4-\uDEB6\uDEC0\uDECC]|\uD83E[\uDD0F\uDD18-\uDD1F\uDD26\uDD30-\uDD39\uDD3C-\uDD3E\uDDB5\uDDB6\uDDB8\uDDB9\uDDBB\uDDCD-\uDDCF\uDDD1-\uDDDD])/g;
+    };
+  }
+});
+
+// node_modules/wrap-ansi/node_modules/string-width/index.js
+var require_string_width = __commonJS({
+  "node_modules/wrap-ansi/node_modules/string-width/index.js"(exports, module) {
+    "use strict";
+    var stripAnsi5 = require_strip_ansi();
+    var isFullwidthCodePoint = require_is_fullwidth_code_point();
+    var emojiRegex2 = require_emoji_regex();
+    var stringWidth3 = (string) => {
+      if (typeof string !== "string" || string.length === 0) {
+        return 0;
+      }
+      string = stripAnsi5(string);
+      if (string.length === 0) {
+        return 0;
+      }
+      string = string.replace(emojiRegex2(), "  ");
+      let width = 0;
+      for (let i2 = 0; i2 < string.length; i2++) {
+        const code = string.codePointAt(i2);
+        if (code <= 31 || code >= 127 && code <= 159) {
+          continue;
+        }
+        if (code >= 768 && code <= 879) {
+          continue;
+        }
+        if (code > 65535) {
+          i2++;
+        }
+        width += isFullwidthCodePoint(code) ? 2 : 1;
+      }
+      return width;
+    };
+    module.exports = stringWidth3;
+    module.exports.default = stringWidth3;
+  }
+});
+
+// node_modules/color-name/index.js
+var require_color_name = __commonJS({
+  "node_modules/color-name/index.js"(exports, module) {
+    "use strict";
+    module.exports = {
+      "aliceblue": [240, 248, 255],
+      "antiquewhite": [250, 235, 215],
+      "aqua": [0, 255, 255],
+      "aquamarine": [127, 255, 212],
+      "azure": [240, 255, 255],
+      "beige": [245, 245, 220],
+      "bisque": [255, 228, 196],
+      "black": [0, 0, 0],
+      "blanchedalmond": [255, 235, 205],
+      "blue": [0, 0, 255],
+      "blueviolet": [138, 43, 226],
+      "brown": [165, 42, 42],
+      "burlywood": [222, 184, 135],
+      "cadetblue": [95, 158, 160],
+      "chartreuse": [127, 255, 0],
+      "chocolate": [210, 105, 30],
+      "coral": [255, 127, 80],
+      "cornflowerblue": [100, 149, 237],
+      "cornsilk": [255, 248, 220],
+      "crimson": [220, 20, 60],
+      "cyan": [0, 255, 255],
+      "darkblue": [0, 0, 139],
+      "darkcyan": [0, 139, 139],
+      "darkgoldenrod": [184, 134, 11],
+      "darkgray": [169, 169, 169],
+      "darkgreen": [0, 100, 0],
+      "darkgrey": [169, 169, 169],
+      "darkkhaki": [189, 183, 107],
+      "darkmagenta": [139, 0, 139],
+      "darkolivegreen": [85, 107, 47],
+      "darkorange": [255, 140, 0],
+      "darkorchid": [153, 50, 204],
+      "darkred": [139, 0, 0],
+      "darksalmon": [233, 150, 122],
+      "darkseagreen": [143, 188, 143],
+      "darkslateblue": [72, 61, 139],
+      "darkslategray": [47, 79, 79],
+      "darkslategrey": [47, 79, 79],
+      "darkturquoise": [0, 206, 209],
+      "darkviolet": [148, 0, 211],
+      "deeppink": [255, 20, 147],
+      "deepskyblue": [0, 191, 255],
+      "dimgray": [105, 105, 105],
+      "dimgrey": [105, 105, 105],
+      "dodgerblue": [30, 144, 255],
+      "firebrick": [178, 34, 34],
+      "floralwhite": [255, 250, 240],
+      "forestgreen": [34, 139, 34],
+      "fuchsia": [255, 0, 255],
+      "gainsboro": [220, 220, 220],
+      "ghostwhite": [248, 248, 255],
+      "gold": [255, 215, 0],
+      "goldenrod": [218, 165, 32],
+      "gray": [128, 128, 128],
+      "green": [0, 128, 0],
+      "greenyellow": [173, 255, 47],
+      "grey": [128, 128, 128],
+      "honeydew": [240, 255, 240],
+      "hotpink": [255, 105, 180],
+      "indianred": [205, 92, 92],
+      "indigo": [75, 0, 130],
+      "ivory": [255, 255, 240],
+      "khaki": [240, 230, 140],
+      "lavender": [230, 230, 250],
+      "lavenderblush": [255, 240, 245],
+      "lawngreen": [124, 252, 0],
+      "lemonchiffon": [255, 250, 205],
+      "lightblue": [173, 216, 230],
+      "lightcoral": [240, 128, 128],
+      "lightcyan": [224, 255, 255],
+      "lightgoldenrodyellow": [250, 250, 210],
+      "lightgray": [211, 211, 211],
+      "lightgreen": [144, 238, 144],
+      "lightgrey": [211, 211, 211],
+      "lightpink": [255, 182, 193],
+      "lightsalmon": [255, 160, 122],
+      "lightseagreen": [32, 178, 170],
+      "lightskyblue": [135, 206, 250],
+      "lightslategray": [119, 136, 153],
+      "lightslategrey": [119, 136, 153],
+      "lightsteelblue": [176, 196, 222],
+      "lightyellow": [255, 255, 224],
+      "lime": [0, 255, 0],
+      "limegreen": [50, 205, 50],
+      "linen": [250, 240, 230],
+      "magenta": [255, 0, 255],
+      "maroon": [128, 0, 0],
+      "mediumaquamarine": [102, 205, 170],
+      "mediumblue": [0, 0, 205],
+      "mediumorchid": [186, 85, 211],
+      "mediumpurple": [147, 112, 219],
+      "mediumseagreen": [60, 179, 113],
+      "mediumslateblue": [123, 104, 238],
+      "mediumspringgreen": [0, 250, 154],
+      "mediumturquoise": [72, 209, 204],
+      "mediumvioletred": [199, 21, 133],
+      "midnightblue": [25, 25, 112],
+      "mintcream": [245, 255, 250],
+      "mistyrose": [255, 228, 225],
+      "moccasin": [255, 228, 181],
+      "navajowhite": [255, 222, 173],
+      "navy": [0, 0, 128],
+      "oldlace": [253, 245, 230],
+      "olive": [128, 128, 0],
+      "olivedrab": [107, 142, 35],
+      "orange": [255, 165, 0],
+      "orangered": [255, 69, 0],
+      "orchid": [218, 112, 214],
+      "palegoldenrod": [238, 232, 170],
+      "palegreen": [152, 251, 152],
+      "paleturquoise": [175, 238, 238],
+      "palevioletred": [219, 112, 147],
+      "papayawhip": [255, 239, 213],
+      "peachpuff": [255, 218, 185],
+      "peru": [205, 133, 63],
+      "pink": [255, 192, 203],
+      "plum": [221, 160, 221],
+      "powderblue": [176, 224, 230],
+      "purple": [128, 0, 128],
+      "rebeccapurple": [102, 51, 153],
+      "red": [255, 0, 0],
+      "rosybrown": [188, 143, 143],
+      "royalblue": [65, 105, 225],
+      "saddlebrown": [139, 69, 19],
+      "salmon": [250, 128, 114],
+      "sandybrown": [244, 164, 96],
+      "seagreen": [46, 139, 87],
+      "seashell": [255, 245, 238],
+      "sienna": [160, 82, 45],
+      "silver": [192, 192, 192],
+      "skyblue": [135, 206, 235],
+      "slateblue": [106, 90, 205],
+      "slategray": [112, 128, 144],
+      "slategrey": [112, 128, 144],
+      "snow": [255, 250, 250],
+      "springgreen": [0, 255, 127],
+      "steelblue": [70, 130, 180],
+      "tan": [210, 180, 140],
+      "teal": [0, 128, 128],
+      "thistle": [216, 191, 216],
+      "tomato": [255, 99, 71],
+      "turquoise": [64, 224, 208],
+      "violet": [238, 130, 238],
+      "wheat": [245, 222, 179],
+      "white": [255, 255, 255],
+      "whitesmoke": [245, 245, 245],
+      "yellow": [255, 255, 0],
+      "yellowgreen": [154, 205, 50]
+    };
+  }
+});
+
+// node_modules/color-convert/conversions.js
+var require_conversions = __commonJS({
+  "node_modules/color-convert/conversions.js"(exports, module) {
+    "use strict";
+    var cssKeywords = require_color_name();
+    var reverseKeywords = {};
+    for (const key of Object.keys(cssKeywords)) {
+      reverseKeywords[cssKeywords[key]] = key;
+    }
+    var convert = {
+      rgb: { channels: 3, labels: "rgb" },
+      hsl: { channels: 3, labels: "hsl" },
+      hsv: { channels: 3, labels: "hsv" },
+      hwb: { channels: 3, labels: "hwb" },
+      cmyk: { channels: 4, labels: "cmyk" },
+      xyz: { channels: 3, labels: "xyz" },
+      lab: { channels: 3, labels: "lab" },
+      lch: { channels: 3, labels: "lch" },
+      hex: { channels: 1, labels: ["hex"] },
+      keyword: { channels: 1, labels: ["keyword"] },
+      ansi16: { channels: 1, labels: ["ansi16"] },
+      ansi256: { channels: 1, labels: ["ansi256"] },
+      hcg: { channels: 3, labels: ["h", "c", "g"] },
+      apple: { channels: 3, labels: ["r16", "g16", "b16"] },
+      gray: { channels: 1, labels: ["gray"] }
+    };
+    module.exports = convert;
+    for (const model of Object.keys(convert)) {
+      if (!("channels" in convert[model])) {
+        throw new Error("missing channels property: " + model);
+      }
+      if (!("labels" in convert[model])) {
+        throw new Error("missing channel labels property: " + model);
+      }
+      if (convert[model].labels.length !== convert[model].channels) {
+        throw new Error("channel and label counts mismatch: " + model);
+      }
+      const { channels, labels } = convert[model];
+      delete convert[model].channels;
+      delete convert[model].labels;
+      Object.defineProperty(convert[model], "channels", { value: channels });
+      Object.defineProperty(convert[model], "labels", { value: labels });
+    }
+    convert.rgb.hsl = function(rgb) {
+      const r3 = rgb[0] / 255;
+      const g3 = rgb[1] / 255;
+      const b2 = rgb[2] / 255;
+      const min = Math.min(r3, g3, b2);
+      const max = Math.max(r3, g3, b2);
+      const delta = max - min;
+      let h2;
+      let s2;
+      if (max === min) {
+        h2 = 0;
+      } else if (r3 === max) {
+        h2 = (g3 - b2) / delta;
+      } else if (g3 === max) {
+        h2 = 2 + (b2 - r3) / delta;
+      } else if (b2 === max) {
+        h2 = 4 + (r3 - g3) / delta;
+      }
+      h2 = Math.min(h2 * 60, 360);
+      if (h2 < 0) {
+        h2 += 360;
+      }
+      const l2 = (min + max) / 2;
+      if (max === min) {
+        s2 = 0;
+      } else if (l2 <= 0.5) {
+        s2 = delta / (max + min);
+      } else {
+        s2 = delta / (2 - max - min);
+      }
+      return [h2, s2 * 100, l2 * 100];
+    };
+    convert.rgb.hsv = function(rgb) {
+      let rdif;
+      let gdif;
+      let bdif;
+      let h2;
+      let s2;
+      const r3 = rgb[0] / 255;
+      const g3 = rgb[1] / 255;
+      const b2 = rgb[2] / 255;
+      const v2 = Math.max(r3, g3, b2);
+      const diff = v2 - Math.min(r3, g3, b2);
+      const diffc = function(c3) {
+        return (v2 - c3) / 6 / diff + 1 / 2;
+      };
+      if (diff === 0) {
+        h2 = 0;
+        s2 = 0;
+      } else {
+        s2 = diff / v2;
+        rdif = diffc(r3);
+        gdif = diffc(g3);
+        bdif = diffc(b2);
+        if (r3 === v2) {
+          h2 = bdif - gdif;
+        } else if (g3 === v2) {
+          h2 = 1 / 3 + rdif - bdif;
+        } else if (b2 === v2) {
+          h2 = 2 / 3 + gdif - rdif;
+        }
+        if (h2 < 0) {
+          h2 += 1;
+        } else if (h2 > 1) {
+          h2 -= 1;
+        }
+      }
+      return [
+        h2 * 360,
+        s2 * 100,
+        v2 * 100
+      ];
+    };
+    convert.rgb.hwb = function(rgb) {
+      const r3 = rgb[0];
+      const g3 = rgb[1];
+      let b2 = rgb[2];
+      const h2 = convert.rgb.hsl(rgb)[0];
+      const w2 = 1 / 255 * Math.min(r3, Math.min(g3, b2));
+      b2 = 1 - 1 / 255 * Math.max(r3, Math.max(g3, b2));
+      return [h2, w2 * 100, b2 * 100];
+    };
+    convert.rgb.cmyk = function(rgb) {
+      const r3 = rgb[0] / 255;
+      const g3 = rgb[1] / 255;
+      const b2 = rgb[2] / 255;
+      const k2 = Math.min(1 - r3, 1 - g3, 1 - b2);
+      const c3 = (1 - r3 - k2) / (1 - k2) || 0;
+      const m2 = (1 - g3 - k2) / (1 - k2) || 0;
+      const y3 = (1 - b2 - k2) / (1 - k2) || 0;
+      return [c3 * 100, m2 * 100, y3 * 100, k2 * 100];
+    };
+    function comparativeDistance(x2, y3) {
+      return (x2[0] - y3[0]) ** 2 + (x2[1] - y3[1]) ** 2 + (x2[2] - y3[2]) ** 2;
+    }
+    convert.rgb.keyword = function(rgb) {
+      const reversed = reverseKeywords[rgb];
+      if (reversed) {
+        return reversed;
+      }
+      let currentClosestDistance = Infinity;
+      let currentClosestKeyword;
+      for (const keyword of Object.keys(cssKeywords)) {
+        const value = cssKeywords[keyword];
+        const distance = comparativeDistance(rgb, value);
+        if (distance < currentClosestDistance) {
+          currentClosestDistance = distance;
+          currentClosestKeyword = keyword;
+        }
+      }
+      return currentClosestKeyword;
+    };
+    convert.keyword.rgb = function(keyword) {
+      return cssKeywords[keyword];
+    };
+    convert.rgb.xyz = function(rgb) {
+      let r3 = rgb[0] / 255;
+      let g3 = rgb[1] / 255;
+      let b2 = rgb[2] / 255;
+      r3 = r3 > 0.04045 ? ((r3 + 0.055) / 1.055) ** 2.4 : r3 / 12.92;
+      g3 = g3 > 0.04045 ? ((g3 + 0.055) / 1.055) ** 2.4 : g3 / 12.92;
+      b2 = b2 > 0.04045 ? ((b2 + 0.055) / 1.055) ** 2.4 : b2 / 12.92;
+      const x2 = r3 * 0.4124 + g3 * 0.3576 + b2 * 0.1805;
+      const y3 = r3 * 0.2126 + g3 * 0.7152 + b2 * 0.0722;
+      const z2 = r3 * 0.0193 + g3 * 0.1192 + b2 * 0.9505;
+      return [x2 * 100, y3 * 100, z2 * 100];
+    };
+    convert.rgb.lab = function(rgb) {
+      const xyz = convert.rgb.xyz(rgb);
+      let x2 = xyz[0];
+      let y3 = xyz[1];
+      let z2 = xyz[2];
+      x2 /= 95.047;
+      y3 /= 100;
+      z2 /= 108.883;
+      x2 = x2 > 8856e-6 ? x2 ** (1 / 3) : 7.787 * x2 + 16 / 116;
+      y3 = y3 > 8856e-6 ? y3 ** (1 / 3) : 7.787 * y3 + 16 / 116;
+      z2 = z2 > 8856e-6 ? z2 ** (1 / 3) : 7.787 * z2 + 16 / 116;
+      const l2 = 116 * y3 - 16;
+      const a2 = 500 * (x2 - y3);
+      const b2 = 200 * (y3 - z2);
+      return [l2, a2, b2];
+    };
+    convert.hsl.rgb = function(hsl) {
+      const h2 = hsl[0] / 360;
+      const s2 = hsl[1] / 100;
+      const l2 = hsl[2] / 100;
+      let t2;
+      let t3;
+      let val;
+      if (s2 === 0) {
+        val = l2 * 255;
+        return [val, val, val];
+      }
+      if (l2 < 0.5) {
+        t2 = l2 * (1 + s2);
+      } else {
+        t2 = l2 + s2 - l2 * s2;
+      }
+      const t1 = 2 * l2 - t2;
+      const rgb = [0, 0, 0];
+      for (let i2 = 0; i2 < 3; i2++) {
+        t3 = h2 + 1 / 3 * -(i2 - 1);
+        if (t3 < 0) {
+          t3++;
+        }
+        if (t3 > 1) {
+          t3--;
+        }
+        if (6 * t3 < 1) {
+          val = t1 + (t2 - t1) * 6 * t3;
+        } else if (2 * t3 < 1) {
+          val = t2;
+        } else if (3 * t3 < 2) {
+          val = t1 + (t2 - t1) * (2 / 3 - t3) * 6;
+        } else {
+          val = t1;
+        }
+        rgb[i2] = val * 255;
+      }
+      return rgb;
+    };
+    convert.hsl.hsv = function(hsl) {
+      const h2 = hsl[0];
+      let s2 = hsl[1] / 100;
+      let l2 = hsl[2] / 100;
+      let smin = s2;
+      const lmin = Math.max(l2, 0.01);
+      l2 *= 2;
+      s2 *= l2 <= 1 ? l2 : 2 - l2;
+      smin *= lmin <= 1 ? lmin : 2 - lmin;
+      const v2 = (l2 + s2) / 2;
+      const sv = l2 === 0 ? 2 * smin / (lmin + smin) : 2 * s2 / (l2 + s2);
+      return [h2, sv * 100, v2 * 100];
+    };
+    convert.hsv.rgb = function(hsv) {
+      const h2 = hsv[0] / 60;
+      const s2 = hsv[1] / 100;
+      let v2 = hsv[2] / 100;
+      const hi = Math.floor(h2) % 6;
+      const f3 = h2 - Math.floor(h2);
+      const p = 255 * v2 * (1 - s2);
+      const q2 = 255 * v2 * (1 - s2 * f3);
+      const t2 = 255 * v2 * (1 - s2 * (1 - f3));
+      v2 *= 255;
+      switch (hi) {
+        case 0:
+          return [v2, t2, p];
+        case 1:
+          return [q2, v2, p];
+        case 2:
+          return [p, v2, t2];
+        case 3:
+          return [p, q2, v2];
+        case 4:
+          return [t2, p, v2];
+        case 5:
+          return [v2, p, q2];
+      }
+    };
+    convert.hsv.hsl = function(hsv) {
+      const h2 = hsv[0];
+      const s2 = hsv[1] / 100;
+      const v2 = hsv[2] / 100;
+      const vmin = Math.max(v2, 0.01);
+      let sl;
+      let l2;
+      l2 = (2 - s2) * v2;
+      const lmin = (2 - s2) * vmin;
+      sl = s2 * vmin;
+      sl /= lmin <= 1 ? lmin : 2 - lmin;
+      sl = sl || 0;
+      l2 /= 2;
+      return [h2, sl * 100, l2 * 100];
+    };
+    convert.hwb.rgb = function(hwb) {
+      const h2 = hwb[0] / 360;
+      let wh = hwb[1] / 100;
+      let bl = hwb[2] / 100;
+      const ratio = wh + bl;
+      let f3;
+      if (ratio > 1) {
+        wh /= ratio;
+        bl /= ratio;
+      }
+      const i2 = Math.floor(6 * h2);
+      const v2 = 1 - bl;
+      f3 = 6 * h2 - i2;
+      if ((i2 & 1) !== 0) {
+        f3 = 1 - f3;
+      }
+      const n2 = wh + f3 * (v2 - wh);
+      let r3;
+      let g3;
+      let b2;
+      switch (i2) {
+        default:
+        case 6:
+        case 0:
+          r3 = v2;
+          g3 = n2;
+          b2 = wh;
+          break;
+        case 1:
+          r3 = n2;
+          g3 = v2;
+          b2 = wh;
+          break;
+        case 2:
+          r3 = wh;
+          g3 = v2;
+          b2 = n2;
+          break;
+        case 3:
+          r3 = wh;
+          g3 = n2;
+          b2 = v2;
+          break;
+        case 4:
+          r3 = n2;
+          g3 = wh;
+          b2 = v2;
+          break;
+        case 5:
+          r3 = v2;
+          g3 = wh;
+          b2 = n2;
+          break;
+      }
+      return [r3 * 255, g3 * 255, b2 * 255];
+    };
+    convert.cmyk.rgb = function(cmyk) {
+      const c3 = cmyk[0] / 100;
+      const m2 = cmyk[1] / 100;
+      const y3 = cmyk[2] / 100;
+      const k2 = cmyk[3] / 100;
+      const r3 = 1 - Math.min(1, c3 * (1 - k2) + k2);
+      const g3 = 1 - Math.min(1, m2 * (1 - k2) + k2);
+      const b2 = 1 - Math.min(1, y3 * (1 - k2) + k2);
+      return [r3 * 255, g3 * 255, b2 * 255];
+    };
+    convert.xyz.rgb = function(xyz) {
+      const x2 = xyz[0] / 100;
+      const y3 = xyz[1] / 100;
+      const z2 = xyz[2] / 100;
+      let r3;
+      let g3;
+      let b2;
+      r3 = x2 * 3.2406 + y3 * -1.5372 + z2 * -0.4986;
+      g3 = x2 * -0.9689 + y3 * 1.8758 + z2 * 0.0415;
+      b2 = x2 * 0.0557 + y3 * -0.204 + z2 * 1.057;
+      r3 = r3 > 31308e-7 ? 1.055 * r3 ** (1 / 2.4) - 0.055 : r3 * 12.92;
+      g3 = g3 > 31308e-7 ? 1.055 * g3 ** (1 / 2.4) - 0.055 : g3 * 12.92;
+      b2 = b2 > 31308e-7 ? 1.055 * b2 ** (1 / 2.4) - 0.055 : b2 * 12.92;
+      r3 = Math.min(Math.max(0, r3), 1);
+      g3 = Math.min(Math.max(0, g3), 1);
+      b2 = Math.min(Math.max(0, b2), 1);
+      return [r3 * 255, g3 * 255, b2 * 255];
+    };
+    convert.xyz.lab = function(xyz) {
+      let x2 = xyz[0];
+      let y3 = xyz[1];
+      let z2 = xyz[2];
+      x2 /= 95.047;
+      y3 /= 100;
+      z2 /= 108.883;
+      x2 = x2 > 8856e-6 ? x2 ** (1 / 3) : 7.787 * x2 + 16 / 116;
+      y3 = y3 > 8856e-6 ? y3 ** (1 / 3) : 7.787 * y3 + 16 / 116;
+      z2 = z2 > 8856e-6 ? z2 ** (1 / 3) : 7.787 * z2 + 16 / 116;
+      const l2 = 116 * y3 - 16;
+      const a2 = 500 * (x2 - y3);
+      const b2 = 200 * (y3 - z2);
+      return [l2, a2, b2];
+    };
+    convert.lab.xyz = function(lab) {
+      const l2 = lab[0];
+      const a2 = lab[1];
+      const b2 = lab[2];
+      let x2;
+      let y3;
+      let z2;
+      y3 = (l2 + 16) / 116;
+      x2 = a2 / 500 + y3;
+      z2 = y3 - b2 / 200;
+      const y22 = y3 ** 3;
+      const x22 = x2 ** 3;
+      const z22 = z2 ** 3;
+      y3 = y22 > 8856e-6 ? y22 : (y3 - 16 / 116) / 7.787;
+      x2 = x22 > 8856e-6 ? x22 : (x2 - 16 / 116) / 7.787;
+      z2 = z22 > 8856e-6 ? z22 : (z2 - 16 / 116) / 7.787;
+      x2 *= 95.047;
+      y3 *= 100;
+      z2 *= 108.883;
+      return [x2, y3, z2];
+    };
+    convert.lab.lch = function(lab) {
+      const l2 = lab[0];
+      const a2 = lab[1];
+      const b2 = lab[2];
+      let h2;
+      const hr = Math.atan2(b2, a2);
+      h2 = hr * 360 / 2 / Math.PI;
+      if (h2 < 0) {
+        h2 += 360;
+      }
+      const c3 = Math.sqrt(a2 * a2 + b2 * b2);
+      return [l2, c3, h2];
+    };
+    convert.lch.lab = function(lch) {
+      const l2 = lch[0];
+      const c3 = lch[1];
+      const h2 = lch[2];
+      const hr = h2 / 360 * 2 * Math.PI;
+      const a2 = c3 * Math.cos(hr);
+      const b2 = c3 * Math.sin(hr);
+      return [l2, a2, b2];
+    };
+    convert.rgb.ansi16 = function(args, saturation = null) {
+      const [r3, g3, b2] = args;
+      let value = saturation === null ? convert.rgb.hsv(args)[2] : saturation;
+      value = Math.round(value / 50);
+      if (value === 0) {
+        return 30;
+      }
+      let ansi = 30 + (Math.round(b2 / 255) << 2 | Math.round(g3 / 255) << 1 | Math.round(r3 / 255));
+      if (value === 2) {
+        ansi += 60;
+      }
+      return ansi;
+    };
+    convert.hsv.ansi16 = function(args) {
+      return convert.rgb.ansi16(convert.hsv.rgb(args), args[2]);
+    };
+    convert.rgb.ansi256 = function(args) {
+      const r3 = args[0];
+      const g3 = args[1];
+      const b2 = args[2];
+      if (r3 === g3 && g3 === b2) {
+        if (r3 < 8) {
+          return 16;
+        }
+        if (r3 > 248) {
+          return 231;
+        }
+        return Math.round((r3 - 8) / 247 * 24) + 232;
+      }
+      const ansi = 16 + 36 * Math.round(r3 / 255 * 5) + 6 * Math.round(g3 / 255 * 5) + Math.round(b2 / 255 * 5);
+      return ansi;
+    };
+    convert.ansi16.rgb = function(args) {
+      let color = args % 10;
+      if (color === 0 || color === 7) {
+        if (args > 50) {
+          color += 3.5;
+        }
+        color = color / 10.5 * 255;
+        return [color, color, color];
+      }
+      const mult = (~~(args > 50) + 1) * 0.5;
+      const r3 = (color & 1) * mult * 255;
+      const g3 = (color >> 1 & 1) * mult * 255;
+      const b2 = (color >> 2 & 1) * mult * 255;
+      return [r3, g3, b2];
+    };
+    convert.ansi256.rgb = function(args) {
+      if (args >= 232) {
+        const c3 = (args - 232) * 10 + 8;
+        return [c3, c3, c3];
+      }
+      args -= 16;
+      let rem;
+      const r3 = Math.floor(args / 36) / 5 * 255;
+      const g3 = Math.floor((rem = args % 36) / 6) / 5 * 255;
+      const b2 = rem % 6 / 5 * 255;
+      return [r3, g3, b2];
+    };
+    convert.rgb.hex = function(args) {
+      const integer = ((Math.round(args[0]) & 255) << 16) + ((Math.round(args[1]) & 255) << 8) + (Math.round(args[2]) & 255);
+      const string = integer.toString(16).toUpperCase();
+      return "000000".substring(string.length) + string;
+    };
+    convert.hex.rgb = function(args) {
+      const match = args.toString(16).match(/[a-f0-9]{6}|[a-f0-9]{3}/i);
+      if (!match) {
+        return [0, 0, 0];
+      }
+      let colorString = match[0];
+      if (match[0].length === 3) {
+        colorString = colorString.split("").map((char) => {
+          return char + char;
+        }).join("");
+      }
+      const integer = parseInt(colorString, 16);
+      const r3 = integer >> 16 & 255;
+      const g3 = integer >> 8 & 255;
+      const b2 = integer & 255;
+      return [r3, g3, b2];
+    };
+    convert.rgb.hcg = function(rgb) {
+      const r3 = rgb[0] / 255;
+      const g3 = rgb[1] / 255;
+      const b2 = rgb[2] / 255;
+      const max = Math.max(Math.max(r3, g3), b2);
+      const min = Math.min(Math.min(r3, g3), b2);
+      const chroma = max - min;
+      let grayscale;
+      let hue;
+      if (chroma < 1) {
+        grayscale = min / (1 - chroma);
+      } else {
+        grayscale = 0;
+      }
+      if (chroma <= 0) {
+        hue = 0;
+      } else if (max === r3) {
+        hue = (g3 - b2) / chroma % 6;
+      } else if (max === g3) {
+        hue = 2 + (b2 - r3) / chroma;
+      } else {
+        hue = 4 + (r3 - g3) / chroma;
+      }
+      hue /= 6;
+      hue %= 1;
+      return [hue * 360, chroma * 100, grayscale * 100];
+    };
+    convert.hsl.hcg = function(hsl) {
+      const s2 = hsl[1] / 100;
+      const l2 = hsl[2] / 100;
+      const c3 = l2 < 0.5 ? 2 * s2 * l2 : 2 * s2 * (1 - l2);
+      let f3 = 0;
+      if (c3 < 1) {
+        f3 = (l2 - 0.5 * c3) / (1 - c3);
+      }
+      return [hsl[0], c3 * 100, f3 * 100];
+    };
+    convert.hsv.hcg = function(hsv) {
+      const s2 = hsv[1] / 100;
+      const v2 = hsv[2] / 100;
+      const c3 = s2 * v2;
+      let f3 = 0;
+      if (c3 < 1) {
+        f3 = (v2 - c3) / (1 - c3);
+      }
+      return [hsv[0], c3 * 100, f3 * 100];
+    };
+    convert.hcg.rgb = function(hcg) {
+      const h2 = hcg[0] / 360;
+      const c3 = hcg[1] / 100;
+      const g3 = hcg[2] / 100;
+      if (c3 === 0) {
+        return [g3 * 255, g3 * 255, g3 * 255];
+      }
+      const pure = [0, 0, 0];
+      const hi = h2 % 1 * 6;
+      const v2 = hi % 1;
+      const w2 = 1 - v2;
+      let mg = 0;
+      switch (Math.floor(hi)) {
+        case 0:
+          pure[0] = 1;
+          pure[1] = v2;
+          pure[2] = 0;
+          break;
+        case 1:
+          pure[0] = w2;
+          pure[1] = 1;
+          pure[2] = 0;
+          break;
+        case 2:
+          pure[0] = 0;
+          pure[1] = 1;
+          pure[2] = v2;
+          break;
+        case 3:
+          pure[0] = 0;
+          pure[1] = w2;
+          pure[2] = 1;
+          break;
+        case 4:
+          pure[0] = v2;
+          pure[1] = 0;
+          pure[2] = 1;
+          break;
+        default:
+          pure[0] = 1;
+          pure[1] = 0;
+          pure[2] = w2;
+      }
+      mg = (1 - c3) * g3;
+      return [
+        (c3 * pure[0] + mg) * 255,
+        (c3 * pure[1] + mg) * 255,
+        (c3 * pure[2] + mg) * 255
+      ];
+    };
+    convert.hcg.hsv = function(hcg) {
+      const c3 = hcg[1] / 100;
+      const g3 = hcg[2] / 100;
+      const v2 = c3 + g3 * (1 - c3);
+      let f3 = 0;
+      if (v2 > 0) {
+        f3 = c3 / v2;
+      }
+      return [hcg[0], f3 * 100, v2 * 100];
+    };
+    convert.hcg.hsl = function(hcg) {
+      const c3 = hcg[1] / 100;
+      const g3 = hcg[2] / 100;
+      const l2 = g3 * (1 - c3) + 0.5 * c3;
+      let s2 = 0;
+      if (l2 > 0 && l2 < 0.5) {
+        s2 = c3 / (2 * l2);
+      } else if (l2 >= 0.5 && l2 < 1) {
+        s2 = c3 / (2 * (1 - l2));
+      }
+      return [hcg[0], s2 * 100, l2 * 100];
+    };
+    convert.hcg.hwb = function(hcg) {
+      const c3 = hcg[1] / 100;
+      const g3 = hcg[2] / 100;
+      const v2 = c3 + g3 * (1 - c3);
+      return [hcg[0], (v2 - c3) * 100, (1 - v2) * 100];
+    };
+    convert.hwb.hcg = function(hwb) {
+      const w2 = hwb[1] / 100;
+      const b2 = hwb[2] / 100;
+      const v2 = 1 - b2;
+      const c3 = v2 - w2;
+      let g3 = 0;
+      if (c3 < 1) {
+        g3 = (v2 - c3) / (1 - c3);
+      }
+      return [hwb[0], c3 * 100, g3 * 100];
+    };
+    convert.apple.rgb = function(apple) {
+      return [apple[0] / 65535 * 255, apple[1] / 65535 * 255, apple[2] / 65535 * 255];
+    };
+    convert.rgb.apple = function(rgb) {
+      return [rgb[0] / 255 * 65535, rgb[1] / 255 * 65535, rgb[2] / 255 * 65535];
+    };
+    convert.gray.rgb = function(args) {
+      return [args[0] / 100 * 255, args[0] / 100 * 255, args[0] / 100 * 255];
+    };
+    convert.gray.hsl = function(args) {
+      return [0, 0, args[0]];
+    };
+    convert.gray.hsv = convert.gray.hsl;
+    convert.gray.hwb = function(gray) {
+      return [0, 100, gray[0]];
+    };
+    convert.gray.cmyk = function(gray) {
+      return [0, 0, 0, gray[0]];
+    };
+    convert.gray.lab = function(gray) {
+      return [gray[0], 0, 0];
+    };
+    convert.gray.hex = function(gray) {
+      const val = Math.round(gray[0] / 100 * 255) & 255;
+      const integer = (val << 16) + (val << 8) + val;
+      const string = integer.toString(16).toUpperCase();
+      return "000000".substring(string.length) + string;
+    };
+    convert.rgb.gray = function(rgb) {
+      const val = (rgb[0] + rgb[1] + rgb[2]) / 3;
+      return [val / 255 * 100];
+    };
+  }
+});
+
+// node_modules/color-convert/route.js
+var require_route = __commonJS({
+  "node_modules/color-convert/route.js"(exports, module) {
+    "use strict";
+    var conversions = require_conversions();
+    function buildGraph() {
+      const graph = {};
+      const models = Object.keys(conversions);
+      for (let len = models.length, i2 = 0; i2 < len; i2++) {
+        graph[models[i2]] = {
+          // http://jsperf.com/1-vs-infinity
+          // micro-opt, but this is simple.
+          distance: -1,
+          parent: null
+        };
+      }
+      return graph;
+    }
+    function deriveBFS(fromModel) {
+      const graph = buildGraph();
+      const queue2 = [fromModel];
+      graph[fromModel].distance = 0;
+      while (queue2.length) {
+        const current = queue2.pop();
+        const adjacents = Object.keys(conversions[current]);
+        for (let len = adjacents.length, i2 = 0; i2 < len; i2++) {
+          const adjacent = adjacents[i2];
+          const node = graph[adjacent];
+          if (node.distance === -1) {
+            node.distance = graph[current].distance + 1;
+            node.parent = current;
+            queue2.unshift(adjacent);
+          }
+        }
+      }
+      return graph;
+    }
+    function link(from, to) {
+      return function(args) {
+        return to(from(args));
+      };
+    }
+    function wrapConversion(toModel, graph) {
+      const path12 = [graph[toModel].parent, toModel];
+      let fn = conversions[graph[toModel].parent][toModel];
+      let cur = graph[toModel].parent;
+      while (graph[cur].parent) {
+        path12.unshift(graph[cur].parent);
+        fn = link(conversions[graph[cur].parent][cur], fn);
+        cur = graph[cur].parent;
+      }
+      fn.conversion = path12;
+      return fn;
+    }
+    module.exports = function(fromModel) {
+      const graph = deriveBFS(fromModel);
+      const conversion = {};
+      const models = Object.keys(graph);
+      for (let len = models.length, i2 = 0; i2 < len; i2++) {
+        const toModel = models[i2];
+        const node = graph[toModel];
+        if (node.parent === null) {
+          continue;
+        }
+        conversion[toModel] = wrapConversion(toModel, graph);
+      }
+      return conversion;
+    };
+  }
+});
+
+// node_modules/color-convert/index.js
+var require_color_convert = __commonJS({
+  "node_modules/color-convert/index.js"(exports, module) {
+    "use strict";
+    var conversions = require_conversions();
+    var route = require_route();
+    var convert = {};
+    var models = Object.keys(conversions);
+    function wrapRaw(fn) {
+      const wrappedFn = function(...args) {
+        const arg0 = args[0];
+        if (arg0 === void 0 || arg0 === null) {
+          return arg0;
+        }
+        if (arg0.length > 1) {
+          args = arg0;
+        }
+        return fn(args);
+      };
+      if ("conversion" in fn) {
+        wrappedFn.conversion = fn.conversion;
+      }
+      return wrappedFn;
+    }
+    function wrapRounded(fn) {
+      const wrappedFn = function(...args) {
+        const arg0 = args[0];
+        if (arg0 === void 0 || arg0 === null) {
+          return arg0;
+        }
+        if (arg0.length > 1) {
+          args = arg0;
+        }
+        const result = fn(args);
+        if (typeof result === "object") {
+          for (let len = result.length, i2 = 0; i2 < len; i2++) {
+            result[i2] = Math.round(result[i2]);
+          }
+        }
+        return result;
+      };
+      if ("conversion" in fn) {
+        wrappedFn.conversion = fn.conversion;
+      }
+      return wrappedFn;
+    }
+    models.forEach((fromModel) => {
+      convert[fromModel] = {};
+      Object.defineProperty(convert[fromModel], "channels", { value: conversions[fromModel].channels });
+      Object.defineProperty(convert[fromModel], "labels", { value: conversions[fromModel].labels });
+      const routes = route(fromModel);
+      const routeModels = Object.keys(routes);
+      routeModels.forEach((toModel) => {
+        const fn = routes[toModel];
+        convert[fromModel][toModel] = wrapRounded(fn);
+        convert[fromModel][toModel].raw = wrapRaw(fn);
+      });
+    });
+    module.exports = convert;
+  }
+});
+
+// node_modules/ansi-styles/index.js
+var require_ansi_styles = __commonJS({
+  "node_modules/ansi-styles/index.js"(exports, module) {
+    "use strict";
+    var wrapAnsi162 = (fn, offset) => (...args) => {
+      const code = fn(...args);
+      return `\x1B[${code + offset}m`;
+    };
+    var wrapAnsi2562 = (fn, offset) => (...args) => {
+      const code = fn(...args);
+      return `\x1B[${38 + offset};5;${code}m`;
+    };
+    var wrapAnsi16m2 = (fn, offset) => (...args) => {
+      const rgb = fn(...args);
+      return `\x1B[${38 + offset};2;${rgb[0]};${rgb[1]};${rgb[2]}m`;
+    };
+    var ansi2ansi = (n2) => n2;
+    var rgb2rgb = (r3, g3, b2) => [r3, g3, b2];
+    var setLazyProperty = (object, property, get) => {
+      Object.defineProperty(object, property, {
+        get: () => {
+          const value = get();
+          Object.defineProperty(object, property, {
+            value,
+            enumerable: true,
+            configurable: true
+          });
+          return value;
+        },
+        enumerable: true,
+        configurable: true
+      });
+    };
+    var colorConvert;
+    var makeDynamicStyles = (wrap, targetSpace, identity, isBackground) => {
+      if (colorConvert === void 0) {
+        colorConvert = require_color_convert();
+      }
+      const offset = isBackground ? 10 : 0;
+      const styles3 = {};
+      for (const [sourceSpace, suite] of Object.entries(colorConvert)) {
+        const name = sourceSpace === "ansi16" ? "ansi" : sourceSpace;
+        if (sourceSpace === targetSpace) {
+          styles3[name] = wrap(identity, offset);
+        } else if (typeof suite === "object") {
+          styles3[name] = wrap(suite[targetSpace], offset);
+        }
+      }
+      return styles3;
+    };
+    function assembleStyles2() {
+      const codes = /* @__PURE__ */ new Map();
+      const styles3 = {
+        modifier: {
+          reset: [0, 0],
+          // 21 isn't widely supported and 22 does the same thing
+          bold: [1, 22],
+          dim: [2, 22],
+          italic: [3, 23],
+          underline: [4, 24],
+          inverse: [7, 27],
+          hidden: [8, 28],
+          strikethrough: [9, 29]
+        },
+        color: {
+          black: [30, 39],
+          red: [31, 39],
+          green: [32, 39],
+          yellow: [33, 39],
+          blue: [34, 39],
+          magenta: [35, 39],
+          cyan: [36, 39],
+          white: [37, 39],
+          // Bright color
+          blackBright: [90, 39],
+          redBright: [91, 39],
+          greenBright: [92, 39],
+          yellowBright: [93, 39],
+          blueBright: [94, 39],
+          magentaBright: [95, 39],
+          cyanBright: [96, 39],
+          whiteBright: [97, 39]
+        },
+        bgColor: {
+          bgBlack: [40, 49],
+          bgRed: [41, 49],
+          bgGreen: [42, 49],
+          bgYellow: [43, 49],
+          bgBlue: [44, 49],
+          bgMagenta: [45, 49],
+          bgCyan: [46, 49],
+          bgWhite: [47, 49],
+          // Bright color
+          bgBlackBright: [100, 49],
+          bgRedBright: [101, 49],
+          bgGreenBright: [102, 49],
+          bgYellowBright: [103, 49],
+          bgBlueBright: [104, 49],
+          bgMagentaBright: [105, 49],
+          bgCyanBright: [106, 49],
+          bgWhiteBright: [107, 49]
+        }
+      };
+      styles3.color.gray = styles3.color.blackBright;
+      styles3.bgColor.bgGray = styles3.bgColor.bgBlackBright;
+      styles3.color.grey = styles3.color.blackBright;
+      styles3.bgColor.bgGrey = styles3.bgColor.bgBlackBright;
+      for (const [groupName, group] of Object.entries(styles3)) {
+        for (const [styleName, style] of Object.entries(group)) {
+          styles3[styleName] = {
+            open: `\x1B[${style[0]}m`,
+            close: `\x1B[${style[1]}m`
+          };
+          group[styleName] = styles3[styleName];
+          codes.set(style[0], style[1]);
+        }
+        Object.defineProperty(styles3, groupName, {
+          value: group,
+          enumerable: false
+        });
+      }
+      Object.defineProperty(styles3, "codes", {
+        value: codes,
+        enumerable: false
+      });
+      styles3.color.close = "\x1B[39m";
+      styles3.bgColor.close = "\x1B[49m";
+      setLazyProperty(styles3.color, "ansi", () => makeDynamicStyles(wrapAnsi162, "ansi16", ansi2ansi, false));
+      setLazyProperty(styles3.color, "ansi256", () => makeDynamicStyles(wrapAnsi2562, "ansi256", ansi2ansi, false));
+      setLazyProperty(styles3.color, "ansi16m", () => makeDynamicStyles(wrapAnsi16m2, "rgb", rgb2rgb, false));
+      setLazyProperty(styles3.bgColor, "ansi", () => makeDynamicStyles(wrapAnsi162, "ansi16", ansi2ansi, true));
+      setLazyProperty(styles3.bgColor, "ansi256", () => makeDynamicStyles(wrapAnsi2562, "ansi256", ansi2ansi, true));
+      setLazyProperty(styles3.bgColor, "ansi16m", () => makeDynamicStyles(wrapAnsi16m2, "rgb", rgb2rgb, true));
+      return styles3;
+    }
+    Object.defineProperty(module, "exports", {
+      enumerable: true,
+      get: assembleStyles2
+    });
+  }
+});
+
+// node_modules/wrap-ansi/index.js
+var require_wrap_ansi = __commonJS({
+  "node_modules/wrap-ansi/index.js"(exports, module) {
+    "use strict";
+    var stringWidth3 = require_string_width();
+    var stripAnsi5 = require_strip_ansi();
+    var ansiStyles2 = require_ansi_styles();
+    var ESCAPES = /* @__PURE__ */ new Set([
+      "\x1B",
+      "\x9B"
+    ]);
+    var END_CODE = 39;
+    var wrapAnsi2 = (code) => `${ESCAPES.values().next().value}[${code}m`;
+    var wordLengths = (string) => string.split(" ").map((character) => stringWidth3(character));
+    var wrapWord = (rows, word, columns) => {
+      const characters = [...word];
+      let isInsideEscape = false;
+      let visible = stringWidth3(stripAnsi5(rows[rows.length - 1]));
+      for (const [index, character] of characters.entries()) {
+        const characterLength = stringWidth3(character);
+        if (visible + characterLength <= columns) {
+          rows[rows.length - 1] += character;
+        } else {
+          rows.push(character);
+          visible = 0;
+        }
+        if (ESCAPES.has(character)) {
+          isInsideEscape = true;
+        } else if (isInsideEscape && character === "m") {
+          isInsideEscape = false;
+          continue;
+        }
+        if (isInsideEscape) {
+          continue;
+        }
+        visible += characterLength;
+        if (visible === columns && index < characters.length - 1) {
+          rows.push("");
+          visible = 0;
+        }
+      }
+      if (!visible && rows[rows.length - 1].length > 0 && rows.length > 1) {
+        rows[rows.length - 2] += rows.pop();
+      }
+    };
+    var stringVisibleTrimSpacesRight = (str) => {
+      const words = str.split(" ");
+      let last = words.length;
+      while (last > 0) {
+        if (stringWidth3(words[last - 1]) > 0) {
+          break;
+        }
+        last--;
+      }
+      if (last === words.length) {
+        return str;
+      }
+      return words.slice(0, last).join(" ") + words.slice(last).join("");
+    };
+    var exec = (string, columns, options = {}) => {
+      if (options.trim !== false && string.trim() === "") {
+        return "";
+      }
+      let pre = "";
+      let ret = "";
+      let escapeCode;
+      const lengths = wordLengths(string);
+      let rows = [""];
+      for (const [index, word] of string.split(" ").entries()) {
+        if (options.trim !== false) {
+          rows[rows.length - 1] = rows[rows.length - 1].trimLeft();
+        }
+        let rowLength = stringWidth3(rows[rows.length - 1]);
+        if (index !== 0) {
+          if (rowLength >= columns && (options.wordWrap === false || options.trim === false)) {
+            rows.push("");
+            rowLength = 0;
+          }
+          if (rowLength > 0 || options.trim === false) {
+            rows[rows.length - 1] += " ";
+            rowLength++;
+          }
+        }
+        if (options.hard && lengths[index] > columns) {
+          const remainingColumns = columns - rowLength;
+          const breaksStartingThisLine = 1 + Math.floor((lengths[index] - remainingColumns - 1) / columns);
+          const breaksStartingNextLine = Math.floor((lengths[index] - 1) / columns);
+          if (breaksStartingNextLine < breaksStartingThisLine) {
+            rows.push("");
+          }
+          wrapWord(rows, word, columns);
+          continue;
+        }
+        if (rowLength + lengths[index] > columns && rowLength > 0 && lengths[index] > 0) {
+          if (options.wordWrap === false && rowLength < columns) {
+            wrapWord(rows, word, columns);
+            continue;
+          }
+          rows.push("");
+        }
+        if (rowLength + lengths[index] > columns && options.wordWrap === false) {
+          wrapWord(rows, word, columns);
+          continue;
+        }
+        rows[rows.length - 1] += word;
+      }
+      if (options.trim !== false) {
+        rows = rows.map(stringVisibleTrimSpacesRight);
+      }
+      pre = rows.join("\n");
+      for (const [index, character] of [...pre].entries()) {
+        ret += character;
+        if (ESCAPES.has(character)) {
+          const code2 = parseFloat(/\d[^m]*/.exec(pre.slice(index, index + 4)));
+          escapeCode = code2 === END_CODE ? null : code2;
+        }
+        const code = ansiStyles2.codes.get(Number(escapeCode));
+        if (escapeCode && code) {
+          if (pre[index + 1] === "\n") {
+            ret += wrapAnsi2(code);
+          } else if (character === "\n") {
+            ret += wrapAnsi2(escapeCode);
+          }
+        }
+      }
+      return ret;
+    };
+    module.exports = (string, columns, options) => {
+      return String(string).normalize().replace(/\r\n/g, "\n").split("\n").map((line) => exec(line, columns, options)).join("\n");
+    };
+  }
+});
+
+// node_modules/mute-stream/lib/index.js
+var require_lib = __commonJS({
+  "node_modules/mute-stream/lib/index.js"(exports, module) {
+    "use strict";
+    var Stream = __require("stream");
+    var MuteStream2 = class extends Stream {
+      #isTTY = null;
+      constructor(opts = {}) {
+        super(opts);
+        this.writable = this.readable = true;
+        this.muted = false;
+        this.on("pipe", this._onpipe);
+        this.replace = opts.replace;
+        this._prompt = opts.prompt || null;
+        this._hadControl = false;
+      }
+      #destSrc(key, def) {
+        if (this._dest) {
+          return this._dest[key];
+        }
+        if (this._src) {
+          return this._src[key];
+        }
+        return def;
+      }
+      #proxy(method, ...args) {
+        if (typeof this._dest?.[method] === "function") {
+          this._dest[method](...args);
+        }
+        if (typeof this._src?.[method] === "function") {
+          this._src[method](...args);
+        }
+      }
+      get isTTY() {
+        if (this.#isTTY !== null) {
+          return this.#isTTY;
+        }
+        return this.#destSrc("isTTY", false);
+      }
+      // basically just get replace the getter/setter with a regular value
+      set isTTY(val) {
+        this.#isTTY = val;
+      }
+      get rows() {
+        return this.#destSrc("rows");
+      }
+      get columns() {
+        return this.#destSrc("columns");
+      }
+      mute() {
+        this.muted = true;
+      }
+      unmute() {
+        this.muted = false;
+      }
+      _onpipe(src2) {
+        this._src = src2;
+      }
+      pipe(dest, options) {
+        this._dest = dest;
+        return super.pipe(dest, options);
+      }
+      pause() {
+        if (this._src) {
+          return this._src.pause();
+        }
+      }
+      resume() {
+        if (this._src) {
+          return this._src.resume();
+        }
+      }
+      write(c3) {
+        if (this.muted) {
+          if (!this.replace) {
+            return true;
+          }
+          if (c3.match(/^\u001b/)) {
+            if (c3.indexOf(this._prompt) === 0) {
+              c3 = c3.slice(this._prompt.length);
+              c3 = c3.replace(/./g, this.replace);
+              c3 = this._prompt + c3;
+            }
+            this._hadControl = true;
+            return this.emit("data", c3);
+          } else {
+            if (this._prompt && this._hadControl && c3.indexOf(this._prompt) === 0) {
+              this._hadControl = false;
+              this.emit("data", this._prompt);
+              c3 = c3.slice(this._prompt.length);
+            }
+            c3 = c3.toString().replace(/./g, this.replace);
+          }
+        }
+        this.emit("data", c3);
+      }
+      end(c3) {
+        if (this.muted) {
+          if (c3 && this.replace) {
+            c3 = c3.toString().replace(/./g, this.replace);
+          } else {
+            c3 = null;
+          }
+        }
+        if (c3) {
+          this.emit("data", c3);
+        }
+        this.emit("end");
+      }
+      destroy(...args) {
+        return this.#proxy("destroy", ...args);
+      }
+      destroySoon(...args) {
+        return this.#proxy("destroySoon", ...args);
+      }
+      close(...args) {
+        return this.#proxy("close", ...args);
+      }
+    };
+    module.exports = MuteStream2;
+  }
+});
+
+// node_modules/@inquirer/core/node_modules/ansi-regex/index.js
+var require_ansi_regex2 = __commonJS({
+  "node_modules/@inquirer/core/node_modules/ansi-regex/index.js"(exports, module) {
+    "use strict";
+    module.exports = ({ onlyFirst = false } = {}) => {
+      const pattern = [
+        "[\\u001B\\u009B][[\\]()#;?]*(?:(?:(?:(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]+)*|[a-zA-Z\\d]+(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]*)*)?\\u0007)",
+        "(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PR-TZcf-ntqry=><~]))"
+      ].join("|");
+      return new RegExp(pattern, onlyFirst ? void 0 : "g");
+    };
+  }
+});
+
+// node_modules/@inquirer/core/node_modules/strip-ansi/index.js
+var require_strip_ansi2 = __commonJS({
+  "node_modules/@inquirer/core/node_modules/strip-ansi/index.js"(exports, module) {
+    "use strict";
+    var ansiRegex4 = require_ansi_regex2();
+    module.exports = (string) => typeof string === "string" ? string.replace(ansiRegex4(), "") : string;
+  }
+});
+
+// node_modules/ansi-escapes/index.js
+var require_ansi_escapes = __commonJS({
+  "node_modules/ansi-escapes/index.js"(exports, module) {
+    "use strict";
+    var ansiEscapes3 = module.exports;
+    module.exports.default = ansiEscapes3;
+    var ESC = "\x1B[";
+    var OSC = "\x1B]";
+    var BEL = "\x07";
+    var SEP = ";";
+    var isTerminalApp = process.env.TERM_PROGRAM === "Apple_Terminal";
+    ansiEscapes3.cursorTo = (x2, y3) => {
+      if (typeof x2 !== "number") {
+        throw new TypeError("The `x` argument is required");
+      }
+      if (typeof y3 !== "number") {
+        return ESC + (x2 + 1) + "G";
+      }
+      return ESC + (y3 + 1) + ";" + (x2 + 1) + "H";
+    };
+    ansiEscapes3.cursorMove = (x2, y3) => {
+      if (typeof x2 !== "number") {
+        throw new TypeError("The `x` argument is required");
+      }
+      let ret = "";
+      if (x2 < 0) {
+        ret += ESC + -x2 + "D";
+      } else if (x2 > 0) {
+        ret += ESC + x2 + "C";
+      }
+      if (y3 < 0) {
+        ret += ESC + -y3 + "A";
+      } else if (y3 > 0) {
+        ret += ESC + y3 + "B";
+      }
+      return ret;
+    };
+    ansiEscapes3.cursorUp = (count = 1) => ESC + count + "A";
+    ansiEscapes3.cursorDown = (count = 1) => ESC + count + "B";
+    ansiEscapes3.cursorForward = (count = 1) => ESC + count + "C";
+    ansiEscapes3.cursorBackward = (count = 1) => ESC + count + "D";
+    ansiEscapes3.cursorLeft = ESC + "G";
+    ansiEscapes3.cursorSavePosition = isTerminalApp ? "\x1B7" : ESC + "s";
+    ansiEscapes3.cursorRestorePosition = isTerminalApp ? "\x1B8" : ESC + "u";
+    ansiEscapes3.cursorGetPosition = ESC + "6n";
+    ansiEscapes3.cursorNextLine = ESC + "E";
+    ansiEscapes3.cursorPrevLine = ESC + "F";
+    ansiEscapes3.cursorHide = ESC + "?25l";
+    ansiEscapes3.cursorShow = ESC + "?25h";
+    ansiEscapes3.eraseLines = (count) => {
+      let clear = "";
+      for (let i2 = 0; i2 < count; i2++) {
+        clear += ansiEscapes3.eraseLine + (i2 < count - 1 ? ansiEscapes3.cursorUp() : "");
+      }
+      if (count) {
+        clear += ansiEscapes3.cursorLeft;
+      }
+      return clear;
+    };
+    ansiEscapes3.eraseEndLine = ESC + "K";
+    ansiEscapes3.eraseStartLine = ESC + "1K";
+    ansiEscapes3.eraseLine = ESC + "2K";
+    ansiEscapes3.eraseDown = ESC + "J";
+    ansiEscapes3.eraseUp = ESC + "1J";
+    ansiEscapes3.eraseScreen = ESC + "2J";
+    ansiEscapes3.scrollUp = ESC + "S";
+    ansiEscapes3.scrollDown = ESC + "T";
+    ansiEscapes3.clearScreen = "\x1Bc";
+    ansiEscapes3.clearTerminal = process.platform === "win32" ? `${ansiEscapes3.eraseScreen}${ESC}0f` : (
+      // 1. Erases the screen (Only done in case `2` is not supported)
+      // 2. Erases the whole screen including scrollback buffer
+      // 3. Moves cursor to the top-left position
+      // More info: https://www.real-world-systems.com/docs/ANSIcode.html
+      `${ansiEscapes3.eraseScreen}${ESC}3J${ESC}H`
+    );
+    ansiEscapes3.beep = BEL;
+    ansiEscapes3.link = (text, url) => {
+      return [
+        OSC,
+        "8",
+        SEP,
+        SEP,
+        url,
+        BEL,
+        text,
+        OSC,
+        "8",
+        SEP,
+        SEP,
+        BEL
+      ].join("");
+    };
+    ansiEscapes3.image = (buffer, options = {}) => {
+      let ret = `${OSC}1337;File=inline=1`;
+      if (options.width) {
+        ret += `;width=${options.width}`;
+      }
+      if (options.height) {
+        ret += `;height=${options.height}`;
+      }
+      if (options.preserveAspectRatio === false) {
+        ret += ";preserveAspectRatio=0";
+      }
+      return ret + ":" + buffer.toString("base64") + BEL;
+    };
+    ansiEscapes3.iTerm = {
+      setCwd: (cwd = process.cwd()) => `${OSC}50;CurrentDir=${cwd}${BEL}`,
+      annotation: (message, options = {}) => {
+        let ret = `${OSC}1337;`;
+        const hasX = typeof options.x !== "undefined";
+        const hasY = typeof options.y !== "undefined";
+        if ((hasX || hasY) && !(hasX && hasY && typeof options.length !== "undefined")) {
+          throw new Error("`x`, `y` and `length` must be defined when `x` or `y` is defined");
+        }
+        message = message.replace(/\|/g, "");
+        ret += options.isHidden ? "AddHiddenAnnotation=" : "AddAnnotation=";
+        if (options.length > 0) {
+          ret += (hasX ? [message, options.length, options.x, options.y] : [options.length, message]).join("|");
+        } else {
+          ret += message;
+        }
+        return ret + BEL;
+      }
+    };
+  }
+});
+
 // node_modules/sql.js/dist/sql-wasm.js
 var require_sql_wasm = __commonJS({
   "node_modules/sql.js/dist/sql-wasm.js"(exports, module) {
@@ -2979,15 +4712,15 @@ var require_sql_wasm = __commonJS({
         "undefined" != typeof __filename ? ya = __filename : ba && (ya = self.location.href);
         var za = "", Aa, Ba;
         if (ca) {
-          var fs10 = __require("fs");
+          var fs12 = __require("fs");
           za = __dirname + "/";
           Ba = (a2) => {
             a2 = Ca(a2) ? new URL(a2) : a2;
-            return fs10.readFileSync(a2);
+            return fs12.readFileSync(a2);
           };
           Aa = async (a2) => {
             a2 = Ca(a2) ? new URL(a2) : a2;
-            return fs10.readFileSync(a2, void 0);
+            return fs12.readFileSync(a2, void 0);
           };
           1 < process.argv.length && (wa = process.argv[1].replace(/\\/g, "/"));
           process.argv.slice(2);
@@ -3269,7 +5002,7 @@ var require_sql_wasm = __commonJS({
               if (ca) {
                 var b2 = Buffer.alloc(256), c3 = 0, d2 = process.stdin.fd;
                 try {
-                  c3 = fs10.readSync(d2, b2, 0, 256);
+                  c3 = fs12.readSync(d2, b2, 0, 256);
                 } catch (e2) {
                   if (e2.toString().includes("EOF")) c3 = 0;
                   else throw e2;
@@ -4590,1739 +6323,6 @@ var require_sql_wasm = __commonJS({
   }
 });
 
-// node_modules/yoctocolors-cjs/index.js
-var require_yoctocolors_cjs = __commonJS({
-  "node_modules/yoctocolors-cjs/index.js"(exports, module) {
-    "use strict";
-    var tty3 = __require("tty");
-    var hasColors = tty3?.WriteStream?.prototype?.hasColors?.() ?? false;
-    var format = (open, close) => {
-      if (!hasColors) {
-        return (input) => input;
-      }
-      const openCode = `\x1B[${open}m`;
-      const closeCode = `\x1B[${close}m`;
-      return (input) => {
-        const string = input + "";
-        let index = string.indexOf(closeCode);
-        if (index === -1) {
-          return openCode + string + closeCode;
-        }
-        let result = openCode;
-        let lastIndex = 0;
-        const reopenOnNestedClose = close === 22;
-        const replaceCode = (reopenOnNestedClose ? closeCode : "") + openCode;
-        while (index !== -1) {
-          result += string.slice(lastIndex, index) + replaceCode;
-          lastIndex = index + closeCode.length;
-          index = string.indexOf(closeCode, lastIndex);
-        }
-        result += string.slice(lastIndex) + closeCode;
-        return result;
-      };
-    };
-    var colors5 = {};
-    colors5.reset = format(0, 0);
-    colors5.bold = format(1, 22);
-    colors5.dim = format(2, 22);
-    colors5.italic = format(3, 23);
-    colors5.underline = format(4, 24);
-    colors5.overline = format(53, 55);
-    colors5.inverse = format(7, 27);
-    colors5.hidden = format(8, 28);
-    colors5.strikethrough = format(9, 29);
-    colors5.black = format(30, 39);
-    colors5.red = format(31, 39);
-    colors5.green = format(32, 39);
-    colors5.yellow = format(33, 39);
-    colors5.blue = format(34, 39);
-    colors5.magenta = format(35, 39);
-    colors5.cyan = format(36, 39);
-    colors5.white = format(37, 39);
-    colors5.gray = format(90, 39);
-    colors5.bgBlack = format(40, 49);
-    colors5.bgRed = format(41, 49);
-    colors5.bgGreen = format(42, 49);
-    colors5.bgYellow = format(43, 49);
-    colors5.bgBlue = format(44, 49);
-    colors5.bgMagenta = format(45, 49);
-    colors5.bgCyan = format(46, 49);
-    colors5.bgWhite = format(47, 49);
-    colors5.bgGray = format(100, 49);
-    colors5.redBright = format(91, 39);
-    colors5.greenBright = format(92, 39);
-    colors5.yellowBright = format(93, 39);
-    colors5.blueBright = format(94, 39);
-    colors5.magentaBright = format(95, 39);
-    colors5.cyanBright = format(96, 39);
-    colors5.whiteBright = format(97, 39);
-    colors5.bgRedBright = format(101, 49);
-    colors5.bgGreenBright = format(102, 49);
-    colors5.bgYellowBright = format(103, 49);
-    colors5.bgBlueBright = format(104, 49);
-    colors5.bgMagentaBright = format(105, 49);
-    colors5.bgCyanBright = format(106, 49);
-    colors5.bgWhiteBright = format(107, 49);
-    module.exports = colors5;
-  }
-});
-
-// node_modules/cli-width/index.js
-var require_cli_width = __commonJS({
-  "node_modules/cli-width/index.js"(exports, module) {
-    "use strict";
-    module.exports = cliWidth2;
-    function normalizeOpts(options) {
-      const defaultOpts = {
-        defaultWidth: 0,
-        output: process.stdout,
-        tty: __require("tty")
-      };
-      if (!options) {
-        return defaultOpts;
-      }
-      Object.keys(defaultOpts).forEach(function(key) {
-        if (!options[key]) {
-          options[key] = defaultOpts[key];
-        }
-      });
-      return options;
-    }
-    function cliWidth2(options) {
-      const opts = normalizeOpts(options);
-      if (opts.output.getWindowSize) {
-        return opts.output.getWindowSize()[0] || opts.defaultWidth;
-      }
-      if (opts.tty.getWindowSize) {
-        return opts.tty.getWindowSize()[1] || opts.defaultWidth;
-      }
-      if (opts.output.columns) {
-        return opts.output.columns;
-      }
-      if (process.env.CLI_WIDTH) {
-        const width = parseInt(process.env.CLI_WIDTH, 10);
-        if (!isNaN(width) && width !== 0) {
-          return width;
-        }
-      }
-      return opts.defaultWidth;
-    }
-  }
-});
-
-// node_modules/wrap-ansi/node_modules/ansi-regex/index.js
-var require_ansi_regex = __commonJS({
-  "node_modules/wrap-ansi/node_modules/ansi-regex/index.js"(exports, module) {
-    "use strict";
-    module.exports = ({ onlyFirst = false } = {}) => {
-      const pattern = [
-        "[\\u001B\\u009B][[\\]()#;?]*(?:(?:(?:(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]+)*|[a-zA-Z\\d]+(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]*)*)?\\u0007)",
-        "(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PR-TZcf-ntqry=><~]))"
-      ].join("|");
-      return new RegExp(pattern, onlyFirst ? void 0 : "g");
-    };
-  }
-});
-
-// node_modules/wrap-ansi/node_modules/strip-ansi/index.js
-var require_strip_ansi = __commonJS({
-  "node_modules/wrap-ansi/node_modules/strip-ansi/index.js"(exports, module) {
-    "use strict";
-    var ansiRegex4 = require_ansi_regex();
-    module.exports = (string) => typeof string === "string" ? string.replace(ansiRegex4(), "") : string;
-  }
-});
-
-// node_modules/is-fullwidth-code-point/index.js
-var require_is_fullwidth_code_point = __commonJS({
-  "node_modules/is-fullwidth-code-point/index.js"(exports, module) {
-    "use strict";
-    var isFullwidthCodePoint = (codePoint) => {
-      if (Number.isNaN(codePoint)) {
-        return false;
-      }
-      if (codePoint >= 4352 && (codePoint <= 4447 || // Hangul Jamo
-      codePoint === 9001 || // LEFT-POINTING ANGLE BRACKET
-      codePoint === 9002 || // RIGHT-POINTING ANGLE BRACKET
-      // CJK Radicals Supplement .. Enclosed CJK Letters and Months
-      11904 <= codePoint && codePoint <= 12871 && codePoint !== 12351 || // Enclosed CJK Letters and Months .. CJK Unified Ideographs Extension A
-      12880 <= codePoint && codePoint <= 19903 || // CJK Unified Ideographs .. Yi Radicals
-      19968 <= codePoint && codePoint <= 42182 || // Hangul Jamo Extended-A
-      43360 <= codePoint && codePoint <= 43388 || // Hangul Syllables
-      44032 <= codePoint && codePoint <= 55203 || // CJK Compatibility Ideographs
-      63744 <= codePoint && codePoint <= 64255 || // Vertical Forms
-      65040 <= codePoint && codePoint <= 65049 || // CJK Compatibility Forms .. Small Form Variants
-      65072 <= codePoint && codePoint <= 65131 || // Halfwidth and Fullwidth Forms
-      65281 <= codePoint && codePoint <= 65376 || 65504 <= codePoint && codePoint <= 65510 || // Kana Supplement
-      110592 <= codePoint && codePoint <= 110593 || // Enclosed Ideographic Supplement
-      127488 <= codePoint && codePoint <= 127569 || // CJK Unified Ideographs Extension B .. Tertiary Ideographic Plane
-      131072 <= codePoint && codePoint <= 262141)) {
-        return true;
-      }
-      return false;
-    };
-    module.exports = isFullwidthCodePoint;
-    module.exports.default = isFullwidthCodePoint;
-  }
-});
-
-// node_modules/wrap-ansi/node_modules/emoji-regex/index.js
-var require_emoji_regex = __commonJS({
-  "node_modules/wrap-ansi/node_modules/emoji-regex/index.js"(exports, module) {
-    "use strict";
-    module.exports = function() {
-      return /\uD83C\uDFF4\uDB40\uDC67\uDB40\uDC62(?:\uDB40\uDC65\uDB40\uDC6E\uDB40\uDC67|\uDB40\uDC73\uDB40\uDC63\uDB40\uDC74|\uDB40\uDC77\uDB40\uDC6C\uDB40\uDC73)\uDB40\uDC7F|\uD83D\uDC68(?:\uD83C\uDFFC\u200D(?:\uD83E\uDD1D\u200D\uD83D\uDC68\uD83C\uDFFB|\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFF\u200D(?:\uD83E\uDD1D\u200D\uD83D\uDC68(?:\uD83C[\uDFFB-\uDFFE])|\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFE\u200D(?:\uD83E\uDD1D\u200D\uD83D\uDC68(?:\uD83C[\uDFFB-\uDFFD])|\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFD\u200D(?:\uD83E\uDD1D\u200D\uD83D\uDC68(?:\uD83C[\uDFFB\uDFFC])|\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\u200D(?:\u2764\uFE0F\u200D(?:\uD83D\uDC8B\u200D)?\uD83D\uDC68|(?:\uD83D[\uDC68\uDC69])\u200D(?:\uD83D\uDC66\u200D\uD83D\uDC66|\uD83D\uDC67\u200D(?:\uD83D[\uDC66\uDC67]))|\uD83D\uDC66\u200D\uD83D\uDC66|\uD83D\uDC67\u200D(?:\uD83D[\uDC66\uDC67])|(?:\uD83D[\uDC68\uDC69])\u200D(?:\uD83D[\uDC66\uDC67])|[\u2695\u2696\u2708]\uFE0F|\uD83D[\uDC66\uDC67]|\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|(?:\uD83C\uDFFB\u200D[\u2695\u2696\u2708]|\uD83C\uDFFF\u200D[\u2695\u2696\u2708]|\uD83C\uDFFE\u200D[\u2695\u2696\u2708]|\uD83C\uDFFD\u200D[\u2695\u2696\u2708]|\uD83C\uDFFC\u200D[\u2695\u2696\u2708])\uFE0F|\uD83C\uDFFB\u200D(?:\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C[\uDFFB-\uDFFF])|(?:\uD83E\uDDD1\uD83C\uDFFB\u200D\uD83E\uDD1D\u200D\uD83E\uDDD1|\uD83D\uDC69\uD83C\uDFFC\u200D\uD83E\uDD1D\u200D\uD83D\uDC69)\uD83C\uDFFB|\uD83E\uDDD1(?:\uD83C\uDFFF\u200D\uD83E\uDD1D\u200D\uD83E\uDDD1(?:\uD83C[\uDFFB-\uDFFF])|\u200D\uD83E\uDD1D\u200D\uD83E\uDDD1)|(?:\uD83E\uDDD1\uD83C\uDFFE\u200D\uD83E\uDD1D\u200D\uD83E\uDDD1|\uD83D\uDC69\uD83C\uDFFF\u200D\uD83E\uDD1D\u200D(?:\uD83D[\uDC68\uDC69]))(?:\uD83C[\uDFFB-\uDFFE])|(?:\uD83E\uDDD1\uD83C\uDFFC\u200D\uD83E\uDD1D\u200D\uD83E\uDDD1|\uD83D\uDC69\uD83C\uDFFD\u200D\uD83E\uDD1D\u200D\uD83D\uDC69)(?:\uD83C[\uDFFB\uDFFC])|\uD83D\uDC69(?:\uD83C\uDFFE\u200D(?:\uD83E\uDD1D\u200D\uD83D\uDC68(?:\uD83C[\uDFFB-\uDFFD\uDFFF])|\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFC\u200D(?:\uD83E\uDD1D\u200D\uD83D\uDC68(?:\uD83C[\uDFFB\uDFFD-\uDFFF])|\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFB\u200D(?:\uD83E\uDD1D\u200D\uD83D\uDC68(?:\uD83C[\uDFFC-\uDFFF])|\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFD\u200D(?:\uD83E\uDD1D\u200D\uD83D\uDC68(?:\uD83C[\uDFFB\uDFFC\uDFFE\uDFFF])|\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\u200D(?:\u2764\uFE0F\u200D(?:\uD83D\uDC8B\u200D(?:\uD83D[\uDC68\uDC69])|\uD83D[\uDC68\uDC69])|\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFF\u200D(?:\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD]))|\uD83D\uDC69\u200D\uD83D\uDC69\u200D(?:\uD83D\uDC66\u200D\uD83D\uDC66|\uD83D\uDC67\u200D(?:\uD83D[\uDC66\uDC67]))|(?:\uD83E\uDDD1\uD83C\uDFFD\u200D\uD83E\uDD1D\u200D\uD83E\uDDD1|\uD83D\uDC69\uD83C\uDFFE\u200D\uD83E\uDD1D\u200D\uD83D\uDC69)(?:\uD83C[\uDFFB-\uDFFD])|\uD83D\uDC69\u200D\uD83D\uDC66\u200D\uD83D\uDC66|\uD83D\uDC69\u200D\uD83D\uDC69\u200D(?:\uD83D[\uDC66\uDC67])|(?:\uD83D\uDC41\uFE0F\u200D\uD83D\uDDE8|\uD83D\uDC69(?:\uD83C\uDFFF\u200D[\u2695\u2696\u2708]|\uD83C\uDFFE\u200D[\u2695\u2696\u2708]|\uD83C\uDFFC\u200D[\u2695\u2696\u2708]|\uD83C\uDFFB\u200D[\u2695\u2696\u2708]|\uD83C\uDFFD\u200D[\u2695\u2696\u2708]|\u200D[\u2695\u2696\u2708])|(?:(?:\u26F9|\uD83C[\uDFCB\uDFCC]|\uD83D\uDD75)\uFE0F|\uD83D\uDC6F|\uD83E[\uDD3C\uDDDE\uDDDF])\u200D[\u2640\u2642]|(?:\u26F9|\uD83C[\uDFCB\uDFCC]|\uD83D\uDD75)(?:\uD83C[\uDFFB-\uDFFF])\u200D[\u2640\u2642]|(?:\uD83C[\uDFC3\uDFC4\uDFCA]|\uD83D[\uDC6E\uDC71\uDC73\uDC77\uDC81\uDC82\uDC86\uDC87\uDE45-\uDE47\uDE4B\uDE4D\uDE4E\uDEA3\uDEB4-\uDEB6]|\uD83E[\uDD26\uDD37-\uDD39\uDD3D\uDD3E\uDDB8\uDDB9\uDDCD-\uDDCF\uDDD6-\uDDDD])(?:(?:\uD83C[\uDFFB-\uDFFF])\u200D[\u2640\u2642]|\u200D[\u2640\u2642])|\uD83C\uDFF4\u200D\u2620)\uFE0F|\uD83D\uDC69\u200D\uD83D\uDC67\u200D(?:\uD83D[\uDC66\uDC67])|\uD83C\uDFF3\uFE0F\u200D\uD83C\uDF08|\uD83D\uDC15\u200D\uD83E\uDDBA|\uD83D\uDC69\u200D\uD83D\uDC66|\uD83D\uDC69\u200D\uD83D\uDC67|\uD83C\uDDFD\uD83C\uDDF0|\uD83C\uDDF4\uD83C\uDDF2|\uD83C\uDDF6\uD83C\uDDE6|[#\*0-9]\uFE0F\u20E3|\uD83C\uDDE7(?:\uD83C[\uDDE6\uDDE7\uDDE9-\uDDEF\uDDF1-\uDDF4\uDDF6-\uDDF9\uDDFB\uDDFC\uDDFE\uDDFF])|\uD83C\uDDF9(?:\uD83C[\uDDE6\uDDE8\uDDE9\uDDEB-\uDDED\uDDEF-\uDDF4\uDDF7\uDDF9\uDDFB\uDDFC\uDDFF])|\uD83C\uDDEA(?:\uD83C[\uDDE6\uDDE8\uDDEA\uDDEC\uDDED\uDDF7-\uDDFA])|\uD83E\uDDD1(?:\uD83C[\uDFFB-\uDFFF])|\uD83C\uDDF7(?:\uD83C[\uDDEA\uDDF4\uDDF8\uDDFA\uDDFC])|\uD83D\uDC69(?:\uD83C[\uDFFB-\uDFFF])|\uD83C\uDDF2(?:\uD83C[\uDDE6\uDDE8-\uDDED\uDDF0-\uDDFF])|\uD83C\uDDE6(?:\uD83C[\uDDE8-\uDDEC\uDDEE\uDDF1\uDDF2\uDDF4\uDDF6-\uDDFA\uDDFC\uDDFD\uDDFF])|\uD83C\uDDF0(?:\uD83C[\uDDEA\uDDEC-\uDDEE\uDDF2\uDDF3\uDDF5\uDDF7\uDDFC\uDDFE\uDDFF])|\uD83C\uDDED(?:\uD83C[\uDDF0\uDDF2\uDDF3\uDDF7\uDDF9\uDDFA])|\uD83C\uDDE9(?:\uD83C[\uDDEA\uDDEC\uDDEF\uDDF0\uDDF2\uDDF4\uDDFF])|\uD83C\uDDFE(?:\uD83C[\uDDEA\uDDF9])|\uD83C\uDDEC(?:\uD83C[\uDDE6\uDDE7\uDDE9-\uDDEE\uDDF1-\uDDF3\uDDF5-\uDDFA\uDDFC\uDDFE])|\uD83C\uDDF8(?:\uD83C[\uDDE6-\uDDEA\uDDEC-\uDDF4\uDDF7-\uDDF9\uDDFB\uDDFD-\uDDFF])|\uD83C\uDDEB(?:\uD83C[\uDDEE-\uDDF0\uDDF2\uDDF4\uDDF7])|\uD83C\uDDF5(?:\uD83C[\uDDE6\uDDEA-\uDDED\uDDF0-\uDDF3\uDDF7-\uDDF9\uDDFC\uDDFE])|\uD83C\uDDFB(?:\uD83C[\uDDE6\uDDE8\uDDEA\uDDEC\uDDEE\uDDF3\uDDFA])|\uD83C\uDDF3(?:\uD83C[\uDDE6\uDDE8\uDDEA-\uDDEC\uDDEE\uDDF1\uDDF4\uDDF5\uDDF7\uDDFA\uDDFF])|\uD83C\uDDE8(?:\uD83C[\uDDE6\uDDE8\uDDE9\uDDEB-\uDDEE\uDDF0-\uDDF5\uDDF7\uDDFA-\uDDFF])|\uD83C\uDDF1(?:\uD83C[\uDDE6-\uDDE8\uDDEE\uDDF0\uDDF7-\uDDFB\uDDFE])|\uD83C\uDDFF(?:\uD83C[\uDDE6\uDDF2\uDDFC])|\uD83C\uDDFC(?:\uD83C[\uDDEB\uDDF8])|\uD83C\uDDFA(?:\uD83C[\uDDE6\uDDEC\uDDF2\uDDF3\uDDF8\uDDFE\uDDFF])|\uD83C\uDDEE(?:\uD83C[\uDDE8-\uDDEA\uDDF1-\uDDF4\uDDF6-\uDDF9])|\uD83C\uDDEF(?:\uD83C[\uDDEA\uDDF2\uDDF4\uDDF5])|(?:\uD83C[\uDFC3\uDFC4\uDFCA]|\uD83D[\uDC6E\uDC71\uDC73\uDC77\uDC81\uDC82\uDC86\uDC87\uDE45-\uDE47\uDE4B\uDE4D\uDE4E\uDEA3\uDEB4-\uDEB6]|\uD83E[\uDD26\uDD37-\uDD39\uDD3D\uDD3E\uDDB8\uDDB9\uDDCD-\uDDCF\uDDD6-\uDDDD])(?:\uD83C[\uDFFB-\uDFFF])|(?:\u26F9|\uD83C[\uDFCB\uDFCC]|\uD83D\uDD75)(?:\uD83C[\uDFFB-\uDFFF])|(?:[\u261D\u270A-\u270D]|\uD83C[\uDF85\uDFC2\uDFC7]|\uD83D[\uDC42\uDC43\uDC46-\uDC50\uDC66\uDC67\uDC6B-\uDC6D\uDC70\uDC72\uDC74-\uDC76\uDC78\uDC7C\uDC83\uDC85\uDCAA\uDD74\uDD7A\uDD90\uDD95\uDD96\uDE4C\uDE4F\uDEC0\uDECC]|\uD83E[\uDD0F\uDD18-\uDD1C\uDD1E\uDD1F\uDD30-\uDD36\uDDB5\uDDB6\uDDBB\uDDD2-\uDDD5])(?:\uD83C[\uDFFB-\uDFFF])|(?:[\u231A\u231B\u23E9-\u23EC\u23F0\u23F3\u25FD\u25FE\u2614\u2615\u2648-\u2653\u267F\u2693\u26A1\u26AA\u26AB\u26BD\u26BE\u26C4\u26C5\u26CE\u26D4\u26EA\u26F2\u26F3\u26F5\u26FA\u26FD\u2705\u270A\u270B\u2728\u274C\u274E\u2753-\u2755\u2757\u2795-\u2797\u27B0\u27BF\u2B1B\u2B1C\u2B50\u2B55]|\uD83C[\uDC04\uDCCF\uDD8E\uDD91-\uDD9A\uDDE6-\uDDFF\uDE01\uDE1A\uDE2F\uDE32-\uDE36\uDE38-\uDE3A\uDE50\uDE51\uDF00-\uDF20\uDF2D-\uDF35\uDF37-\uDF7C\uDF7E-\uDF93\uDFA0-\uDFCA\uDFCF-\uDFD3\uDFE0-\uDFF0\uDFF4\uDFF8-\uDFFF]|\uD83D[\uDC00-\uDC3E\uDC40\uDC42-\uDCFC\uDCFF-\uDD3D\uDD4B-\uDD4E\uDD50-\uDD67\uDD7A\uDD95\uDD96\uDDA4\uDDFB-\uDE4F\uDE80-\uDEC5\uDECC\uDED0-\uDED2\uDED5\uDEEB\uDEEC\uDEF4-\uDEFA\uDFE0-\uDFEB]|\uD83E[\uDD0D-\uDD3A\uDD3C-\uDD45\uDD47-\uDD71\uDD73-\uDD76\uDD7A-\uDDA2\uDDA5-\uDDAA\uDDAE-\uDDCA\uDDCD-\uDDFF\uDE70-\uDE73\uDE78-\uDE7A\uDE80-\uDE82\uDE90-\uDE95])|(?:[#\*0-9\xA9\xAE\u203C\u2049\u2122\u2139\u2194-\u2199\u21A9\u21AA\u231A\u231B\u2328\u23CF\u23E9-\u23F3\u23F8-\u23FA\u24C2\u25AA\u25AB\u25B6\u25C0\u25FB-\u25FE\u2600-\u2604\u260E\u2611\u2614\u2615\u2618\u261D\u2620\u2622\u2623\u2626\u262A\u262E\u262F\u2638-\u263A\u2640\u2642\u2648-\u2653\u265F\u2660\u2663\u2665\u2666\u2668\u267B\u267E\u267F\u2692-\u2697\u2699\u269B\u269C\u26A0\u26A1\u26AA\u26AB\u26B0\u26B1\u26BD\u26BE\u26C4\u26C5\u26C8\u26CE\u26CF\u26D1\u26D3\u26D4\u26E9\u26EA\u26F0-\u26F5\u26F7-\u26FA\u26FD\u2702\u2705\u2708-\u270D\u270F\u2712\u2714\u2716\u271D\u2721\u2728\u2733\u2734\u2744\u2747\u274C\u274E\u2753-\u2755\u2757\u2763\u2764\u2795-\u2797\u27A1\u27B0\u27BF\u2934\u2935\u2B05-\u2B07\u2B1B\u2B1C\u2B50\u2B55\u3030\u303D\u3297\u3299]|\uD83C[\uDC04\uDCCF\uDD70\uDD71\uDD7E\uDD7F\uDD8E\uDD91-\uDD9A\uDDE6-\uDDFF\uDE01\uDE02\uDE1A\uDE2F\uDE32-\uDE3A\uDE50\uDE51\uDF00-\uDF21\uDF24-\uDF93\uDF96\uDF97\uDF99-\uDF9B\uDF9E-\uDFF0\uDFF3-\uDFF5\uDFF7-\uDFFF]|\uD83D[\uDC00-\uDCFD\uDCFF-\uDD3D\uDD49-\uDD4E\uDD50-\uDD67\uDD6F\uDD70\uDD73-\uDD7A\uDD87\uDD8A-\uDD8D\uDD90\uDD95\uDD96\uDDA4\uDDA5\uDDA8\uDDB1\uDDB2\uDDBC\uDDC2-\uDDC4\uDDD1-\uDDD3\uDDDC-\uDDDE\uDDE1\uDDE3\uDDE8\uDDEF\uDDF3\uDDFA-\uDE4F\uDE80-\uDEC5\uDECB-\uDED2\uDED5\uDEE0-\uDEE5\uDEE9\uDEEB\uDEEC\uDEF0\uDEF3-\uDEFA\uDFE0-\uDFEB]|\uD83E[\uDD0D-\uDD3A\uDD3C-\uDD45\uDD47-\uDD71\uDD73-\uDD76\uDD7A-\uDDA2\uDDA5-\uDDAA\uDDAE-\uDDCA\uDDCD-\uDDFF\uDE70-\uDE73\uDE78-\uDE7A\uDE80-\uDE82\uDE90-\uDE95])\uFE0F|(?:[\u261D\u26F9\u270A-\u270D]|\uD83C[\uDF85\uDFC2-\uDFC4\uDFC7\uDFCA-\uDFCC]|\uD83D[\uDC42\uDC43\uDC46-\uDC50\uDC66-\uDC78\uDC7C\uDC81-\uDC83\uDC85-\uDC87\uDC8F\uDC91\uDCAA\uDD74\uDD75\uDD7A\uDD90\uDD95\uDD96\uDE45-\uDE47\uDE4B-\uDE4F\uDEA3\uDEB4-\uDEB6\uDEC0\uDECC]|\uD83E[\uDD0F\uDD18-\uDD1F\uDD26\uDD30-\uDD39\uDD3C-\uDD3E\uDDB5\uDDB6\uDDB8\uDDB9\uDDBB\uDDCD-\uDDCF\uDDD1-\uDDDD])/g;
-    };
-  }
-});
-
-// node_modules/wrap-ansi/node_modules/string-width/index.js
-var require_string_width = __commonJS({
-  "node_modules/wrap-ansi/node_modules/string-width/index.js"(exports, module) {
-    "use strict";
-    var stripAnsi5 = require_strip_ansi();
-    var isFullwidthCodePoint = require_is_fullwidth_code_point();
-    var emojiRegex2 = require_emoji_regex();
-    var stringWidth3 = (string) => {
-      if (typeof string !== "string" || string.length === 0) {
-        return 0;
-      }
-      string = stripAnsi5(string);
-      if (string.length === 0) {
-        return 0;
-      }
-      string = string.replace(emojiRegex2(), "  ");
-      let width = 0;
-      for (let i2 = 0; i2 < string.length; i2++) {
-        const code = string.codePointAt(i2);
-        if (code <= 31 || code >= 127 && code <= 159) {
-          continue;
-        }
-        if (code >= 768 && code <= 879) {
-          continue;
-        }
-        if (code > 65535) {
-          i2++;
-        }
-        width += isFullwidthCodePoint(code) ? 2 : 1;
-      }
-      return width;
-    };
-    module.exports = stringWidth3;
-    module.exports.default = stringWidth3;
-  }
-});
-
-// node_modules/color-name/index.js
-var require_color_name = __commonJS({
-  "node_modules/color-name/index.js"(exports, module) {
-    "use strict";
-    module.exports = {
-      "aliceblue": [240, 248, 255],
-      "antiquewhite": [250, 235, 215],
-      "aqua": [0, 255, 255],
-      "aquamarine": [127, 255, 212],
-      "azure": [240, 255, 255],
-      "beige": [245, 245, 220],
-      "bisque": [255, 228, 196],
-      "black": [0, 0, 0],
-      "blanchedalmond": [255, 235, 205],
-      "blue": [0, 0, 255],
-      "blueviolet": [138, 43, 226],
-      "brown": [165, 42, 42],
-      "burlywood": [222, 184, 135],
-      "cadetblue": [95, 158, 160],
-      "chartreuse": [127, 255, 0],
-      "chocolate": [210, 105, 30],
-      "coral": [255, 127, 80],
-      "cornflowerblue": [100, 149, 237],
-      "cornsilk": [255, 248, 220],
-      "crimson": [220, 20, 60],
-      "cyan": [0, 255, 255],
-      "darkblue": [0, 0, 139],
-      "darkcyan": [0, 139, 139],
-      "darkgoldenrod": [184, 134, 11],
-      "darkgray": [169, 169, 169],
-      "darkgreen": [0, 100, 0],
-      "darkgrey": [169, 169, 169],
-      "darkkhaki": [189, 183, 107],
-      "darkmagenta": [139, 0, 139],
-      "darkolivegreen": [85, 107, 47],
-      "darkorange": [255, 140, 0],
-      "darkorchid": [153, 50, 204],
-      "darkred": [139, 0, 0],
-      "darksalmon": [233, 150, 122],
-      "darkseagreen": [143, 188, 143],
-      "darkslateblue": [72, 61, 139],
-      "darkslategray": [47, 79, 79],
-      "darkslategrey": [47, 79, 79],
-      "darkturquoise": [0, 206, 209],
-      "darkviolet": [148, 0, 211],
-      "deeppink": [255, 20, 147],
-      "deepskyblue": [0, 191, 255],
-      "dimgray": [105, 105, 105],
-      "dimgrey": [105, 105, 105],
-      "dodgerblue": [30, 144, 255],
-      "firebrick": [178, 34, 34],
-      "floralwhite": [255, 250, 240],
-      "forestgreen": [34, 139, 34],
-      "fuchsia": [255, 0, 255],
-      "gainsboro": [220, 220, 220],
-      "ghostwhite": [248, 248, 255],
-      "gold": [255, 215, 0],
-      "goldenrod": [218, 165, 32],
-      "gray": [128, 128, 128],
-      "green": [0, 128, 0],
-      "greenyellow": [173, 255, 47],
-      "grey": [128, 128, 128],
-      "honeydew": [240, 255, 240],
-      "hotpink": [255, 105, 180],
-      "indianred": [205, 92, 92],
-      "indigo": [75, 0, 130],
-      "ivory": [255, 255, 240],
-      "khaki": [240, 230, 140],
-      "lavender": [230, 230, 250],
-      "lavenderblush": [255, 240, 245],
-      "lawngreen": [124, 252, 0],
-      "lemonchiffon": [255, 250, 205],
-      "lightblue": [173, 216, 230],
-      "lightcoral": [240, 128, 128],
-      "lightcyan": [224, 255, 255],
-      "lightgoldenrodyellow": [250, 250, 210],
-      "lightgray": [211, 211, 211],
-      "lightgreen": [144, 238, 144],
-      "lightgrey": [211, 211, 211],
-      "lightpink": [255, 182, 193],
-      "lightsalmon": [255, 160, 122],
-      "lightseagreen": [32, 178, 170],
-      "lightskyblue": [135, 206, 250],
-      "lightslategray": [119, 136, 153],
-      "lightslategrey": [119, 136, 153],
-      "lightsteelblue": [176, 196, 222],
-      "lightyellow": [255, 255, 224],
-      "lime": [0, 255, 0],
-      "limegreen": [50, 205, 50],
-      "linen": [250, 240, 230],
-      "magenta": [255, 0, 255],
-      "maroon": [128, 0, 0],
-      "mediumaquamarine": [102, 205, 170],
-      "mediumblue": [0, 0, 205],
-      "mediumorchid": [186, 85, 211],
-      "mediumpurple": [147, 112, 219],
-      "mediumseagreen": [60, 179, 113],
-      "mediumslateblue": [123, 104, 238],
-      "mediumspringgreen": [0, 250, 154],
-      "mediumturquoise": [72, 209, 204],
-      "mediumvioletred": [199, 21, 133],
-      "midnightblue": [25, 25, 112],
-      "mintcream": [245, 255, 250],
-      "mistyrose": [255, 228, 225],
-      "moccasin": [255, 228, 181],
-      "navajowhite": [255, 222, 173],
-      "navy": [0, 0, 128],
-      "oldlace": [253, 245, 230],
-      "olive": [128, 128, 0],
-      "olivedrab": [107, 142, 35],
-      "orange": [255, 165, 0],
-      "orangered": [255, 69, 0],
-      "orchid": [218, 112, 214],
-      "palegoldenrod": [238, 232, 170],
-      "palegreen": [152, 251, 152],
-      "paleturquoise": [175, 238, 238],
-      "palevioletred": [219, 112, 147],
-      "papayawhip": [255, 239, 213],
-      "peachpuff": [255, 218, 185],
-      "peru": [205, 133, 63],
-      "pink": [255, 192, 203],
-      "plum": [221, 160, 221],
-      "powderblue": [176, 224, 230],
-      "purple": [128, 0, 128],
-      "rebeccapurple": [102, 51, 153],
-      "red": [255, 0, 0],
-      "rosybrown": [188, 143, 143],
-      "royalblue": [65, 105, 225],
-      "saddlebrown": [139, 69, 19],
-      "salmon": [250, 128, 114],
-      "sandybrown": [244, 164, 96],
-      "seagreen": [46, 139, 87],
-      "seashell": [255, 245, 238],
-      "sienna": [160, 82, 45],
-      "silver": [192, 192, 192],
-      "skyblue": [135, 206, 235],
-      "slateblue": [106, 90, 205],
-      "slategray": [112, 128, 144],
-      "slategrey": [112, 128, 144],
-      "snow": [255, 250, 250],
-      "springgreen": [0, 255, 127],
-      "steelblue": [70, 130, 180],
-      "tan": [210, 180, 140],
-      "teal": [0, 128, 128],
-      "thistle": [216, 191, 216],
-      "tomato": [255, 99, 71],
-      "turquoise": [64, 224, 208],
-      "violet": [238, 130, 238],
-      "wheat": [245, 222, 179],
-      "white": [255, 255, 255],
-      "whitesmoke": [245, 245, 245],
-      "yellow": [255, 255, 0],
-      "yellowgreen": [154, 205, 50]
-    };
-  }
-});
-
-// node_modules/color-convert/conversions.js
-var require_conversions = __commonJS({
-  "node_modules/color-convert/conversions.js"(exports, module) {
-    "use strict";
-    var cssKeywords = require_color_name();
-    var reverseKeywords = {};
-    for (const key of Object.keys(cssKeywords)) {
-      reverseKeywords[cssKeywords[key]] = key;
-    }
-    var convert = {
-      rgb: { channels: 3, labels: "rgb" },
-      hsl: { channels: 3, labels: "hsl" },
-      hsv: { channels: 3, labels: "hsv" },
-      hwb: { channels: 3, labels: "hwb" },
-      cmyk: { channels: 4, labels: "cmyk" },
-      xyz: { channels: 3, labels: "xyz" },
-      lab: { channels: 3, labels: "lab" },
-      lch: { channels: 3, labels: "lch" },
-      hex: { channels: 1, labels: ["hex"] },
-      keyword: { channels: 1, labels: ["keyword"] },
-      ansi16: { channels: 1, labels: ["ansi16"] },
-      ansi256: { channels: 1, labels: ["ansi256"] },
-      hcg: { channels: 3, labels: ["h", "c", "g"] },
-      apple: { channels: 3, labels: ["r16", "g16", "b16"] },
-      gray: { channels: 1, labels: ["gray"] }
-    };
-    module.exports = convert;
-    for (const model of Object.keys(convert)) {
-      if (!("channels" in convert[model])) {
-        throw new Error("missing channels property: " + model);
-      }
-      if (!("labels" in convert[model])) {
-        throw new Error("missing channel labels property: " + model);
-      }
-      if (convert[model].labels.length !== convert[model].channels) {
-        throw new Error("channel and label counts mismatch: " + model);
-      }
-      const { channels, labels } = convert[model];
-      delete convert[model].channels;
-      delete convert[model].labels;
-      Object.defineProperty(convert[model], "channels", { value: channels });
-      Object.defineProperty(convert[model], "labels", { value: labels });
-    }
-    convert.rgb.hsl = function(rgb) {
-      const r3 = rgb[0] / 255;
-      const g3 = rgb[1] / 255;
-      const b2 = rgb[2] / 255;
-      const min = Math.min(r3, g3, b2);
-      const max = Math.max(r3, g3, b2);
-      const delta = max - min;
-      let h2;
-      let s2;
-      if (max === min) {
-        h2 = 0;
-      } else if (r3 === max) {
-        h2 = (g3 - b2) / delta;
-      } else if (g3 === max) {
-        h2 = 2 + (b2 - r3) / delta;
-      } else if (b2 === max) {
-        h2 = 4 + (r3 - g3) / delta;
-      }
-      h2 = Math.min(h2 * 60, 360);
-      if (h2 < 0) {
-        h2 += 360;
-      }
-      const l2 = (min + max) / 2;
-      if (max === min) {
-        s2 = 0;
-      } else if (l2 <= 0.5) {
-        s2 = delta / (max + min);
-      } else {
-        s2 = delta / (2 - max - min);
-      }
-      return [h2, s2 * 100, l2 * 100];
-    };
-    convert.rgb.hsv = function(rgb) {
-      let rdif;
-      let gdif;
-      let bdif;
-      let h2;
-      let s2;
-      const r3 = rgb[0] / 255;
-      const g3 = rgb[1] / 255;
-      const b2 = rgb[2] / 255;
-      const v2 = Math.max(r3, g3, b2);
-      const diff = v2 - Math.min(r3, g3, b2);
-      const diffc = function(c3) {
-        return (v2 - c3) / 6 / diff + 1 / 2;
-      };
-      if (diff === 0) {
-        h2 = 0;
-        s2 = 0;
-      } else {
-        s2 = diff / v2;
-        rdif = diffc(r3);
-        gdif = diffc(g3);
-        bdif = diffc(b2);
-        if (r3 === v2) {
-          h2 = bdif - gdif;
-        } else if (g3 === v2) {
-          h2 = 1 / 3 + rdif - bdif;
-        } else if (b2 === v2) {
-          h2 = 2 / 3 + gdif - rdif;
-        }
-        if (h2 < 0) {
-          h2 += 1;
-        } else if (h2 > 1) {
-          h2 -= 1;
-        }
-      }
-      return [
-        h2 * 360,
-        s2 * 100,
-        v2 * 100
-      ];
-    };
-    convert.rgb.hwb = function(rgb) {
-      const r3 = rgb[0];
-      const g3 = rgb[1];
-      let b2 = rgb[2];
-      const h2 = convert.rgb.hsl(rgb)[0];
-      const w2 = 1 / 255 * Math.min(r3, Math.min(g3, b2));
-      b2 = 1 - 1 / 255 * Math.max(r3, Math.max(g3, b2));
-      return [h2, w2 * 100, b2 * 100];
-    };
-    convert.rgb.cmyk = function(rgb) {
-      const r3 = rgb[0] / 255;
-      const g3 = rgb[1] / 255;
-      const b2 = rgb[2] / 255;
-      const k2 = Math.min(1 - r3, 1 - g3, 1 - b2);
-      const c3 = (1 - r3 - k2) / (1 - k2) || 0;
-      const m2 = (1 - g3 - k2) / (1 - k2) || 0;
-      const y3 = (1 - b2 - k2) / (1 - k2) || 0;
-      return [c3 * 100, m2 * 100, y3 * 100, k2 * 100];
-    };
-    function comparativeDistance(x2, y3) {
-      return (x2[0] - y3[0]) ** 2 + (x2[1] - y3[1]) ** 2 + (x2[2] - y3[2]) ** 2;
-    }
-    convert.rgb.keyword = function(rgb) {
-      const reversed = reverseKeywords[rgb];
-      if (reversed) {
-        return reversed;
-      }
-      let currentClosestDistance = Infinity;
-      let currentClosestKeyword;
-      for (const keyword of Object.keys(cssKeywords)) {
-        const value = cssKeywords[keyword];
-        const distance = comparativeDistance(rgb, value);
-        if (distance < currentClosestDistance) {
-          currentClosestDistance = distance;
-          currentClosestKeyword = keyword;
-        }
-      }
-      return currentClosestKeyword;
-    };
-    convert.keyword.rgb = function(keyword) {
-      return cssKeywords[keyword];
-    };
-    convert.rgb.xyz = function(rgb) {
-      let r3 = rgb[0] / 255;
-      let g3 = rgb[1] / 255;
-      let b2 = rgb[2] / 255;
-      r3 = r3 > 0.04045 ? ((r3 + 0.055) / 1.055) ** 2.4 : r3 / 12.92;
-      g3 = g3 > 0.04045 ? ((g3 + 0.055) / 1.055) ** 2.4 : g3 / 12.92;
-      b2 = b2 > 0.04045 ? ((b2 + 0.055) / 1.055) ** 2.4 : b2 / 12.92;
-      const x2 = r3 * 0.4124 + g3 * 0.3576 + b2 * 0.1805;
-      const y3 = r3 * 0.2126 + g3 * 0.7152 + b2 * 0.0722;
-      const z2 = r3 * 0.0193 + g3 * 0.1192 + b2 * 0.9505;
-      return [x2 * 100, y3 * 100, z2 * 100];
-    };
-    convert.rgb.lab = function(rgb) {
-      const xyz = convert.rgb.xyz(rgb);
-      let x2 = xyz[0];
-      let y3 = xyz[1];
-      let z2 = xyz[2];
-      x2 /= 95.047;
-      y3 /= 100;
-      z2 /= 108.883;
-      x2 = x2 > 8856e-6 ? x2 ** (1 / 3) : 7.787 * x2 + 16 / 116;
-      y3 = y3 > 8856e-6 ? y3 ** (1 / 3) : 7.787 * y3 + 16 / 116;
-      z2 = z2 > 8856e-6 ? z2 ** (1 / 3) : 7.787 * z2 + 16 / 116;
-      const l2 = 116 * y3 - 16;
-      const a2 = 500 * (x2 - y3);
-      const b2 = 200 * (y3 - z2);
-      return [l2, a2, b2];
-    };
-    convert.hsl.rgb = function(hsl) {
-      const h2 = hsl[0] / 360;
-      const s2 = hsl[1] / 100;
-      const l2 = hsl[2] / 100;
-      let t2;
-      let t3;
-      let val;
-      if (s2 === 0) {
-        val = l2 * 255;
-        return [val, val, val];
-      }
-      if (l2 < 0.5) {
-        t2 = l2 * (1 + s2);
-      } else {
-        t2 = l2 + s2 - l2 * s2;
-      }
-      const t1 = 2 * l2 - t2;
-      const rgb = [0, 0, 0];
-      for (let i2 = 0; i2 < 3; i2++) {
-        t3 = h2 + 1 / 3 * -(i2 - 1);
-        if (t3 < 0) {
-          t3++;
-        }
-        if (t3 > 1) {
-          t3--;
-        }
-        if (6 * t3 < 1) {
-          val = t1 + (t2 - t1) * 6 * t3;
-        } else if (2 * t3 < 1) {
-          val = t2;
-        } else if (3 * t3 < 2) {
-          val = t1 + (t2 - t1) * (2 / 3 - t3) * 6;
-        } else {
-          val = t1;
-        }
-        rgb[i2] = val * 255;
-      }
-      return rgb;
-    };
-    convert.hsl.hsv = function(hsl) {
-      const h2 = hsl[0];
-      let s2 = hsl[1] / 100;
-      let l2 = hsl[2] / 100;
-      let smin = s2;
-      const lmin = Math.max(l2, 0.01);
-      l2 *= 2;
-      s2 *= l2 <= 1 ? l2 : 2 - l2;
-      smin *= lmin <= 1 ? lmin : 2 - lmin;
-      const v2 = (l2 + s2) / 2;
-      const sv = l2 === 0 ? 2 * smin / (lmin + smin) : 2 * s2 / (l2 + s2);
-      return [h2, sv * 100, v2 * 100];
-    };
-    convert.hsv.rgb = function(hsv) {
-      const h2 = hsv[0] / 60;
-      const s2 = hsv[1] / 100;
-      let v2 = hsv[2] / 100;
-      const hi = Math.floor(h2) % 6;
-      const f3 = h2 - Math.floor(h2);
-      const p = 255 * v2 * (1 - s2);
-      const q2 = 255 * v2 * (1 - s2 * f3);
-      const t2 = 255 * v2 * (1 - s2 * (1 - f3));
-      v2 *= 255;
-      switch (hi) {
-        case 0:
-          return [v2, t2, p];
-        case 1:
-          return [q2, v2, p];
-        case 2:
-          return [p, v2, t2];
-        case 3:
-          return [p, q2, v2];
-        case 4:
-          return [t2, p, v2];
-        case 5:
-          return [v2, p, q2];
-      }
-    };
-    convert.hsv.hsl = function(hsv) {
-      const h2 = hsv[0];
-      const s2 = hsv[1] / 100;
-      const v2 = hsv[2] / 100;
-      const vmin = Math.max(v2, 0.01);
-      let sl;
-      let l2;
-      l2 = (2 - s2) * v2;
-      const lmin = (2 - s2) * vmin;
-      sl = s2 * vmin;
-      sl /= lmin <= 1 ? lmin : 2 - lmin;
-      sl = sl || 0;
-      l2 /= 2;
-      return [h2, sl * 100, l2 * 100];
-    };
-    convert.hwb.rgb = function(hwb) {
-      const h2 = hwb[0] / 360;
-      let wh = hwb[1] / 100;
-      let bl = hwb[2] / 100;
-      const ratio = wh + bl;
-      let f3;
-      if (ratio > 1) {
-        wh /= ratio;
-        bl /= ratio;
-      }
-      const i2 = Math.floor(6 * h2);
-      const v2 = 1 - bl;
-      f3 = 6 * h2 - i2;
-      if ((i2 & 1) !== 0) {
-        f3 = 1 - f3;
-      }
-      const n2 = wh + f3 * (v2 - wh);
-      let r3;
-      let g3;
-      let b2;
-      switch (i2) {
-        default:
-        case 6:
-        case 0:
-          r3 = v2;
-          g3 = n2;
-          b2 = wh;
-          break;
-        case 1:
-          r3 = n2;
-          g3 = v2;
-          b2 = wh;
-          break;
-        case 2:
-          r3 = wh;
-          g3 = v2;
-          b2 = n2;
-          break;
-        case 3:
-          r3 = wh;
-          g3 = n2;
-          b2 = v2;
-          break;
-        case 4:
-          r3 = n2;
-          g3 = wh;
-          b2 = v2;
-          break;
-        case 5:
-          r3 = v2;
-          g3 = wh;
-          b2 = n2;
-          break;
-      }
-      return [r3 * 255, g3 * 255, b2 * 255];
-    };
-    convert.cmyk.rgb = function(cmyk) {
-      const c3 = cmyk[0] / 100;
-      const m2 = cmyk[1] / 100;
-      const y3 = cmyk[2] / 100;
-      const k2 = cmyk[3] / 100;
-      const r3 = 1 - Math.min(1, c3 * (1 - k2) + k2);
-      const g3 = 1 - Math.min(1, m2 * (1 - k2) + k2);
-      const b2 = 1 - Math.min(1, y3 * (1 - k2) + k2);
-      return [r3 * 255, g3 * 255, b2 * 255];
-    };
-    convert.xyz.rgb = function(xyz) {
-      const x2 = xyz[0] / 100;
-      const y3 = xyz[1] / 100;
-      const z2 = xyz[2] / 100;
-      let r3;
-      let g3;
-      let b2;
-      r3 = x2 * 3.2406 + y3 * -1.5372 + z2 * -0.4986;
-      g3 = x2 * -0.9689 + y3 * 1.8758 + z2 * 0.0415;
-      b2 = x2 * 0.0557 + y3 * -0.204 + z2 * 1.057;
-      r3 = r3 > 31308e-7 ? 1.055 * r3 ** (1 / 2.4) - 0.055 : r3 * 12.92;
-      g3 = g3 > 31308e-7 ? 1.055 * g3 ** (1 / 2.4) - 0.055 : g3 * 12.92;
-      b2 = b2 > 31308e-7 ? 1.055 * b2 ** (1 / 2.4) - 0.055 : b2 * 12.92;
-      r3 = Math.min(Math.max(0, r3), 1);
-      g3 = Math.min(Math.max(0, g3), 1);
-      b2 = Math.min(Math.max(0, b2), 1);
-      return [r3 * 255, g3 * 255, b2 * 255];
-    };
-    convert.xyz.lab = function(xyz) {
-      let x2 = xyz[0];
-      let y3 = xyz[1];
-      let z2 = xyz[2];
-      x2 /= 95.047;
-      y3 /= 100;
-      z2 /= 108.883;
-      x2 = x2 > 8856e-6 ? x2 ** (1 / 3) : 7.787 * x2 + 16 / 116;
-      y3 = y3 > 8856e-6 ? y3 ** (1 / 3) : 7.787 * y3 + 16 / 116;
-      z2 = z2 > 8856e-6 ? z2 ** (1 / 3) : 7.787 * z2 + 16 / 116;
-      const l2 = 116 * y3 - 16;
-      const a2 = 500 * (x2 - y3);
-      const b2 = 200 * (y3 - z2);
-      return [l2, a2, b2];
-    };
-    convert.lab.xyz = function(lab) {
-      const l2 = lab[0];
-      const a2 = lab[1];
-      const b2 = lab[2];
-      let x2;
-      let y3;
-      let z2;
-      y3 = (l2 + 16) / 116;
-      x2 = a2 / 500 + y3;
-      z2 = y3 - b2 / 200;
-      const y22 = y3 ** 3;
-      const x22 = x2 ** 3;
-      const z22 = z2 ** 3;
-      y3 = y22 > 8856e-6 ? y22 : (y3 - 16 / 116) / 7.787;
-      x2 = x22 > 8856e-6 ? x22 : (x2 - 16 / 116) / 7.787;
-      z2 = z22 > 8856e-6 ? z22 : (z2 - 16 / 116) / 7.787;
-      x2 *= 95.047;
-      y3 *= 100;
-      z2 *= 108.883;
-      return [x2, y3, z2];
-    };
-    convert.lab.lch = function(lab) {
-      const l2 = lab[0];
-      const a2 = lab[1];
-      const b2 = lab[2];
-      let h2;
-      const hr = Math.atan2(b2, a2);
-      h2 = hr * 360 / 2 / Math.PI;
-      if (h2 < 0) {
-        h2 += 360;
-      }
-      const c3 = Math.sqrt(a2 * a2 + b2 * b2);
-      return [l2, c3, h2];
-    };
-    convert.lch.lab = function(lch) {
-      const l2 = lch[0];
-      const c3 = lch[1];
-      const h2 = lch[2];
-      const hr = h2 / 360 * 2 * Math.PI;
-      const a2 = c3 * Math.cos(hr);
-      const b2 = c3 * Math.sin(hr);
-      return [l2, a2, b2];
-    };
-    convert.rgb.ansi16 = function(args, saturation = null) {
-      const [r3, g3, b2] = args;
-      let value = saturation === null ? convert.rgb.hsv(args)[2] : saturation;
-      value = Math.round(value / 50);
-      if (value === 0) {
-        return 30;
-      }
-      let ansi = 30 + (Math.round(b2 / 255) << 2 | Math.round(g3 / 255) << 1 | Math.round(r3 / 255));
-      if (value === 2) {
-        ansi += 60;
-      }
-      return ansi;
-    };
-    convert.hsv.ansi16 = function(args) {
-      return convert.rgb.ansi16(convert.hsv.rgb(args), args[2]);
-    };
-    convert.rgb.ansi256 = function(args) {
-      const r3 = args[0];
-      const g3 = args[1];
-      const b2 = args[2];
-      if (r3 === g3 && g3 === b2) {
-        if (r3 < 8) {
-          return 16;
-        }
-        if (r3 > 248) {
-          return 231;
-        }
-        return Math.round((r3 - 8) / 247 * 24) + 232;
-      }
-      const ansi = 16 + 36 * Math.round(r3 / 255 * 5) + 6 * Math.round(g3 / 255 * 5) + Math.round(b2 / 255 * 5);
-      return ansi;
-    };
-    convert.ansi16.rgb = function(args) {
-      let color = args % 10;
-      if (color === 0 || color === 7) {
-        if (args > 50) {
-          color += 3.5;
-        }
-        color = color / 10.5 * 255;
-        return [color, color, color];
-      }
-      const mult = (~~(args > 50) + 1) * 0.5;
-      const r3 = (color & 1) * mult * 255;
-      const g3 = (color >> 1 & 1) * mult * 255;
-      const b2 = (color >> 2 & 1) * mult * 255;
-      return [r3, g3, b2];
-    };
-    convert.ansi256.rgb = function(args) {
-      if (args >= 232) {
-        const c3 = (args - 232) * 10 + 8;
-        return [c3, c3, c3];
-      }
-      args -= 16;
-      let rem;
-      const r3 = Math.floor(args / 36) / 5 * 255;
-      const g3 = Math.floor((rem = args % 36) / 6) / 5 * 255;
-      const b2 = rem % 6 / 5 * 255;
-      return [r3, g3, b2];
-    };
-    convert.rgb.hex = function(args) {
-      const integer = ((Math.round(args[0]) & 255) << 16) + ((Math.round(args[1]) & 255) << 8) + (Math.round(args[2]) & 255);
-      const string = integer.toString(16).toUpperCase();
-      return "000000".substring(string.length) + string;
-    };
-    convert.hex.rgb = function(args) {
-      const match = args.toString(16).match(/[a-f0-9]{6}|[a-f0-9]{3}/i);
-      if (!match) {
-        return [0, 0, 0];
-      }
-      let colorString = match[0];
-      if (match[0].length === 3) {
-        colorString = colorString.split("").map((char) => {
-          return char + char;
-        }).join("");
-      }
-      const integer = parseInt(colorString, 16);
-      const r3 = integer >> 16 & 255;
-      const g3 = integer >> 8 & 255;
-      const b2 = integer & 255;
-      return [r3, g3, b2];
-    };
-    convert.rgb.hcg = function(rgb) {
-      const r3 = rgb[0] / 255;
-      const g3 = rgb[1] / 255;
-      const b2 = rgb[2] / 255;
-      const max = Math.max(Math.max(r3, g3), b2);
-      const min = Math.min(Math.min(r3, g3), b2);
-      const chroma = max - min;
-      let grayscale;
-      let hue;
-      if (chroma < 1) {
-        grayscale = min / (1 - chroma);
-      } else {
-        grayscale = 0;
-      }
-      if (chroma <= 0) {
-        hue = 0;
-      } else if (max === r3) {
-        hue = (g3 - b2) / chroma % 6;
-      } else if (max === g3) {
-        hue = 2 + (b2 - r3) / chroma;
-      } else {
-        hue = 4 + (r3 - g3) / chroma;
-      }
-      hue /= 6;
-      hue %= 1;
-      return [hue * 360, chroma * 100, grayscale * 100];
-    };
-    convert.hsl.hcg = function(hsl) {
-      const s2 = hsl[1] / 100;
-      const l2 = hsl[2] / 100;
-      const c3 = l2 < 0.5 ? 2 * s2 * l2 : 2 * s2 * (1 - l2);
-      let f3 = 0;
-      if (c3 < 1) {
-        f3 = (l2 - 0.5 * c3) / (1 - c3);
-      }
-      return [hsl[0], c3 * 100, f3 * 100];
-    };
-    convert.hsv.hcg = function(hsv) {
-      const s2 = hsv[1] / 100;
-      const v2 = hsv[2] / 100;
-      const c3 = s2 * v2;
-      let f3 = 0;
-      if (c3 < 1) {
-        f3 = (v2 - c3) / (1 - c3);
-      }
-      return [hsv[0], c3 * 100, f3 * 100];
-    };
-    convert.hcg.rgb = function(hcg) {
-      const h2 = hcg[0] / 360;
-      const c3 = hcg[1] / 100;
-      const g3 = hcg[2] / 100;
-      if (c3 === 0) {
-        return [g3 * 255, g3 * 255, g3 * 255];
-      }
-      const pure = [0, 0, 0];
-      const hi = h2 % 1 * 6;
-      const v2 = hi % 1;
-      const w2 = 1 - v2;
-      let mg = 0;
-      switch (Math.floor(hi)) {
-        case 0:
-          pure[0] = 1;
-          pure[1] = v2;
-          pure[2] = 0;
-          break;
-        case 1:
-          pure[0] = w2;
-          pure[1] = 1;
-          pure[2] = 0;
-          break;
-        case 2:
-          pure[0] = 0;
-          pure[1] = 1;
-          pure[2] = v2;
-          break;
-        case 3:
-          pure[0] = 0;
-          pure[1] = w2;
-          pure[2] = 1;
-          break;
-        case 4:
-          pure[0] = v2;
-          pure[1] = 0;
-          pure[2] = 1;
-          break;
-        default:
-          pure[0] = 1;
-          pure[1] = 0;
-          pure[2] = w2;
-      }
-      mg = (1 - c3) * g3;
-      return [
-        (c3 * pure[0] + mg) * 255,
-        (c3 * pure[1] + mg) * 255,
-        (c3 * pure[2] + mg) * 255
-      ];
-    };
-    convert.hcg.hsv = function(hcg) {
-      const c3 = hcg[1] / 100;
-      const g3 = hcg[2] / 100;
-      const v2 = c3 + g3 * (1 - c3);
-      let f3 = 0;
-      if (v2 > 0) {
-        f3 = c3 / v2;
-      }
-      return [hcg[0], f3 * 100, v2 * 100];
-    };
-    convert.hcg.hsl = function(hcg) {
-      const c3 = hcg[1] / 100;
-      const g3 = hcg[2] / 100;
-      const l2 = g3 * (1 - c3) + 0.5 * c3;
-      let s2 = 0;
-      if (l2 > 0 && l2 < 0.5) {
-        s2 = c3 / (2 * l2);
-      } else if (l2 >= 0.5 && l2 < 1) {
-        s2 = c3 / (2 * (1 - l2));
-      }
-      return [hcg[0], s2 * 100, l2 * 100];
-    };
-    convert.hcg.hwb = function(hcg) {
-      const c3 = hcg[1] / 100;
-      const g3 = hcg[2] / 100;
-      const v2 = c3 + g3 * (1 - c3);
-      return [hcg[0], (v2 - c3) * 100, (1 - v2) * 100];
-    };
-    convert.hwb.hcg = function(hwb) {
-      const w2 = hwb[1] / 100;
-      const b2 = hwb[2] / 100;
-      const v2 = 1 - b2;
-      const c3 = v2 - w2;
-      let g3 = 0;
-      if (c3 < 1) {
-        g3 = (v2 - c3) / (1 - c3);
-      }
-      return [hwb[0], c3 * 100, g3 * 100];
-    };
-    convert.apple.rgb = function(apple) {
-      return [apple[0] / 65535 * 255, apple[1] / 65535 * 255, apple[2] / 65535 * 255];
-    };
-    convert.rgb.apple = function(rgb) {
-      return [rgb[0] / 255 * 65535, rgb[1] / 255 * 65535, rgb[2] / 255 * 65535];
-    };
-    convert.gray.rgb = function(args) {
-      return [args[0] / 100 * 255, args[0] / 100 * 255, args[0] / 100 * 255];
-    };
-    convert.gray.hsl = function(args) {
-      return [0, 0, args[0]];
-    };
-    convert.gray.hsv = convert.gray.hsl;
-    convert.gray.hwb = function(gray) {
-      return [0, 100, gray[0]];
-    };
-    convert.gray.cmyk = function(gray) {
-      return [0, 0, 0, gray[0]];
-    };
-    convert.gray.lab = function(gray) {
-      return [gray[0], 0, 0];
-    };
-    convert.gray.hex = function(gray) {
-      const val = Math.round(gray[0] / 100 * 255) & 255;
-      const integer = (val << 16) + (val << 8) + val;
-      const string = integer.toString(16).toUpperCase();
-      return "000000".substring(string.length) + string;
-    };
-    convert.rgb.gray = function(rgb) {
-      const val = (rgb[0] + rgb[1] + rgb[2]) / 3;
-      return [val / 255 * 100];
-    };
-  }
-});
-
-// node_modules/color-convert/route.js
-var require_route = __commonJS({
-  "node_modules/color-convert/route.js"(exports, module) {
-    "use strict";
-    var conversions = require_conversions();
-    function buildGraph() {
-      const graph = {};
-      const models = Object.keys(conversions);
-      for (let len = models.length, i2 = 0; i2 < len; i2++) {
-        graph[models[i2]] = {
-          // http://jsperf.com/1-vs-infinity
-          // micro-opt, but this is simple.
-          distance: -1,
-          parent: null
-        };
-      }
-      return graph;
-    }
-    function deriveBFS(fromModel) {
-      const graph = buildGraph();
-      const queue2 = [fromModel];
-      graph[fromModel].distance = 0;
-      while (queue2.length) {
-        const current = queue2.pop();
-        const adjacents = Object.keys(conversions[current]);
-        for (let len = adjacents.length, i2 = 0; i2 < len; i2++) {
-          const adjacent = adjacents[i2];
-          const node = graph[adjacent];
-          if (node.distance === -1) {
-            node.distance = graph[current].distance + 1;
-            node.parent = current;
-            queue2.unshift(adjacent);
-          }
-        }
-      }
-      return graph;
-    }
-    function link(from, to) {
-      return function(args) {
-        return to(from(args));
-      };
-    }
-    function wrapConversion(toModel, graph) {
-      const path10 = [graph[toModel].parent, toModel];
-      let fn = conversions[graph[toModel].parent][toModel];
-      let cur = graph[toModel].parent;
-      while (graph[cur].parent) {
-        path10.unshift(graph[cur].parent);
-        fn = link(conversions[graph[cur].parent][cur], fn);
-        cur = graph[cur].parent;
-      }
-      fn.conversion = path10;
-      return fn;
-    }
-    module.exports = function(fromModel) {
-      const graph = deriveBFS(fromModel);
-      const conversion = {};
-      const models = Object.keys(graph);
-      for (let len = models.length, i2 = 0; i2 < len; i2++) {
-        const toModel = models[i2];
-        const node = graph[toModel];
-        if (node.parent === null) {
-          continue;
-        }
-        conversion[toModel] = wrapConversion(toModel, graph);
-      }
-      return conversion;
-    };
-  }
-});
-
-// node_modules/color-convert/index.js
-var require_color_convert = __commonJS({
-  "node_modules/color-convert/index.js"(exports, module) {
-    "use strict";
-    var conversions = require_conversions();
-    var route = require_route();
-    var convert = {};
-    var models = Object.keys(conversions);
-    function wrapRaw(fn) {
-      const wrappedFn = function(...args) {
-        const arg0 = args[0];
-        if (arg0 === void 0 || arg0 === null) {
-          return arg0;
-        }
-        if (arg0.length > 1) {
-          args = arg0;
-        }
-        return fn(args);
-      };
-      if ("conversion" in fn) {
-        wrappedFn.conversion = fn.conversion;
-      }
-      return wrappedFn;
-    }
-    function wrapRounded(fn) {
-      const wrappedFn = function(...args) {
-        const arg0 = args[0];
-        if (arg0 === void 0 || arg0 === null) {
-          return arg0;
-        }
-        if (arg0.length > 1) {
-          args = arg0;
-        }
-        const result = fn(args);
-        if (typeof result === "object") {
-          for (let len = result.length, i2 = 0; i2 < len; i2++) {
-            result[i2] = Math.round(result[i2]);
-          }
-        }
-        return result;
-      };
-      if ("conversion" in fn) {
-        wrappedFn.conversion = fn.conversion;
-      }
-      return wrappedFn;
-    }
-    models.forEach((fromModel) => {
-      convert[fromModel] = {};
-      Object.defineProperty(convert[fromModel], "channels", { value: conversions[fromModel].channels });
-      Object.defineProperty(convert[fromModel], "labels", { value: conversions[fromModel].labels });
-      const routes = route(fromModel);
-      const routeModels = Object.keys(routes);
-      routeModels.forEach((toModel) => {
-        const fn = routes[toModel];
-        convert[fromModel][toModel] = wrapRounded(fn);
-        convert[fromModel][toModel].raw = wrapRaw(fn);
-      });
-    });
-    module.exports = convert;
-  }
-});
-
-// node_modules/ansi-styles/index.js
-var require_ansi_styles = __commonJS({
-  "node_modules/ansi-styles/index.js"(exports, module) {
-    "use strict";
-    var wrapAnsi162 = (fn, offset) => (...args) => {
-      const code = fn(...args);
-      return `\x1B[${code + offset}m`;
-    };
-    var wrapAnsi2562 = (fn, offset) => (...args) => {
-      const code = fn(...args);
-      return `\x1B[${38 + offset};5;${code}m`;
-    };
-    var wrapAnsi16m2 = (fn, offset) => (...args) => {
-      const rgb = fn(...args);
-      return `\x1B[${38 + offset};2;${rgb[0]};${rgb[1]};${rgb[2]}m`;
-    };
-    var ansi2ansi = (n2) => n2;
-    var rgb2rgb = (r3, g3, b2) => [r3, g3, b2];
-    var setLazyProperty = (object, property, get) => {
-      Object.defineProperty(object, property, {
-        get: () => {
-          const value = get();
-          Object.defineProperty(object, property, {
-            value,
-            enumerable: true,
-            configurable: true
-          });
-          return value;
-        },
-        enumerable: true,
-        configurable: true
-      });
-    };
-    var colorConvert;
-    var makeDynamicStyles = (wrap, targetSpace, identity, isBackground) => {
-      if (colorConvert === void 0) {
-        colorConvert = require_color_convert();
-      }
-      const offset = isBackground ? 10 : 0;
-      const styles3 = {};
-      for (const [sourceSpace, suite] of Object.entries(colorConvert)) {
-        const name = sourceSpace === "ansi16" ? "ansi" : sourceSpace;
-        if (sourceSpace === targetSpace) {
-          styles3[name] = wrap(identity, offset);
-        } else if (typeof suite === "object") {
-          styles3[name] = wrap(suite[targetSpace], offset);
-        }
-      }
-      return styles3;
-    };
-    function assembleStyles2() {
-      const codes = /* @__PURE__ */ new Map();
-      const styles3 = {
-        modifier: {
-          reset: [0, 0],
-          // 21 isn't widely supported and 22 does the same thing
-          bold: [1, 22],
-          dim: [2, 22],
-          italic: [3, 23],
-          underline: [4, 24],
-          inverse: [7, 27],
-          hidden: [8, 28],
-          strikethrough: [9, 29]
-        },
-        color: {
-          black: [30, 39],
-          red: [31, 39],
-          green: [32, 39],
-          yellow: [33, 39],
-          blue: [34, 39],
-          magenta: [35, 39],
-          cyan: [36, 39],
-          white: [37, 39],
-          // Bright color
-          blackBright: [90, 39],
-          redBright: [91, 39],
-          greenBright: [92, 39],
-          yellowBright: [93, 39],
-          blueBright: [94, 39],
-          magentaBright: [95, 39],
-          cyanBright: [96, 39],
-          whiteBright: [97, 39]
-        },
-        bgColor: {
-          bgBlack: [40, 49],
-          bgRed: [41, 49],
-          bgGreen: [42, 49],
-          bgYellow: [43, 49],
-          bgBlue: [44, 49],
-          bgMagenta: [45, 49],
-          bgCyan: [46, 49],
-          bgWhite: [47, 49],
-          // Bright color
-          bgBlackBright: [100, 49],
-          bgRedBright: [101, 49],
-          bgGreenBright: [102, 49],
-          bgYellowBright: [103, 49],
-          bgBlueBright: [104, 49],
-          bgMagentaBright: [105, 49],
-          bgCyanBright: [106, 49],
-          bgWhiteBright: [107, 49]
-        }
-      };
-      styles3.color.gray = styles3.color.blackBright;
-      styles3.bgColor.bgGray = styles3.bgColor.bgBlackBright;
-      styles3.color.grey = styles3.color.blackBright;
-      styles3.bgColor.bgGrey = styles3.bgColor.bgBlackBright;
-      for (const [groupName, group] of Object.entries(styles3)) {
-        for (const [styleName, style] of Object.entries(group)) {
-          styles3[styleName] = {
-            open: `\x1B[${style[0]}m`,
-            close: `\x1B[${style[1]}m`
-          };
-          group[styleName] = styles3[styleName];
-          codes.set(style[0], style[1]);
-        }
-        Object.defineProperty(styles3, groupName, {
-          value: group,
-          enumerable: false
-        });
-      }
-      Object.defineProperty(styles3, "codes", {
-        value: codes,
-        enumerable: false
-      });
-      styles3.color.close = "\x1B[39m";
-      styles3.bgColor.close = "\x1B[49m";
-      setLazyProperty(styles3.color, "ansi", () => makeDynamicStyles(wrapAnsi162, "ansi16", ansi2ansi, false));
-      setLazyProperty(styles3.color, "ansi256", () => makeDynamicStyles(wrapAnsi2562, "ansi256", ansi2ansi, false));
-      setLazyProperty(styles3.color, "ansi16m", () => makeDynamicStyles(wrapAnsi16m2, "rgb", rgb2rgb, false));
-      setLazyProperty(styles3.bgColor, "ansi", () => makeDynamicStyles(wrapAnsi162, "ansi16", ansi2ansi, true));
-      setLazyProperty(styles3.bgColor, "ansi256", () => makeDynamicStyles(wrapAnsi2562, "ansi256", ansi2ansi, true));
-      setLazyProperty(styles3.bgColor, "ansi16m", () => makeDynamicStyles(wrapAnsi16m2, "rgb", rgb2rgb, true));
-      return styles3;
-    }
-    Object.defineProperty(module, "exports", {
-      enumerable: true,
-      get: assembleStyles2
-    });
-  }
-});
-
-// node_modules/wrap-ansi/index.js
-var require_wrap_ansi = __commonJS({
-  "node_modules/wrap-ansi/index.js"(exports, module) {
-    "use strict";
-    var stringWidth3 = require_string_width();
-    var stripAnsi5 = require_strip_ansi();
-    var ansiStyles2 = require_ansi_styles();
-    var ESCAPES = /* @__PURE__ */ new Set([
-      "\x1B",
-      "\x9B"
-    ]);
-    var END_CODE = 39;
-    var wrapAnsi2 = (code) => `${ESCAPES.values().next().value}[${code}m`;
-    var wordLengths = (string) => string.split(" ").map((character) => stringWidth3(character));
-    var wrapWord = (rows, word, columns) => {
-      const characters = [...word];
-      let isInsideEscape = false;
-      let visible = stringWidth3(stripAnsi5(rows[rows.length - 1]));
-      for (const [index, character] of characters.entries()) {
-        const characterLength = stringWidth3(character);
-        if (visible + characterLength <= columns) {
-          rows[rows.length - 1] += character;
-        } else {
-          rows.push(character);
-          visible = 0;
-        }
-        if (ESCAPES.has(character)) {
-          isInsideEscape = true;
-        } else if (isInsideEscape && character === "m") {
-          isInsideEscape = false;
-          continue;
-        }
-        if (isInsideEscape) {
-          continue;
-        }
-        visible += characterLength;
-        if (visible === columns && index < characters.length - 1) {
-          rows.push("");
-          visible = 0;
-        }
-      }
-      if (!visible && rows[rows.length - 1].length > 0 && rows.length > 1) {
-        rows[rows.length - 2] += rows.pop();
-      }
-    };
-    var stringVisibleTrimSpacesRight = (str) => {
-      const words = str.split(" ");
-      let last = words.length;
-      while (last > 0) {
-        if (stringWidth3(words[last - 1]) > 0) {
-          break;
-        }
-        last--;
-      }
-      if (last === words.length) {
-        return str;
-      }
-      return words.slice(0, last).join(" ") + words.slice(last).join("");
-    };
-    var exec = (string, columns, options = {}) => {
-      if (options.trim !== false && string.trim() === "") {
-        return "";
-      }
-      let pre = "";
-      let ret = "";
-      let escapeCode;
-      const lengths = wordLengths(string);
-      let rows = [""];
-      for (const [index, word] of string.split(" ").entries()) {
-        if (options.trim !== false) {
-          rows[rows.length - 1] = rows[rows.length - 1].trimLeft();
-        }
-        let rowLength = stringWidth3(rows[rows.length - 1]);
-        if (index !== 0) {
-          if (rowLength >= columns && (options.wordWrap === false || options.trim === false)) {
-            rows.push("");
-            rowLength = 0;
-          }
-          if (rowLength > 0 || options.trim === false) {
-            rows[rows.length - 1] += " ";
-            rowLength++;
-          }
-        }
-        if (options.hard && lengths[index] > columns) {
-          const remainingColumns = columns - rowLength;
-          const breaksStartingThisLine = 1 + Math.floor((lengths[index] - remainingColumns - 1) / columns);
-          const breaksStartingNextLine = Math.floor((lengths[index] - 1) / columns);
-          if (breaksStartingNextLine < breaksStartingThisLine) {
-            rows.push("");
-          }
-          wrapWord(rows, word, columns);
-          continue;
-        }
-        if (rowLength + lengths[index] > columns && rowLength > 0 && lengths[index] > 0) {
-          if (options.wordWrap === false && rowLength < columns) {
-            wrapWord(rows, word, columns);
-            continue;
-          }
-          rows.push("");
-        }
-        if (rowLength + lengths[index] > columns && options.wordWrap === false) {
-          wrapWord(rows, word, columns);
-          continue;
-        }
-        rows[rows.length - 1] += word;
-      }
-      if (options.trim !== false) {
-        rows = rows.map(stringVisibleTrimSpacesRight);
-      }
-      pre = rows.join("\n");
-      for (const [index, character] of [...pre].entries()) {
-        ret += character;
-        if (ESCAPES.has(character)) {
-          const code2 = parseFloat(/\d[^m]*/.exec(pre.slice(index, index + 4)));
-          escapeCode = code2 === END_CODE ? null : code2;
-        }
-        const code = ansiStyles2.codes.get(Number(escapeCode));
-        if (escapeCode && code) {
-          if (pre[index + 1] === "\n") {
-            ret += wrapAnsi2(code);
-          } else if (character === "\n") {
-            ret += wrapAnsi2(escapeCode);
-          }
-        }
-      }
-      return ret;
-    };
-    module.exports = (string, columns, options) => {
-      return String(string).normalize().replace(/\r\n/g, "\n").split("\n").map((line) => exec(line, columns, options)).join("\n");
-    };
-  }
-});
-
-// node_modules/mute-stream/lib/index.js
-var require_lib = __commonJS({
-  "node_modules/mute-stream/lib/index.js"(exports, module) {
-    "use strict";
-    var Stream = __require("stream");
-    var MuteStream2 = class extends Stream {
-      #isTTY = null;
-      constructor(opts = {}) {
-        super(opts);
-        this.writable = this.readable = true;
-        this.muted = false;
-        this.on("pipe", this._onpipe);
-        this.replace = opts.replace;
-        this._prompt = opts.prompt || null;
-        this._hadControl = false;
-      }
-      #destSrc(key, def) {
-        if (this._dest) {
-          return this._dest[key];
-        }
-        if (this._src) {
-          return this._src[key];
-        }
-        return def;
-      }
-      #proxy(method, ...args) {
-        if (typeof this._dest?.[method] === "function") {
-          this._dest[method](...args);
-        }
-        if (typeof this._src?.[method] === "function") {
-          this._src[method](...args);
-        }
-      }
-      get isTTY() {
-        if (this.#isTTY !== null) {
-          return this.#isTTY;
-        }
-        return this.#destSrc("isTTY", false);
-      }
-      // basically just get replace the getter/setter with a regular value
-      set isTTY(val) {
-        this.#isTTY = val;
-      }
-      get rows() {
-        return this.#destSrc("rows");
-      }
-      get columns() {
-        return this.#destSrc("columns");
-      }
-      mute() {
-        this.muted = true;
-      }
-      unmute() {
-        this.muted = false;
-      }
-      _onpipe(src2) {
-        this._src = src2;
-      }
-      pipe(dest, options) {
-        this._dest = dest;
-        return super.pipe(dest, options);
-      }
-      pause() {
-        if (this._src) {
-          return this._src.pause();
-        }
-      }
-      resume() {
-        if (this._src) {
-          return this._src.resume();
-        }
-      }
-      write(c3) {
-        if (this.muted) {
-          if (!this.replace) {
-            return true;
-          }
-          if (c3.match(/^\u001b/)) {
-            if (c3.indexOf(this._prompt) === 0) {
-              c3 = c3.slice(this._prompt.length);
-              c3 = c3.replace(/./g, this.replace);
-              c3 = this._prompt + c3;
-            }
-            this._hadControl = true;
-            return this.emit("data", c3);
-          } else {
-            if (this._prompt && this._hadControl && c3.indexOf(this._prompt) === 0) {
-              this._hadControl = false;
-              this.emit("data", this._prompt);
-              c3 = c3.slice(this._prompt.length);
-            }
-            c3 = c3.toString().replace(/./g, this.replace);
-          }
-        }
-        this.emit("data", c3);
-      }
-      end(c3) {
-        if (this.muted) {
-          if (c3 && this.replace) {
-            c3 = c3.toString().replace(/./g, this.replace);
-          } else {
-            c3 = null;
-          }
-        }
-        if (c3) {
-          this.emit("data", c3);
-        }
-        this.emit("end");
-      }
-      destroy(...args) {
-        return this.#proxy("destroy", ...args);
-      }
-      destroySoon(...args) {
-        return this.#proxy("destroySoon", ...args);
-      }
-      close(...args) {
-        return this.#proxy("close", ...args);
-      }
-    };
-    module.exports = MuteStream2;
-  }
-});
-
-// node_modules/@inquirer/core/node_modules/ansi-regex/index.js
-var require_ansi_regex2 = __commonJS({
-  "node_modules/@inquirer/core/node_modules/ansi-regex/index.js"(exports, module) {
-    "use strict";
-    module.exports = ({ onlyFirst = false } = {}) => {
-      const pattern = [
-        "[\\u001B\\u009B][[\\]()#;?]*(?:(?:(?:(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]+)*|[a-zA-Z\\d]+(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]*)*)?\\u0007)",
-        "(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PR-TZcf-ntqry=><~]))"
-      ].join("|");
-      return new RegExp(pattern, onlyFirst ? void 0 : "g");
-    };
-  }
-});
-
-// node_modules/@inquirer/core/node_modules/strip-ansi/index.js
-var require_strip_ansi2 = __commonJS({
-  "node_modules/@inquirer/core/node_modules/strip-ansi/index.js"(exports, module) {
-    "use strict";
-    var ansiRegex4 = require_ansi_regex2();
-    module.exports = (string) => typeof string === "string" ? string.replace(ansiRegex4(), "") : string;
-  }
-});
-
-// node_modules/ansi-escapes/index.js
-var require_ansi_escapes = __commonJS({
-  "node_modules/ansi-escapes/index.js"(exports, module) {
-    "use strict";
-    var ansiEscapes3 = module.exports;
-    module.exports.default = ansiEscapes3;
-    var ESC = "\x1B[";
-    var OSC = "\x1B]";
-    var BEL = "\x07";
-    var SEP = ";";
-    var isTerminalApp = process.env.TERM_PROGRAM === "Apple_Terminal";
-    ansiEscapes3.cursorTo = (x2, y3) => {
-      if (typeof x2 !== "number") {
-        throw new TypeError("The `x` argument is required");
-      }
-      if (typeof y3 !== "number") {
-        return ESC + (x2 + 1) + "G";
-      }
-      return ESC + (y3 + 1) + ";" + (x2 + 1) + "H";
-    };
-    ansiEscapes3.cursorMove = (x2, y3) => {
-      if (typeof x2 !== "number") {
-        throw new TypeError("The `x` argument is required");
-      }
-      let ret = "";
-      if (x2 < 0) {
-        ret += ESC + -x2 + "D";
-      } else if (x2 > 0) {
-        ret += ESC + x2 + "C";
-      }
-      if (y3 < 0) {
-        ret += ESC + -y3 + "A";
-      } else if (y3 > 0) {
-        ret += ESC + y3 + "B";
-      }
-      return ret;
-    };
-    ansiEscapes3.cursorUp = (count = 1) => ESC + count + "A";
-    ansiEscapes3.cursorDown = (count = 1) => ESC + count + "B";
-    ansiEscapes3.cursorForward = (count = 1) => ESC + count + "C";
-    ansiEscapes3.cursorBackward = (count = 1) => ESC + count + "D";
-    ansiEscapes3.cursorLeft = ESC + "G";
-    ansiEscapes3.cursorSavePosition = isTerminalApp ? "\x1B7" : ESC + "s";
-    ansiEscapes3.cursorRestorePosition = isTerminalApp ? "\x1B8" : ESC + "u";
-    ansiEscapes3.cursorGetPosition = ESC + "6n";
-    ansiEscapes3.cursorNextLine = ESC + "E";
-    ansiEscapes3.cursorPrevLine = ESC + "F";
-    ansiEscapes3.cursorHide = ESC + "?25l";
-    ansiEscapes3.cursorShow = ESC + "?25h";
-    ansiEscapes3.eraseLines = (count) => {
-      let clear = "";
-      for (let i2 = 0; i2 < count; i2++) {
-        clear += ansiEscapes3.eraseLine + (i2 < count - 1 ? ansiEscapes3.cursorUp() : "");
-      }
-      if (count) {
-        clear += ansiEscapes3.cursorLeft;
-      }
-      return clear;
-    };
-    ansiEscapes3.eraseEndLine = ESC + "K";
-    ansiEscapes3.eraseStartLine = ESC + "1K";
-    ansiEscapes3.eraseLine = ESC + "2K";
-    ansiEscapes3.eraseDown = ESC + "J";
-    ansiEscapes3.eraseUp = ESC + "1J";
-    ansiEscapes3.eraseScreen = ESC + "2J";
-    ansiEscapes3.scrollUp = ESC + "S";
-    ansiEscapes3.scrollDown = ESC + "T";
-    ansiEscapes3.clearScreen = "\x1Bc";
-    ansiEscapes3.clearTerminal = process.platform === "win32" ? `${ansiEscapes3.eraseScreen}${ESC}0f` : (
-      // 1. Erases the screen (Only done in case `2` is not supported)
-      // 2. Erases the whole screen including scrollback buffer
-      // 3. Moves cursor to the top-left position
-      // More info: https://www.real-world-systems.com/docs/ANSIcode.html
-      `${ansiEscapes3.eraseScreen}${ESC}3J${ESC}H`
-    );
-    ansiEscapes3.beep = BEL;
-    ansiEscapes3.link = (text, url) => {
-      return [
-        OSC,
-        "8",
-        SEP,
-        SEP,
-        url,
-        BEL,
-        text,
-        OSC,
-        "8",
-        SEP,
-        SEP,
-        BEL
-      ].join("");
-    };
-    ansiEscapes3.image = (buffer, options = {}) => {
-      let ret = `${OSC}1337;File=inline=1`;
-      if (options.width) {
-        ret += `;width=${options.width}`;
-      }
-      if (options.height) {
-        ret += `;height=${options.height}`;
-      }
-      if (options.preserveAspectRatio === false) {
-        ret += ";preserveAspectRatio=0";
-      }
-      return ret + ":" + buffer.toString("base64") + BEL;
-    };
-    ansiEscapes3.iTerm = {
-      setCwd: (cwd = process.cwd()) => `${OSC}50;CurrentDir=${cwd}${BEL}`,
-      annotation: (message, options = {}) => {
-        let ret = `${OSC}1337;`;
-        const hasX = typeof options.x !== "undefined";
-        const hasY = typeof options.y !== "undefined";
-        if ((hasX || hasY) && !(hasX && hasY && typeof options.length !== "undefined")) {
-          throw new Error("`x`, `y` and `length` must be defined when `x` or `y` is defined");
-        }
-        message = message.replace(/\|/g, "");
-        ret += options.isHidden ? "AddHiddenAnnotation=" : "AddAnnotation=";
-        if (options.length > 0) {
-          ret += (hasX ? [message, options.length, options.x, options.y] : [options.length, message]).join("|");
-        } else {
-          ret += message;
-        }
-        return ret + BEL;
-      }
-    };
-  }
-});
-
 // node_modules/consola/dist/core.mjs
 var LogLevels = {
   silent: Number.NEGATIVE_INFINITY,
@@ -6920,20 +6920,20 @@ var isColorSupported = !isDisabled && (isForced || isWindows && !isDumbTerminal 
 function replaceClose(index, string, close, replace, head = string.slice(0, Math.max(0, index)) + replace, tail = string.slice(Math.max(0, index + close.length)), next = tail.indexOf(close)) {
   return head + (next < 0 ? tail : replaceClose(next, tail, close, replace));
 }
-function clearBleed(index, string, open, close, replace) {
-  return index < 0 ? open + string + close : open + replaceClose(index, string, close, replace) + close;
+function clearBleed(index, string, open2, close, replace) {
+  return index < 0 ? open2 + string + close : open2 + replaceClose(index, string, close, replace) + close;
 }
-function filterEmpty(open, close, replace = open, at = open.length + 1) {
+function filterEmpty(open2, close, replace = open2, at = open2.length + 1) {
   return (string) => string || !(string === "" || string === void 0) ? clearBleed(
     ("" + string).indexOf(close, at),
     string,
-    open,
+    open2,
     close,
     replace
   ) : "";
 }
-function init(open, close, replace) {
-  return filterEmpty(`\x1B[${open}m`, `\x1B[${close}m`, replace);
+function init(open2, close, replace) {
+  return filterEmpty(`\x1B[${open2}m`, `\x1B[${close}m`, replace);
 }
 var colorDefs = {
   reset: init(0, 0),
@@ -8321,18 +8321,18 @@ var proto = Object.defineProperties(() => {
     }
   }
 });
-var createStyler = (open, close, parent) => {
+var createStyler = (open2, close, parent) => {
   let openAll;
   let closeAll;
   if (parent === void 0) {
-    openAll = open;
+    openAll = open2;
     closeAll = close;
   } else {
-    openAll = parent.openAll + open;
+    openAll = parent.openAll + open2;
     closeAll = close + parent.closeAll;
   }
   return {
-    open,
+    open: open2,
     close,
     openAll,
     closeAll,
@@ -9297,945 +9297,6 @@ function ora(options) {
   return new Ora(options);
 }
 
-// src/index.ts
-import * as fs9 from "fs";
-import * as path9 from "path";
-import * as os6 from "os";
-
-// src/parsers/claude.ts
-import * as fs from "fs";
-import * as readline from "readline";
-import * as path from "path";
-var SKIP_TYPES = /* @__PURE__ */ new Set([
-  "permission-mode",
-  "attachment",
-  "file-history-snapshot",
-  "last-prompt",
-  "summary"
-]);
-async function parseClaudeSession(filePath) {
-  const warnings = [];
-  const messages = [];
-  const unknownBlockTypes = /* @__PURE__ */ new Set();
-  let model;
-  let cwd;
-  let sessionId;
-  let firstTimestamp;
-  const stream = fs.createReadStream(filePath, { encoding: "utf8" });
-  const rl = readline.createInterface({ input: stream, crlfDelay: Infinity });
-  let lineNo = 0;
-  for await (const line of rl) {
-    lineNo++;
-    if (!line.trim()) continue;
-    let obj;
-    try {
-      obj = JSON.parse(line);
-    } catch (err) {
-      warnings.push(`line ${lineNo}: invalid JSON, skipped`);
-      continue;
-    }
-    if (!sessionId && typeof obj.sessionId === "string") sessionId = obj.sessionId;
-    if (!cwd && typeof obj.cwd === "string") cwd = obj.cwd;
-    if (!firstTimestamp && typeof obj.timestamp === "string") firstTimestamp = obj.timestamp;
-    if (!model && obj.message?.model) model = obj.message.model;
-    if (SKIP_TYPES.has(obj.type)) continue;
-    if (obj.type !== "user" && obj.type !== "assistant") continue;
-    const role = obj.message?.role === "assistant" ? "assistant" : "user";
-    const blocks = [];
-    const content = obj.message?.content;
-    if (typeof content === "string") {
-      if (content.length > 0) blocks.push({ type: "text", text: content });
-    } else if (Array.isArray(content)) {
-      for (const b2 of content) {
-        const mapped = mapBlock(b2, unknownBlockTypes);
-        if (mapped) blocks.push(mapped);
-      }
-    } else {
-      warnings.push(`line ${lineNo}: message.content has unexpected shape, skipped`);
-      continue;
-    }
-    if (blocks.length === 0) continue;
-    messages.push({
-      id: typeof obj.uuid === "string" ? obj.uuid : `synthetic-${lineNo}`,
-      role,
-      timestamp: typeof obj.timestamp === "string" ? obj.timestamp : (/* @__PURE__ */ new Date()).toISOString(),
-      parentId: typeof obj.parentUuid === "string" ? obj.parentUuid : void 0,
-      blocks
-    });
-  }
-  for (const t2 of unknownBlockTypes) {
-    warnings.push(`unknown content block type "${t2}" \u2014 dropped`);
-  }
-  if (!sessionId) {
-    sessionId = path.basename(filePath, ".jsonl");
-  }
-  return {
-    session: {
-      id: sessionId,
-      sourceRuntime: "claude",
-      createdAt: firstTimestamp ?? (/* @__PURE__ */ new Date()).toISOString(),
-      model,
-      workingDirectory: cwd,
-      messages
-    },
-    warnings
-  };
-}
-function mapBlock(b2, unknown) {
-  if (!b2 || typeof b2 !== "object") return null;
-  switch (b2.type) {
-    case "text":
-      return { type: "text", text: typeof b2.text === "string" ? b2.text : "" };
-    case "thinking":
-      return { type: "thinking", text: typeof b2.thinking === "string" ? b2.thinking : "" };
-    case "tool_use":
-      return {
-        type: "tool_call",
-        id: typeof b2.id === "string" ? b2.id : "",
-        name: typeof b2.name === "string" ? b2.name : "unknown",
-        arguments: b2.input && typeof b2.input === "object" ? b2.input : {}
-      };
-    case "tool_result": {
-      let content = "";
-      let isError;
-      if (typeof b2.content === "string") {
-        content = b2.content;
-      } else if (Array.isArray(b2.content)) {
-        content = b2.content.map((p) => typeof p?.text === "string" ? p.text : "").filter(Boolean).join("\n");
-      }
-      if (b2.is_error === true) isError = true;
-      return {
-        type: "tool_result",
-        toolCallId: typeof b2.tool_use_id === "string" ? b2.tool_use_id : "",
-        content,
-        isError
-      };
-    }
-    case "image":
-      unknown.add("image");
-      return null;
-    default:
-      if (typeof b2.type === "string") unknown.add(b2.type);
-      return null;
-  }
-}
-
-// src/parsers/codex.ts
-import * as fs2 from "fs";
-import * as readline2 from "readline";
-import * as path2 from "path";
-import { randomUUID } from "crypto";
-async function parseCodexSession(filePath) {
-  const warnings = [];
-  const messages = [];
-  const skippedKinds = /* @__PURE__ */ new Map();
-  let sessionId;
-  let cwd;
-  let model;
-  let firstTimestamp;
-  const stream = fs2.createReadStream(filePath, { encoding: "utf8" });
-  const rl = readline2.createInterface({ input: stream, crlfDelay: Infinity });
-  let lineNo = 0;
-  let prevId;
-  for await (const line of rl) {
-    lineNo++;
-    if (!line.trim()) continue;
-    let obj;
-    try {
-      obj = JSON.parse(line);
-    } catch {
-      warnings.push(`line ${lineNo}: invalid JSON, skipped`);
-      continue;
-    }
-    if (!firstTimestamp && typeof obj.timestamp === "string") firstTimestamp = obj.timestamp;
-    if (obj.type === "session_meta") {
-      sessionId = obj.payload?.id ?? sessionId;
-      cwd = obj.payload?.cwd ?? cwd;
-      continue;
-    }
-    if (obj.type === "turn_context") {
-      model = obj.payload?.model ?? model;
-      cwd = obj.payload?.cwd ?? cwd;
-      continue;
-    }
-    if (obj.type !== "response_item") {
-      continue;
-    }
-    const p = obj.payload;
-    if (!p || typeof p !== "object") continue;
-    const ts = typeof obj.timestamp === "string" ? obj.timestamp : (/* @__PURE__ */ new Date()).toISOString();
-    let role;
-    let block;
-    switch (p.type) {
-      case "message": {
-        if (p.role === "developer") {
-          bump(skippedKinds, "developer-message");
-          continue;
-        }
-        role = p.role === "assistant" ? "assistant" : "user";
-        const parts = [];
-        if (Array.isArray(p.content)) {
-          for (const c3 of p.content) {
-            if (c3?.type === "input_text" || c3?.type === "output_text") {
-              if (typeof c3.text === "string") parts.push(c3.text);
-            }
-          }
-        }
-        const text = parts.join("\n");
-        if (!text) continue;
-        if (role === "user" && isEnvironmentContextOnly(text)) {
-          bump(skippedKinds, "environment_context");
-          continue;
-        }
-        block = { type: "text", text };
-        break;
-      }
-      case "function_call": {
-        role = "assistant";
-        let args = {};
-        if (typeof p.arguments === "string") {
-          try {
-            args = JSON.parse(p.arguments) ?? {};
-          } catch {
-            args = { _raw: p.arguments };
-          }
-        } else if (p.arguments && typeof p.arguments === "object") {
-          args = p.arguments;
-        }
-        block = {
-          type: "tool_call",
-          id: typeof p.call_id === "string" ? p.call_id : randomUUID(),
-          name: typeof p.name === "string" ? p.name : "unknown",
-          arguments: args
-        };
-        break;
-      }
-      case "function_call_output": {
-        role = "user";
-        block = {
-          type: "tool_result",
-          toolCallId: typeof p.call_id === "string" ? p.call_id : "",
-          content: typeof p.output === "string" ? p.output : JSON.stringify(p.output ?? "")
-        };
-        break;
-      }
-      case "reasoning":
-      case "web_search_call":
-      case "custom_tool_call":
-      case "custom_tool_call_output":
-        bump(skippedKinds, p.type);
-        continue;
-      default:
-        bump(skippedKinds, `unknown:${p.type}`);
-        continue;
-    }
-    if (!role || !block) continue;
-    const id = randomUUID();
-    messages.push({ id, role, timestamp: ts, parentId: prevId, blocks: [block] });
-    prevId = id;
-  }
-  for (const [k2, n2] of skippedKinds) {
-    warnings.push(`skipped ${n2} ${k2} ${n2 === 1 ? "item" : "items"}`);
-  }
-  if (!sessionId) sessionId = path2.basename(filePath, ".jsonl");
-  return {
-    session: {
-      id: sessionId,
-      sourceRuntime: "codex",
-      createdAt: firstTimestamp ?? (/* @__PURE__ */ new Date()).toISOString(),
-      model,
-      workingDirectory: cwd,
-      messages
-    },
-    warnings
-  };
-}
-function bump(m2, k2) {
-  m2.set(k2, (m2.get(k2) ?? 0) + 1);
-}
-function isEnvironmentContextOnly(text) {
-  const trimmed = text.trim();
-  return /^<environment_context>[\s\S]*<\/environment_context>$/.test(trimmed);
-}
-
-// src/parsers/opencode.ts
-import * as os2 from "os";
-import * as path4 from "path";
-import { randomUUID as randomUUID2 } from "crypto";
-
-// src/sqlite.ts
-var import_sql = __toESM(require_sql_wasm(), 1);
-import * as fs3 from "fs";
-import * as path3 from "path";
-import { fileURLToPath } from "url";
-var cached = null;
-async function getSqlJs() {
-  if (cached) return cached;
-  cached = await (0, import_sql.default)({
-    // Locate sql-wasm.wasm next to the sql.js package, regardless of whether
-    // we're running from source or from a global npm install.
-    locateFile: (file) => {
-      const here = path3.dirname(fileURLToPath(import.meta.url));
-      const sibling = path3.join(here, file);
-      if (fs3.existsSync(sibling)) return sibling;
-      let dir = here;
-      for (let i2 = 0; i2 < 6; i2++) {
-        const candidate = path3.join(dir, "node_modules", "sql.js", "dist", file);
-        if (fs3.existsSync(candidate)) return candidate;
-        dir = path3.dirname(dir);
-      }
-      return file;
-    }
-  });
-  return cached;
-}
-async function openDatabase(filePath) {
-  const SQL = await getSqlJs();
-  const buf = fs3.readFileSync(filePath);
-  return new SQL.Database(new Uint8Array(buf));
-}
-
-// src/parsers/opencode.ts
-var OPENCODE_DB = path4.join(os2.homedir(), ".local", "share", "opencode", "opencode.db");
-var OPENCODE_PREFIX = "opencode://";
-function isOpencodeRef(ref) {
-  return ref.startsWith(OPENCODE_PREFIX);
-}
-function refToSessionId(ref) {
-  return ref.slice(OPENCODE_PREFIX.length);
-}
-function sessionIdToRef(id) {
-  return OPENCODE_PREFIX + id;
-}
-async function parseOpencodeSession(ref) {
-  const sessionId = isOpencodeRef(ref) ? refToSessionId(ref) : ref;
-  const db = await openDatabase(OPENCODE_DB);
-  try {
-    const row = queryOne(
-      db,
-      "SELECT id, directory, title, time_created FROM session WHERE id = $id",
-      { $id: sessionId }
-    );
-    if (!row) throw new Error(`OpenCode session not found: ${sessionId}`);
-    const messageRows = queryAll(
-      db,
-      "SELECT id, time_created, data FROM message WHERE session_id = $sid ORDER BY time_created, id",
-      { $sid: sessionId }
-    );
-    const partsByMessage = /* @__PURE__ */ new Map();
-    const partRows = queryAll(
-      db,
-      "SELECT message_id, time_created, data FROM part WHERE session_id = $sid ORDER BY message_id, time_created, id",
-      { $sid: sessionId }
-    );
-    for (const p of partRows) {
-      let arr = partsByMessage.get(p.message_id);
-      if (!arr) {
-        arr = [];
-        partsByMessage.set(p.message_id, arr);
-      }
-      arr.push({ time_created: p.time_created, data: p.data });
-    }
-    const messages = [];
-    const warnings = [];
-    const skipCounts = /* @__PURE__ */ new Map();
-    let model;
-    let prevId;
-    for (const m2 of messageRows) {
-      let mdata;
-      try {
-        mdata = JSON.parse(m2.data);
-      } catch {
-        warnings.push(`message ${m2.id}: invalid JSON, skipped`);
-        continue;
-      }
-      if (!model && typeof mdata.modelID === "string") model = mdata.modelID;
-      const role = mdata.role === "assistant" ? "assistant" : "user";
-      const parts = partsByMessage.get(m2.id) ?? [];
-      for (const p of parts) {
-        let pdata;
-        try {
-          pdata = JSON.parse(p.data);
-        } catch {
-          bump2(skipCounts, "invalid-part-json");
-          continue;
-        }
-        const ts = new Date(p.time_created).toISOString();
-        switch (pdata.type) {
-          case "text": {
-            const text = typeof pdata.text === "string" ? pdata.text : "";
-            if (!text) continue;
-            const id = randomUUID2();
-            messages.push({
-              id,
-              role,
-              timestamp: ts,
-              parentId: prevId,
-              blocks: [{ type: "text", text }]
-            });
-            prevId = id;
-            break;
-          }
-          case "reasoning": {
-            const text = typeof pdata.text === "string" ? pdata.text : "";
-            if (!text) continue;
-            const id = randomUUID2();
-            messages.push({
-              id,
-              role: "assistant",
-              timestamp: ts,
-              parentId: prevId,
-              blocks: [{ type: "thinking", text }]
-            });
-            prevId = id;
-            break;
-          }
-          case "tool": {
-            const callId = typeof pdata.callID === "string" ? pdata.callID : randomUUID2();
-            const name = typeof pdata.tool === "string" ? pdata.tool : "unknown";
-            const input = pdata.state?.input;
-            const args = input && typeof input === "object" ? input : {};
-            const callMsgId = randomUUID2();
-            messages.push({
-              id: callMsgId,
-              role: "assistant",
-              timestamp: ts,
-              parentId: prevId,
-              blocks: [{ type: "tool_call", id: callId, name, arguments: args }]
-            });
-            prevId = callMsgId;
-            const status = pdata.state?.status;
-            const output = pdata.state?.output;
-            if (status === "completed" && (typeof output === "string" || output != null)) {
-              const resMsgId = randomUUID2();
-              messages.push({
-                id: resMsgId,
-                role: "user",
-                timestamp: ts,
-                parentId: prevId,
-                blocks: [{
-                  type: "tool_result",
-                  toolCallId: callId,
-                  content: typeof output === "string" ? output : JSON.stringify(output)
-                }]
-              });
-              prevId = resMsgId;
-            } else if (status === "error") {
-              const errMsgId = randomUUID2();
-              messages.push({
-                id: errMsgId,
-                role: "user",
-                timestamp: ts,
-                parentId: prevId,
-                blocks: [{
-                  type: "tool_result",
-                  toolCallId: callId,
-                  content: typeof pdata.state?.error === "string" ? pdata.state.error : "tool error",
-                  isError: true
-                }]
-              });
-              prevId = errMsgId;
-            }
-            break;
-          }
-          case "step-start":
-          case "step-finish":
-          case "compaction":
-            break;
-          case "patch":
-          case "file":
-            bump2(skipCounts, pdata.type);
-            break;
-          default:
-            bump2(skipCounts, `unknown:${pdata.type ?? "?"}`);
-        }
-      }
-    }
-    for (const [k2, n2] of skipCounts) {
-      warnings.push(`skipped ${n2} ${k2} ${n2 === 1 ? "part" : "parts"}`);
-    }
-    return {
-      session: {
-        id: row.id,
-        sourceRuntime: "opencode",
-        createdAt: new Date(row.time_created).toISOString(),
-        model,
-        workingDirectory: row.directory,
-        messages
-      },
-      warnings
-    };
-  } finally {
-    db.close();
-  }
-}
-function bump2(m2, k2) {
-  m2.set(k2, (m2.get(k2) ?? 0) + 1);
-}
-function queryAll(db, sql, params) {
-  const stmt = db.prepare(sql);
-  try {
-    stmt.bind(params);
-    const rows = [];
-    while (stmt.step()) rows.push(stmt.getAsObject());
-    return rows;
-  } finally {
-    stmt.free();
-  }
-}
-function queryOne(db, sql, params) {
-  const rows = queryAll(db, sql, params);
-  return rows[0];
-}
-
-// src/emitters/codex.ts
-import * as fs4 from "fs";
-import * as path5 from "path";
-import * as os3 from "os";
-import { randomUUID as randomUUID3 } from "crypto";
-async function writeCodexSession(session, options = {}) {
-  const sessionId = randomUUID3();
-  const now = /* @__PURE__ */ new Date();
-  const outputPath = options.outputPath ?? defaultRolloutPath(now, sessionId);
-  fs4.mkdirSync(path5.dirname(outputPath), { recursive: true });
-  const out = fs4.createWriteStream(outputPath, { encoding: "utf8" });
-  const write = (obj) => out.write(JSON.stringify(obj) + "\n");
-  const cwd = session.workingDirectory ?? os3.homedir();
-  const model = session.model ?? "gpt-5.5";
-  const isoNow = now.toISOString();
-  write({
-    timestamp: isoNow,
-    type: "session_meta",
-    payload: {
-      id: sessionId,
-      timestamp: isoNow,
-      cwd,
-      originator: options.originator ?? "strait",
-      cli_version: options.cliVersion ?? "0.0.1",
-      source: "strait",
-      model_provider: "openai"
-    }
-  });
-  write({
-    timestamp: isoNow,
-    type: "turn_context",
-    payload: {
-      turn_id: randomUUID3(),
-      cwd,
-      current_date: isoNow.slice(0, 10),
-      timezone: process.env.TZ ?? "UTC",
-      approval_policy: "on-request",
-      sandbox_policy: {
-        type: "workspace-write",
-        writable_roots: [cwd],
-        network_access: false,
-        exclude_tmpdir_env_var: false,
-        exclude_slash_tmp: false
-      },
-      model,
-      personality: "friendly",
-      effort: "medium",
-      summary: "none"
-    }
-  });
-  const stats = {
-    messagesIn: session.messages.length,
-    responseItemsOut: 0,
-    toolCalls: 0,
-    toolResults: 0,
-    droppedThinking: 0,
-    droppedImages: 0
-  };
-  for (const msg of session.messages) {
-    for (const block of msg.blocks) {
-      const ts = msg.timestamp;
-      switch (block.type) {
-        case "text": {
-          const role = msg.role === "assistant" ? "assistant" : "user";
-          const innerType = role === "assistant" ? "output_text" : "input_text";
-          write({
-            timestamp: ts,
-            type: "response_item",
-            payload: {
-              type: "message",
-              role,
-              content: [{ type: innerType, text: block.text }]
-            }
-          });
-          stats.responseItemsOut++;
-          break;
-        }
-        case "tool_call": {
-          write({
-            timestamp: ts,
-            type: "response_item",
-            payload: {
-              type: "function_call",
-              name: block.name,
-              arguments: JSON.stringify(block.arguments ?? {}),
-              call_id: block.id
-            }
-          });
-          stats.responseItemsOut++;
-          stats.toolCalls++;
-          break;
-        }
-        case "tool_result": {
-          write({
-            timestamp: ts,
-            type: "response_item",
-            payload: {
-              type: "function_call_output",
-              call_id: block.toolCallId,
-              output: block.content
-            }
-          });
-          stats.responseItemsOut++;
-          stats.toolResults++;
-          break;
-        }
-        case "thinking":
-          stats.droppedThinking++;
-          break;
-        case "image":
-          stats.droppedImages++;
-          break;
-      }
-    }
-  }
-  await new Promise((resolve, reject) => {
-    out.end((err) => err ? reject(err) : resolve());
-  });
-  return { outputPath, sessionId, stats };
-}
-function defaultRolloutPath(now, sessionId) {
-  const yyyy = String(now.getUTCFullYear());
-  const mm = String(now.getUTCMonth() + 1).padStart(2, "0");
-  const dd = String(now.getUTCDate()).padStart(2, "0");
-  const stamp = now.toISOString().replace(/[:.]/g, "-").replace("Z", "");
-  return path5.join(
-    os3.homedir(),
-    ".codex",
-    "sessions",
-    yyyy,
-    mm,
-    dd,
-    `rollout-${stamp}-${sessionId}.jsonl`
-  );
-}
-
-// src/emitters/claude.ts
-import * as fs5 from "fs";
-import * as path6 from "path";
-import * as os4 from "os";
-import { randomUUID as randomUUID4 } from "crypto";
-async function writeClaudeSession(session, options = {}) {
-  const sessionId = randomUUID4();
-  const cwd = options.cwd ?? session.workingDirectory ?? os4.homedir();
-  const outputPath = options.outputPath ?? defaultClaudePath(cwd, sessionId);
-  const model = session.model ?? "claude-sonnet-4-6";
-  fs5.mkdirSync(path6.dirname(outputPath), { recursive: true });
-  const out = fs5.createWriteStream(outputPath, { encoding: "utf8" });
-  const write = (obj) => out.write(JSON.stringify(obj) + "\n");
-  const stats = {
-    messagesIn: session.messages.length,
-    linesOut: 0,
-    toolCalls: 0,
-    toolResults: 0,
-    droppedThinking: 0,
-    droppedImages: 0
-  };
-  let prevUuid;
-  for (const msg of session.messages) {
-    for (const block of msg.blocks) {
-      const uuid = randomUUID4();
-      const ts = msg.timestamp;
-      const claudeBlock = toClaudeBlock(block, stats);
-      if (!claudeBlock) continue;
-      const role = msg.role === "assistant" ? "assistant" : "user";
-      const messagePayload = role === "assistant" ? { id: `msg_${uuid.replace(/-/g, "").slice(0, 24)}`, type: "message", role, model, content: [claudeBlock] } : { role, content: [claudeBlock] };
-      write({
-        parentUuid: prevUuid ?? null,
-        isSidechain: false,
-        userType: "external",
-        cwd,
-        sessionId,
-        version: "2.1.114",
-        gitBranch: "",
-        type: role,
-        message: messagePayload,
-        uuid,
-        timestamp: ts
-      });
-      stats.linesOut++;
-      prevUuid = uuid;
-    }
-  }
-  await new Promise((resolve, reject) => {
-    out.end((err) => err ? reject(err) : resolve());
-  });
-  return { outputPath, sessionId, stats };
-}
-function toClaudeBlock(b2, stats) {
-  switch (b2.type) {
-    case "text":
-      return { type: "text", text: b2.text };
-    case "tool_call":
-      stats.toolCalls++;
-      return { type: "tool_use", id: b2.id, name: b2.name, input: b2.arguments };
-    case "tool_result":
-      stats.toolResults++;
-      return {
-        type: "tool_result",
-        tool_use_id: b2.toolCallId,
-        content: b2.content,
-        ...b2.isError ? { is_error: true } : {}
-      };
-    case "thinking":
-      stats.droppedThinking++;
-      return null;
-    case "image":
-      stats.droppedImages++;
-      return null;
-  }
-}
-function defaultClaudePath(cwd, sessionId) {
-  const dashed = cwd.replace(/[/.]/g, "-");
-  return path6.join(os4.homedir(), ".claude", "projects", dashed, `${sessionId}.jsonl`);
-}
-
-// src/emitters/opencode.ts
-import * as fs6 from "fs";
-import { execSync, execFileSync } from "child_process";
-async function writeOpencodeSession(session, options = {}) {
-  const dbPath = options.outputPath ?? OPENCODE_DB;
-  if (!fs6.existsSync(dbPath)) {
-    throw new Error(
-      `OpenCode database not found at ${dbPath}. Open OpenCode at least once before importing.`
-    );
-  }
-  if (!options.force && isDatabaseInUse(dbPath)) {
-    throw new Error(
-      `OpenCode appears to be running (database is open by another process). Quit OpenCode and try again, or pass --force.`
-    );
-  }
-  checkpointWal(dbPath);
-  const db = await openDatabase(dbPath);
-  const stats = {
-    messagesIn: session.messages.length,
-    messageRows: 0,
-    partRows: 0,
-    toolCalls: 0,
-    toolResultsFolded: 0,
-    droppedImages: 0
-  };
-  try {
-    const sessionId = generateId("ses");
-    const now = Date.now();
-    const projectId = pickProjectId(db);
-    const cwd = session.workingDirectory ?? process.cwd();
-    const title = pickTitle(session);
-    const slug = makeSlug();
-    db.run(
-      `INSERT INTO session
-       (id, project_id, slug, directory, title, version, time_created, time_updated)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [sessionId, projectId, slug, cwd, title, "1.2.27", now, now]
-    );
-    let lastAssistantMsgId;
-    let timeCursor = now;
-    const resultsByCallId = /* @__PURE__ */ new Map();
-    for (const m2 of session.messages) {
-      for (const b2 of m2.blocks) {
-        if (b2.type === "tool_result") {
-          resultsByCallId.set(b2.toolCallId, { content: b2.content, isError: b2.isError });
-        }
-      }
-    }
-    for (const msg of session.messages) {
-      if (msg.blocks.every((b2) => b2.type === "tool_result")) {
-        stats.toolResultsFolded += msg.blocks.length;
-        continue;
-      }
-      const messageId = generateId("msg");
-      const role = msg.role === "assistant" ? "assistant" : "user";
-      const messageTime = ++timeCursor;
-      const messageData = role === "user" ? { role: "user", time: { created: messageTime } } : {
-        role: "assistant",
-        time: { created: messageTime, completed: messageTime + 1 },
-        parentID: lastAssistantMsgId,
-        modelID: session.model ?? "imported-from-strait",
-        providerID: "strait",
-        mode: "build",
-        agent: "build",
-        path: { cwd, root: "/" },
-        cost: 0,
-        tokens: { total: 0, input: 0, output: 0, reasoning: 0, cache: { read: 0, write: 0 } },
-        finish: "stop"
-      };
-      db.run(
-        `INSERT INTO message (id, session_id, time_created, time_updated, data)
-         VALUES (?, ?, ?, ?, ?)`,
-        [messageId, sessionId, messageTime, messageTime, JSON.stringify(messageData)]
-      );
-      stats.messageRows++;
-      if (role === "assistant") lastAssistantMsgId = messageId;
-      for (const block of msg.blocks) {
-        if (block.type === "tool_result") continue;
-        const partRow = blockToPart(block, resultsByCallId, stats);
-        if (!partRow) continue;
-        const partId = generateId("prt");
-        const partTime = ++timeCursor;
-        db.run(
-          `INSERT INTO part (id, message_id, session_id, time_created, time_updated, data)
-           VALUES (?, ?, ?, ?, ?, ?)`,
-          [partId, messageId, sessionId, partTime, partTime, JSON.stringify(partRow)]
-        );
-        stats.partRows++;
-      }
-    }
-    db.run(`UPDATE session SET time_updated = ? WHERE id = ?`, [timeCursor, sessionId]);
-    const exported = Buffer.from(db.export());
-    const tmp = dbPath + ".strait-tmp";
-    fs6.writeFileSync(tmp, exported);
-    const fd = fs6.openSync(tmp, "r+");
-    try {
-      fs6.fsyncSync(fd);
-    } finally {
-      fs6.closeSync(fd);
-    }
-    if (!verifyIntegrity(tmp)) {
-      try {
-        fs6.unlinkSync(tmp);
-      } catch {
-      }
-      throw new Error(
-        "Exported DB failed integrity check; original left untouched. (This usually means sql.js produced an invalid serialization.)"
-      );
-    }
-    fs6.renameSync(tmp, dbPath);
-    for (const sidecar of [dbPath + "-wal", dbPath + "-shm"]) {
-      try {
-        fs6.unlinkSync(sidecar);
-      } catch {
-      }
-    }
-    return { outputPath: dbPath, sessionId, stats };
-  } finally {
-    db.close();
-  }
-}
-function blockToPart(block, results, stats) {
-  switch (block.type) {
-    case "text":
-      return { type: "text", text: block.text, tool: null, callID: null };
-    case "thinking":
-      return { type: "reasoning", text: block.text, tool: null, callID: null };
-    case "tool_call": {
-      stats.toolCalls++;
-      const result = results.get(block.id);
-      const state = result ? {
-        status: result.isError ? "error" : "completed",
-        input: block.arguments ?? {},
-        ...result.isError ? { error: result.content } : { output: result.content }
-      } : { status: "pending", input: block.arguments ?? {} };
-      if (result) stats.toolResultsFolded++;
-      return {
-        type: "tool",
-        callID: block.id,
-        tool: block.name,
-        state,
-        text: ""
-      };
-    }
-    case "image":
-      stats.droppedImages++;
-      return null;
-    case "tool_result":
-      return null;
-  }
-}
-function checkpointWal(dbPath) {
-  if (!fs6.existsSync(dbPath + "-wal")) return;
-  try {
-    execFileSync("sqlite3", [dbPath, "PRAGMA wal_checkpoint(TRUNCATE);"], {
-      stdio: ["ignore", "ignore", "ignore"]
-    });
-  } catch {
-  }
-}
-function verifyIntegrity(dbPath) {
-  try {
-    const out = execFileSync("sqlite3", ["-readonly", dbPath, "PRAGMA integrity_check;"], {
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "pipe"]
-    });
-    return out.trim() === "ok";
-  } catch {
-    return true;
-  }
-}
-function isDatabaseInUse(dbPath) {
-  try {
-    const out = execSync(`lsof -- ${JSON.stringify(dbPath)} 2>/dev/null`, {
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "ignore"]
-    });
-    return out.split("\n").slice(1).some((l2) => l2.trim().length > 0);
-  } catch {
-    return false;
-  }
-}
-function pickProjectId(db) {
-  const stmt = db.prepare("SELECT id FROM project WHERE id = 'global' LIMIT 1");
-  try {
-    if (stmt.step()) return "global";
-  } finally {
-    stmt.free();
-  }
-  const any = db.prepare("SELECT id FROM project LIMIT 1");
-  try {
-    if (any.step()) return any.getAsObject().id;
-  } finally {
-    any.free();
-  }
-  const now = Date.now();
-  db.run(
-    `INSERT INTO project (id, worktree, time_created, time_updated, sandboxes) VALUES (?, ?, ?, ?, ?)`,
-    ["global", "/", now, now, "[]"]
-  );
-  return "global";
-}
-function pickTitle(session) {
-  for (const m2 of session.messages) {
-    if (m2.role !== "user") continue;
-    for (const b2 of m2.blocks) {
-      if (b2.type === "text" && b2.text.trim()) {
-        return b2.text.replace(/\s+/g, " ").slice(0, 60).trim();
-      }
-    }
-  }
-  return `Imported from ${session.sourceRuntime} via strait`;
-}
-function makeSlug() {
-  const a2 = ["bright", "glowing", "calm", "swift", "quiet", "wild", "ancient", "hidden", "open", "rolling"];
-  const b2 = ["harbor", "strait", "passage", "tide", "channel", "sound", "current", "wake", "shore", "horizon"];
-  return a2[Math.floor(Math.random() * a2.length)] + "-" + b2[Math.floor(Math.random() * b2.length)];
-}
-var ID_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-function generateId(prefix) {
-  let out = prefix + "_";
-  for (let i2 = 0; i2 < 25; i2++) {
-    out += ID_ALPHABET[Math.floor(Math.random() * ID_ALPHABET.length)];
-  }
-  return out;
-}
-
-// src/interactive.ts
-import * as fs8 from "fs";
-import * as path8 from "path";
-import { spawn } from "child_process";
-
 // node_modules/@inquirer/core/dist/esm/lib/key.mjs
 var isUpKey = (key) => (
   // The up key
@@ -10314,7 +9375,7 @@ function getStore() {
   }
   return store;
 }
-function readline3() {
+function readline() {
   return getStore().rl;
 }
 function withUpdates(fn) {
@@ -10359,7 +9420,7 @@ var effectScheduler = {
     const { index } = store;
     store.hooksEffect.push(() => {
       store.hooksCleanup[index]?.();
-      const cleanFn = cb(readline3());
+      const cleanFn = cb(readline());
       if (cleanFn != null && typeof cleanFn !== "function") {
         throw new ValidationError("useEffect return value must be a cleanup function or nothing.");
       }
@@ -10761,12 +9822,12 @@ function makeTheme(...themes) {
 }
 
 // node_modules/@inquirer/core/dist/esm/lib/use-prefix.mjs
-function usePrefix({ status = "idle", theme }) {
+function usePrefix({ status: status2 = "idle", theme }) {
   const [showLoader, setShowLoader] = useState(false);
   const [tick, setTick] = useState(0);
   const { prefix, spinner } = makeTheme(theme);
   useEffect(() => {
-    if (status === "loading") {
+    if (status2 === "loading") {
       let tickInterval;
       let inc = -1;
       const delayTimeout = setTimeout(AsyncResource2.bind(() => {
@@ -10783,11 +9844,11 @@ function usePrefix({ status = "idle", theme }) {
     } else {
       setShowLoader(false);
     }
-  }, [status]);
+  }, [status2]);
   if (showLoader) {
     return spinner.frames[tick];
   }
-  const iconName = status === "loading" ? "idle" : status;
+  const iconName = status2 === "loading" ? "idle" : status2;
   return typeof prefix === "string" ? prefix : prefix[iconName];
 }
 
@@ -10835,7 +9896,7 @@ function breakLines(content, width) {
   return content.split("\n").flatMap((line) => (0, import_wrap_ansi.default)(line, width, { trim: false, hard: true }).split("\n").map((str) => str.trimEnd())).join("\n");
 }
 function readlineWidth() {
-  return (0, import_cli_width.default)({ defaultWidth: 80, output: readline3().output });
+  return (0, import_cli_width.default)({ defaultWidth: 80, output: readline().output });
 }
 
 // node_modules/@inquirer/core/dist/esm/lib/pagination/lines.mjs
@@ -10928,7 +9989,7 @@ function usePagination({ items, active, renderItem, pageSize, loop = true }) {
 
 // node_modules/@inquirer/core/dist/esm/lib/create-prompt.mjs
 var import_mute_stream = __toESM(require_lib(), 1);
-import * as readline4 from "readline";
+import * as readline2 from "readline";
 import { AsyncResource as AsyncResource3 } from "async_hooks";
 
 // node_modules/@inquirer/core/dist/esm/lib/screen-manager.mjs
@@ -11019,7 +10080,7 @@ function createPrompt(view) {
     const cleanups = /* @__PURE__ */ new Set();
     const output = new import_mute_stream.default();
     output.pipe(context.output ?? process.stdout);
-    const rl = readline4.createInterface({
+    const rl = readline2.createInterface({
       terminal: true,
       input,
       output
@@ -11092,7 +10153,7 @@ var Separator = class {
 // node_modules/@inquirer/confirm/dist/esm/index.mjs
 var esm_default2 = createPrompt((config, done) => {
   const { transformer = (answer) => answer ? "yes" : "no" } = config;
-  const [status, setStatus] = useState("pending");
+  const [status2, setStatus] = useState("pending");
   const [value, setValue] = useState("");
   const theme = makeTheme(config.theme);
   const prefix = usePrefix({ theme });
@@ -11112,7 +10173,7 @@ var esm_default2 = createPrompt((config, done) => {
   });
   let formattedValue = value;
   let defaultValue = "";
-  if (status === "done") {
+  if (status2 === "done") {
     formattedValue = theme.style.answer(value);
   } else {
     defaultValue = ` ${theme.style.defaultAnswer(config.default === false ? "y/N" : "Y/n")}`;
@@ -11162,7 +10223,7 @@ var esm_default3 = createPrompt((config, done) => {
   const firstRender = useRef(true);
   const theme = makeTheme(selectTheme, config.theme);
   const prefix = usePrefix({ theme });
-  const [status, setStatus] = useState("pending");
+  const [status2, setStatus] = useState("pending");
   const searchTimeoutRef = useRef();
   const items = useMemo(() => normalizeChoices(config.choices), [config.choices]);
   const bounds = useMemo(() => {
@@ -11252,7 +10313,7 @@ ${theme.style.help("(Use arrow keys to reveal more choices)")}`;
     pageSize,
     loop
   });
-  if (status === "done") {
+  if (status2 === "done") {
     return `${prefix} ${message} ${theme.style.answer(selectedChoice.short)}`;
   }
   const choiceDescription = selectedChoice.description ? `
@@ -11260,6 +10321,948 @@ ${theme.style.description(selectedChoice.description)}` : ``;
   return `${[prefix, message, helpTipTop].filter(Boolean).join(" ")}
 ${page}${helpTipBottom}${choiceDescription}${import_ansi_escapes2.default.cursorHide}`;
 });
+
+// src/index.ts
+import { spawn as spawn2 } from "child_process";
+import * as fs11 from "fs";
+import * as path11 from "path";
+import * as os7 from "os";
+
+// src/parsers/claude.ts
+import * as fs from "fs";
+import * as readline3 from "readline";
+import * as path from "path";
+var SKIP_TYPES = /* @__PURE__ */ new Set([
+  "permission-mode",
+  "attachment",
+  "file-history-snapshot",
+  "last-prompt",
+  "summary"
+]);
+async function parseClaudeSession(filePath) {
+  const warnings = [];
+  const messages = [];
+  const unknownBlockTypes = /* @__PURE__ */ new Set();
+  let model;
+  let cwd;
+  let sessionId;
+  let firstTimestamp;
+  const stream = fs.createReadStream(filePath, { encoding: "utf8" });
+  const rl = readline3.createInterface({ input: stream, crlfDelay: Infinity });
+  let lineNo = 0;
+  for await (const line of rl) {
+    lineNo++;
+    if (!line.trim()) continue;
+    let obj;
+    try {
+      obj = JSON.parse(line);
+    } catch (err) {
+      warnings.push(`line ${lineNo}: invalid JSON, skipped`);
+      continue;
+    }
+    if (!sessionId && typeof obj.sessionId === "string") sessionId = obj.sessionId;
+    if (!cwd && typeof obj.cwd === "string") cwd = obj.cwd;
+    if (!firstTimestamp && typeof obj.timestamp === "string") firstTimestamp = obj.timestamp;
+    if (!model && obj.message?.model) model = obj.message.model;
+    if (SKIP_TYPES.has(obj.type)) continue;
+    if (obj.type !== "user" && obj.type !== "assistant") continue;
+    const role = obj.message?.role === "assistant" ? "assistant" : "user";
+    const blocks = [];
+    const content = obj.message?.content;
+    if (typeof content === "string") {
+      if (content.length > 0) blocks.push({ type: "text", text: content });
+    } else if (Array.isArray(content)) {
+      for (const b2 of content) {
+        const mapped = mapBlock(b2, unknownBlockTypes);
+        if (mapped) blocks.push(mapped);
+      }
+    } else {
+      warnings.push(`line ${lineNo}: message.content has unexpected shape, skipped`);
+      continue;
+    }
+    if (blocks.length === 0) continue;
+    messages.push({
+      id: typeof obj.uuid === "string" ? obj.uuid : `synthetic-${lineNo}`,
+      role,
+      timestamp: typeof obj.timestamp === "string" ? obj.timestamp : (/* @__PURE__ */ new Date()).toISOString(),
+      parentId: typeof obj.parentUuid === "string" ? obj.parentUuid : void 0,
+      blocks
+    });
+  }
+  for (const t2 of unknownBlockTypes) {
+    warnings.push(`unknown content block type "${t2}" \u2014 dropped`);
+  }
+  if (!sessionId) {
+    sessionId = path.basename(filePath, ".jsonl");
+  }
+  return {
+    session: {
+      id: sessionId,
+      sourceRuntime: "claude",
+      createdAt: firstTimestamp ?? (/* @__PURE__ */ new Date()).toISOString(),
+      model,
+      workingDirectory: cwd,
+      messages
+    },
+    warnings
+  };
+}
+function mapBlock(b2, unknown) {
+  if (!b2 || typeof b2 !== "object") return null;
+  switch (b2.type) {
+    case "text":
+      return { type: "text", text: typeof b2.text === "string" ? b2.text : "" };
+    case "thinking":
+      return { type: "thinking", text: typeof b2.thinking === "string" ? b2.thinking : "" };
+    case "tool_use":
+      return {
+        type: "tool_call",
+        id: typeof b2.id === "string" ? b2.id : "",
+        name: typeof b2.name === "string" ? b2.name : "unknown",
+        arguments: b2.input && typeof b2.input === "object" ? b2.input : {}
+      };
+    case "tool_result": {
+      let content = "";
+      let isError;
+      if (typeof b2.content === "string") {
+        content = b2.content;
+      } else if (Array.isArray(b2.content)) {
+        content = b2.content.map((p) => typeof p?.text === "string" ? p.text : "").filter(Boolean).join("\n");
+      }
+      if (b2.is_error === true) isError = true;
+      return {
+        type: "tool_result",
+        toolCallId: typeof b2.tool_use_id === "string" ? b2.tool_use_id : "",
+        content,
+        isError
+      };
+    }
+    case "image":
+      unknown.add("image");
+      return null;
+    default:
+      if (typeof b2.type === "string") unknown.add(b2.type);
+      return null;
+  }
+}
+
+// src/parsers/codex.ts
+import * as fs2 from "fs";
+import * as readline4 from "readline";
+import * as path2 from "path";
+import { randomUUID } from "crypto";
+async function parseCodexSession(filePath) {
+  const warnings = [];
+  const messages = [];
+  const skippedKinds = /* @__PURE__ */ new Map();
+  let sessionId;
+  let cwd;
+  let model;
+  let firstTimestamp;
+  const stream = fs2.createReadStream(filePath, { encoding: "utf8" });
+  const rl = readline4.createInterface({ input: stream, crlfDelay: Infinity });
+  let lineNo = 0;
+  let prevId;
+  for await (const line of rl) {
+    lineNo++;
+    if (!line.trim()) continue;
+    let obj;
+    try {
+      obj = JSON.parse(line);
+    } catch {
+      warnings.push(`line ${lineNo}: invalid JSON, skipped`);
+      continue;
+    }
+    if (!firstTimestamp && typeof obj.timestamp === "string") firstTimestamp = obj.timestamp;
+    if (obj.type === "session_meta") {
+      sessionId = obj.payload?.id ?? sessionId;
+      cwd = obj.payload?.cwd ?? cwd;
+      continue;
+    }
+    if (obj.type === "turn_context") {
+      model = obj.payload?.model ?? model;
+      cwd = obj.payload?.cwd ?? cwd;
+      continue;
+    }
+    if (obj.type !== "response_item") {
+      continue;
+    }
+    const p = obj.payload;
+    if (!p || typeof p !== "object") continue;
+    const ts = typeof obj.timestamp === "string" ? obj.timestamp : (/* @__PURE__ */ new Date()).toISOString();
+    let role;
+    let block;
+    switch (p.type) {
+      case "message": {
+        if (p.role === "developer") {
+          bump(skippedKinds, "developer-message");
+          continue;
+        }
+        role = p.role === "assistant" ? "assistant" : "user";
+        const parts = [];
+        if (Array.isArray(p.content)) {
+          for (const c3 of p.content) {
+            if (c3?.type === "input_text" || c3?.type === "output_text") {
+              if (typeof c3.text === "string") parts.push(c3.text);
+            }
+          }
+        }
+        const text = parts.join("\n");
+        if (!text) continue;
+        if (role === "user" && isEnvironmentContextOnly(text)) {
+          bump(skippedKinds, "environment_context");
+          continue;
+        }
+        block = { type: "text", text };
+        break;
+      }
+      case "function_call": {
+        role = "assistant";
+        let args = {};
+        if (typeof p.arguments === "string") {
+          try {
+            args = JSON.parse(p.arguments) ?? {};
+          } catch {
+            args = { _raw: p.arguments };
+          }
+        } else if (p.arguments && typeof p.arguments === "object") {
+          args = p.arguments;
+        }
+        block = {
+          type: "tool_call",
+          id: typeof p.call_id === "string" ? p.call_id : randomUUID(),
+          name: typeof p.name === "string" ? p.name : "unknown",
+          arguments: args
+        };
+        break;
+      }
+      case "function_call_output": {
+        role = "user";
+        block = {
+          type: "tool_result",
+          toolCallId: typeof p.call_id === "string" ? p.call_id : "",
+          content: typeof p.output === "string" ? p.output : JSON.stringify(p.output ?? "")
+        };
+        break;
+      }
+      case "reasoning":
+      case "web_search_call":
+      case "custom_tool_call":
+      case "custom_tool_call_output":
+        bump(skippedKinds, p.type);
+        continue;
+      default:
+        bump(skippedKinds, `unknown:${p.type}`);
+        continue;
+    }
+    if (!role || !block) continue;
+    const id = randomUUID();
+    messages.push({ id, role, timestamp: ts, parentId: prevId, blocks: [block] });
+    prevId = id;
+  }
+  for (const [k2, n2] of skippedKinds) {
+    warnings.push(`skipped ${n2} ${k2} ${n2 === 1 ? "item" : "items"}`);
+  }
+  if (!sessionId) sessionId = path2.basename(filePath, ".jsonl");
+  return {
+    session: {
+      id: sessionId,
+      sourceRuntime: "codex",
+      createdAt: firstTimestamp ?? (/* @__PURE__ */ new Date()).toISOString(),
+      model,
+      workingDirectory: cwd,
+      messages
+    },
+    warnings
+  };
+}
+function bump(m2, k2) {
+  m2.set(k2, (m2.get(k2) ?? 0) + 1);
+}
+function isEnvironmentContextOnly(text) {
+  const trimmed = text.trim();
+  return /^<environment_context>[\s\S]*<\/environment_context>$/.test(trimmed);
+}
+
+// src/parsers/opencode.ts
+import * as os2 from "os";
+import * as path4 from "path";
+import { randomUUID as randomUUID2 } from "crypto";
+
+// src/sqlite.ts
+var import_sql = __toESM(require_sql_wasm(), 1);
+import * as fs3 from "fs";
+import * as path3 from "path";
+import { fileURLToPath } from "url";
+var cached = null;
+async function getSqlJs() {
+  if (cached) return cached;
+  cached = await (0, import_sql.default)({
+    // Locate sql-wasm.wasm next to the sql.js package, regardless of whether
+    // we're running from source or from a global npm install.
+    locateFile: (file) => {
+      const here = path3.dirname(fileURLToPath(import.meta.url));
+      const sibling = path3.join(here, file);
+      if (fs3.existsSync(sibling)) return sibling;
+      let dir = here;
+      for (let i2 = 0; i2 < 6; i2++) {
+        const candidate = path3.join(dir, "node_modules", "sql.js", "dist", file);
+        if (fs3.existsSync(candidate)) return candidate;
+        dir = path3.dirname(dir);
+      }
+      return file;
+    }
+  });
+  return cached;
+}
+async function openDatabase(filePath) {
+  const SQL = await getSqlJs();
+  const buf = fs3.readFileSync(filePath);
+  return new SQL.Database(new Uint8Array(buf));
+}
+
+// src/parsers/opencode.ts
+var OPENCODE_DB = path4.join(os2.homedir(), ".local", "share", "opencode", "opencode.db");
+var OPENCODE_PREFIX = "opencode://";
+function isOpencodeRef(ref) {
+  return ref.startsWith(OPENCODE_PREFIX);
+}
+function refToSessionId(ref) {
+  return ref.slice(OPENCODE_PREFIX.length);
+}
+function sessionIdToRef(id) {
+  return OPENCODE_PREFIX + id;
+}
+async function parseOpencodeSession(ref) {
+  const sessionId = isOpencodeRef(ref) ? refToSessionId(ref) : ref;
+  const db = await openDatabase(OPENCODE_DB);
+  try {
+    const row = queryOne(
+      db,
+      "SELECT id, directory, title, time_created FROM session WHERE id = $id",
+      { $id: sessionId }
+    );
+    if (!row) throw new Error(`OpenCode session not found: ${sessionId}`);
+    const messageRows = queryAll(
+      db,
+      "SELECT id, time_created, data FROM message WHERE session_id = $sid ORDER BY time_created, id",
+      { $sid: sessionId }
+    );
+    const partsByMessage = /* @__PURE__ */ new Map();
+    const partRows = queryAll(
+      db,
+      "SELECT message_id, time_created, data FROM part WHERE session_id = $sid ORDER BY message_id, time_created, id",
+      { $sid: sessionId }
+    );
+    for (const p of partRows) {
+      let arr = partsByMessage.get(p.message_id);
+      if (!arr) {
+        arr = [];
+        partsByMessage.set(p.message_id, arr);
+      }
+      arr.push({ time_created: p.time_created, data: p.data });
+    }
+    const messages = [];
+    const warnings = [];
+    const skipCounts = /* @__PURE__ */ new Map();
+    let model;
+    let prevId;
+    for (const m2 of messageRows) {
+      let mdata;
+      try {
+        mdata = JSON.parse(m2.data);
+      } catch {
+        warnings.push(`message ${m2.id}: invalid JSON, skipped`);
+        continue;
+      }
+      if (!model && typeof mdata.modelID === "string") model = mdata.modelID;
+      const role = mdata.role === "assistant" ? "assistant" : "user";
+      const parts = partsByMessage.get(m2.id) ?? [];
+      for (const p of parts) {
+        let pdata;
+        try {
+          pdata = JSON.parse(p.data);
+        } catch {
+          bump2(skipCounts, "invalid-part-json");
+          continue;
+        }
+        const ts = new Date(p.time_created).toISOString();
+        switch (pdata.type) {
+          case "text": {
+            const text = typeof pdata.text === "string" ? pdata.text : "";
+            if (!text) continue;
+            const id = randomUUID2();
+            messages.push({
+              id,
+              role,
+              timestamp: ts,
+              parentId: prevId,
+              blocks: [{ type: "text", text }]
+            });
+            prevId = id;
+            break;
+          }
+          case "reasoning": {
+            const text = typeof pdata.text === "string" ? pdata.text : "";
+            if (!text) continue;
+            const id = randomUUID2();
+            messages.push({
+              id,
+              role: "assistant",
+              timestamp: ts,
+              parentId: prevId,
+              blocks: [{ type: "thinking", text }]
+            });
+            prevId = id;
+            break;
+          }
+          case "tool": {
+            const callId = typeof pdata.callID === "string" ? pdata.callID : randomUUID2();
+            const name = typeof pdata.tool === "string" ? pdata.tool : "unknown";
+            const input = pdata.state?.input;
+            const args = input && typeof input === "object" ? input : {};
+            const callMsgId = randomUUID2();
+            messages.push({
+              id: callMsgId,
+              role: "assistant",
+              timestamp: ts,
+              parentId: prevId,
+              blocks: [{ type: "tool_call", id: callId, name, arguments: args }]
+            });
+            prevId = callMsgId;
+            const status2 = pdata.state?.status;
+            const output = pdata.state?.output;
+            if (status2 === "completed" && (typeof output === "string" || output != null)) {
+              const resMsgId = randomUUID2();
+              messages.push({
+                id: resMsgId,
+                role: "user",
+                timestamp: ts,
+                parentId: prevId,
+                blocks: [{
+                  type: "tool_result",
+                  toolCallId: callId,
+                  content: typeof output === "string" ? output : JSON.stringify(output)
+                }]
+              });
+              prevId = resMsgId;
+            } else if (status2 === "error") {
+              const errMsgId = randomUUID2();
+              messages.push({
+                id: errMsgId,
+                role: "user",
+                timestamp: ts,
+                parentId: prevId,
+                blocks: [{
+                  type: "tool_result",
+                  toolCallId: callId,
+                  content: typeof pdata.state?.error === "string" ? pdata.state.error : "tool error",
+                  isError: true
+                }]
+              });
+              prevId = errMsgId;
+            }
+            break;
+          }
+          case "step-start":
+          case "step-finish":
+          case "compaction":
+            break;
+          case "patch":
+          case "file":
+            bump2(skipCounts, pdata.type);
+            break;
+          default:
+            bump2(skipCounts, `unknown:${pdata.type ?? "?"}`);
+        }
+      }
+    }
+    for (const [k2, n2] of skipCounts) {
+      warnings.push(`skipped ${n2} ${k2} ${n2 === 1 ? "part" : "parts"}`);
+    }
+    return {
+      session: {
+        id: row.id,
+        sourceRuntime: "opencode",
+        createdAt: new Date(row.time_created).toISOString(),
+        model,
+        workingDirectory: row.directory,
+        messages
+      },
+      warnings
+    };
+  } finally {
+    db.close();
+  }
+}
+function bump2(m2, k2) {
+  m2.set(k2, (m2.get(k2) ?? 0) + 1);
+}
+function queryAll(db, sql, params) {
+  const stmt = db.prepare(sql);
+  try {
+    stmt.bind(params);
+    const rows = [];
+    while (stmt.step()) rows.push(stmt.getAsObject());
+    return rows;
+  } finally {
+    stmt.free();
+  }
+}
+function queryOne(db, sql, params) {
+  const rows = queryAll(db, sql, params);
+  return rows[0];
+}
+
+// src/emitters/codex.ts
+import * as fs4 from "fs";
+import * as path5 from "path";
+import * as os3 from "os";
+import { randomUUID as randomUUID3 } from "crypto";
+async function writeCodexSession(session, options = {}) {
+  const sessionId = randomUUID3();
+  const now = /* @__PURE__ */ new Date();
+  const outputPath = options.outputPath ?? defaultRolloutPath(now, sessionId);
+  fs4.mkdirSync(path5.dirname(outputPath), { recursive: true });
+  const out = fs4.createWriteStream(outputPath, { encoding: "utf8" });
+  const write = (obj) => out.write(JSON.stringify(obj) + "\n");
+  const cwd = session.workingDirectory ?? os3.homedir();
+  const model = session.model ?? "gpt-5.5";
+  const isoNow = now.toISOString();
+  write({
+    timestamp: isoNow,
+    type: "session_meta",
+    payload: {
+      id: sessionId,
+      timestamp: isoNow,
+      cwd,
+      originator: options.originator ?? "strait",
+      cli_version: options.cliVersion ?? "0.0.1",
+      source: "strait",
+      model_provider: "openai"
+    }
+  });
+  write({
+    timestamp: isoNow,
+    type: "turn_context",
+    payload: {
+      turn_id: randomUUID3(),
+      cwd,
+      current_date: isoNow.slice(0, 10),
+      timezone: process.env.TZ ?? "UTC",
+      approval_policy: "on-request",
+      sandbox_policy: {
+        type: "workspace-write",
+        writable_roots: [cwd],
+        network_access: false,
+        exclude_tmpdir_env_var: false,
+        exclude_slash_tmp: false
+      },
+      model,
+      personality: "friendly",
+      effort: "medium",
+      summary: "none"
+    }
+  });
+  const stats2 = {
+    messagesIn: session.messages.length,
+    responseItemsOut: 0,
+    toolCalls: 0,
+    toolResults: 0,
+    droppedThinking: 0,
+    droppedImages: 0
+  };
+  for (const msg of session.messages) {
+    for (const block of msg.blocks) {
+      const ts = msg.timestamp;
+      switch (block.type) {
+        case "text": {
+          const role = msg.role === "assistant" ? "assistant" : "user";
+          const innerType = role === "assistant" ? "output_text" : "input_text";
+          write({
+            timestamp: ts,
+            type: "response_item",
+            payload: {
+              type: "message",
+              role,
+              content: [{ type: innerType, text: block.text }]
+            }
+          });
+          stats2.responseItemsOut++;
+          break;
+        }
+        case "tool_call": {
+          write({
+            timestamp: ts,
+            type: "response_item",
+            payload: {
+              type: "function_call",
+              name: block.name,
+              arguments: JSON.stringify(block.arguments ?? {}),
+              call_id: block.id
+            }
+          });
+          stats2.responseItemsOut++;
+          stats2.toolCalls++;
+          break;
+        }
+        case "tool_result": {
+          write({
+            timestamp: ts,
+            type: "response_item",
+            payload: {
+              type: "function_call_output",
+              call_id: block.toolCallId,
+              output: block.content
+            }
+          });
+          stats2.responseItemsOut++;
+          stats2.toolResults++;
+          break;
+        }
+        case "thinking":
+          stats2.droppedThinking++;
+          break;
+        case "image":
+          stats2.droppedImages++;
+          break;
+      }
+    }
+  }
+  await new Promise((resolve, reject) => {
+    out.end((err) => err ? reject(err) : resolve());
+  });
+  return { outputPath, sessionId, stats: stats2 };
+}
+function defaultRolloutPath(now, sessionId) {
+  const yyyy = String(now.getUTCFullYear());
+  const mm = String(now.getUTCMonth() + 1).padStart(2, "0");
+  const dd = String(now.getUTCDate()).padStart(2, "0");
+  const stamp = now.toISOString().replace(/[:.]/g, "-").replace("Z", "");
+  return path5.join(
+    os3.homedir(),
+    ".codex",
+    "sessions",
+    yyyy,
+    mm,
+    dd,
+    `rollout-${stamp}-${sessionId}.jsonl`
+  );
+}
+
+// src/emitters/claude.ts
+import * as fs5 from "fs";
+import * as path6 from "path";
+import * as os4 from "os";
+import { randomUUID as randomUUID4 } from "crypto";
+async function writeClaudeSession(session, options = {}) {
+  const sessionId = randomUUID4();
+  const cwd = options.cwd ?? session.workingDirectory ?? os4.homedir();
+  const outputPath = options.outputPath ?? defaultClaudePath(cwd, sessionId);
+  const model = session.model ?? "claude-sonnet-4-6";
+  fs5.mkdirSync(path6.dirname(outputPath), { recursive: true });
+  const out = fs5.createWriteStream(outputPath, { encoding: "utf8" });
+  const write = (obj) => out.write(JSON.stringify(obj) + "\n");
+  const stats2 = {
+    messagesIn: session.messages.length,
+    linesOut: 0,
+    toolCalls: 0,
+    toolResults: 0,
+    droppedThinking: 0,
+    droppedImages: 0
+  };
+  let prevUuid;
+  for (const msg of session.messages) {
+    for (const block of msg.blocks) {
+      const uuid = randomUUID4();
+      const ts = msg.timestamp;
+      const claudeBlock = toClaudeBlock(block, stats2);
+      if (!claudeBlock) continue;
+      const role = msg.role === "assistant" ? "assistant" : "user";
+      const messagePayload = role === "assistant" ? { id: `msg_${uuid.replace(/-/g, "").slice(0, 24)}`, type: "message", role, model, content: [claudeBlock] } : { role, content: [claudeBlock] };
+      write({
+        parentUuid: prevUuid ?? null,
+        isSidechain: false,
+        userType: "external",
+        cwd,
+        sessionId,
+        version: "2.1.114",
+        gitBranch: "",
+        type: role,
+        message: messagePayload,
+        uuid,
+        timestamp: ts
+      });
+      stats2.linesOut++;
+      prevUuid = uuid;
+    }
+  }
+  await new Promise((resolve, reject) => {
+    out.end((err) => err ? reject(err) : resolve());
+  });
+  return { outputPath, sessionId, stats: stats2 };
+}
+function toClaudeBlock(b2, stats2) {
+  switch (b2.type) {
+    case "text":
+      return { type: "text", text: b2.text };
+    case "tool_call":
+      stats2.toolCalls++;
+      return { type: "tool_use", id: b2.id, name: b2.name, input: b2.arguments };
+    case "tool_result":
+      stats2.toolResults++;
+      return {
+        type: "tool_result",
+        tool_use_id: b2.toolCallId,
+        content: b2.content,
+        ...b2.isError ? { is_error: true } : {}
+      };
+    case "thinking":
+      stats2.droppedThinking++;
+      return null;
+    case "image":
+      stats2.droppedImages++;
+      return null;
+  }
+}
+function defaultClaudePath(cwd, sessionId) {
+  const dashed = cwd.replace(/[/.]/g, "-");
+  return path6.join(os4.homedir(), ".claude", "projects", dashed, `${sessionId}.jsonl`);
+}
+
+// src/emitters/opencode.ts
+import * as fs6 from "fs";
+import { execFileSync } from "child_process";
+async function writeOpencodeSession(session, options = {}) {
+  const dbPath = options.outputPath ?? OPENCODE_DB;
+  if (!fs6.existsSync(dbPath)) {
+    throw new Error(
+      `OpenCode database not found at ${dbPath}. Open OpenCode at least once before importing.`
+    );
+  }
+  if (!options.force && isDatabaseLocked(dbPath)) {
+    throw new Error(
+      `OpenCode appears to be running (database write lock is held). Quit OpenCode and try again, or pass --force.`
+    );
+  }
+  checkpointWal(dbPath);
+  const db = await openDatabase(dbPath);
+  const stats2 = {
+    messagesIn: session.messages.length,
+    messageRows: 0,
+    partRows: 0,
+    toolCalls: 0,
+    toolResultsFolded: 0,
+    droppedImages: 0
+  };
+  try {
+    const sessionId = generateId("ses");
+    const now = Date.now();
+    const projectId = pickProjectId(db);
+    const cwd = session.workingDirectory ?? process.cwd();
+    const title = pickTitle(session);
+    const slug = makeSlug();
+    db.run(
+      `INSERT INTO session
+       (id, project_id, slug, directory, title, version, time_created, time_updated)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [sessionId, projectId, slug, cwd, title, "1.2.27", now, now]
+    );
+    let lastAssistantMsgId;
+    let timeCursor = now;
+    const resultsByCallId = /* @__PURE__ */ new Map();
+    for (const m2 of session.messages) {
+      for (const b2 of m2.blocks) {
+        if (b2.type === "tool_result") {
+          resultsByCallId.set(b2.toolCallId, { content: b2.content, isError: b2.isError });
+        }
+      }
+    }
+    for (const msg of session.messages) {
+      if (msg.blocks.every((b2) => b2.type === "tool_result")) {
+        stats2.toolResultsFolded += msg.blocks.length;
+        continue;
+      }
+      const messageId = generateId("msg");
+      const role = msg.role === "assistant" ? "assistant" : "user";
+      const messageTime = ++timeCursor;
+      const messageData = role === "user" ? { role: "user", time: { created: messageTime } } : {
+        role: "assistant",
+        time: { created: messageTime, completed: messageTime + 1 },
+        parentID: lastAssistantMsgId,
+        modelID: session.model ?? "imported-from-strait",
+        providerID: "strait",
+        mode: "build",
+        agent: "build",
+        path: { cwd, root: "/" },
+        cost: 0,
+        tokens: { total: 0, input: 0, output: 0, reasoning: 0, cache: { read: 0, write: 0 } },
+        finish: "stop"
+      };
+      db.run(
+        `INSERT INTO message (id, session_id, time_created, time_updated, data)
+         VALUES (?, ?, ?, ?, ?)`,
+        [messageId, sessionId, messageTime, messageTime, JSON.stringify(messageData)]
+      );
+      stats2.messageRows++;
+      if (role === "assistant") lastAssistantMsgId = messageId;
+      for (const block of msg.blocks) {
+        if (block.type === "tool_result") continue;
+        const partRow = blockToPart(block, resultsByCallId, stats2);
+        if (!partRow) continue;
+        const partId = generateId("prt");
+        const partTime = ++timeCursor;
+        db.run(
+          `INSERT INTO part (id, message_id, session_id, time_created, time_updated, data)
+           VALUES (?, ?, ?, ?, ?, ?)`,
+          [partId, messageId, sessionId, partTime, partTime, JSON.stringify(partRow)]
+        );
+        stats2.partRows++;
+      }
+    }
+    db.run(`UPDATE session SET time_updated = ? WHERE id = ?`, [timeCursor, sessionId]);
+    const exported = Buffer.from(db.export());
+    const tmp = dbPath + ".strait-tmp";
+    fs6.writeFileSync(tmp, exported);
+    const fd = fs6.openSync(tmp, "r+");
+    try {
+      fs6.fsyncSync(fd);
+    } finally {
+      fs6.closeSync(fd);
+    }
+    if (!verifyIntegrity(tmp)) {
+      try {
+        fs6.unlinkSync(tmp);
+      } catch {
+      }
+      throw new Error(
+        "Exported DB failed integrity check; original left untouched. (This usually means sql.js produced an invalid serialization.)"
+      );
+    }
+    fs6.renameSync(tmp, dbPath);
+    for (const sidecar of [dbPath + "-wal", dbPath + "-shm"]) {
+      try {
+        fs6.unlinkSync(sidecar);
+      } catch {
+      }
+    }
+    return { outputPath: dbPath, sessionId, stats: stats2 };
+  } finally {
+    db.close();
+  }
+}
+function blockToPart(block, results, stats2) {
+  switch (block.type) {
+    case "text":
+      return { type: "text", text: block.text, tool: null, callID: null };
+    case "thinking":
+      return { type: "reasoning", text: block.text, tool: null, callID: null };
+    case "tool_call": {
+      stats2.toolCalls++;
+      const result = results.get(block.id);
+      const state = result ? {
+        status: result.isError ? "error" : "completed",
+        input: block.arguments ?? {},
+        ...result.isError ? { error: result.content } : { output: result.content }
+      } : { status: "pending", input: block.arguments ?? {} };
+      if (result) stats2.toolResultsFolded++;
+      return {
+        type: "tool",
+        callID: block.id,
+        tool: block.name,
+        state,
+        text: ""
+      };
+    }
+    case "image":
+      stats2.droppedImages++;
+      return null;
+    case "tool_result":
+      return null;
+  }
+}
+function checkpointWal(dbPath) {
+  if (!fs6.existsSync(dbPath + "-wal")) return;
+  try {
+    execFileSync("sqlite3", [dbPath, "PRAGMA wal_checkpoint(TRUNCATE);"], {
+      stdio: ["ignore", "ignore", "ignore"]
+    });
+  } catch {
+  }
+}
+function verifyIntegrity(dbPath) {
+  try {
+    const out = execFileSync("sqlite3", ["-readonly", dbPath, "PRAGMA integrity_check;"], {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"]
+    });
+    return out.trim() === "ok";
+  } catch {
+    return true;
+  }
+}
+function isDatabaseLocked(dbPath) {
+  try {
+    execFileSync("sqlite3", [dbPath, "BEGIN IMMEDIATE; ROLLBACK;"], {
+      stdio: ["ignore", "ignore", "pipe"],
+      timeout: 2e3
+    });
+    return false;
+  } catch (err) {
+    const stderr = String(err?.stderr ?? "");
+    if (/database is locked|is busy/i.test(stderr)) return true;
+    return false;
+  }
+}
+function pickProjectId(db) {
+  const stmt = db.prepare("SELECT id FROM project WHERE id = 'global' LIMIT 1");
+  try {
+    if (stmt.step()) return "global";
+  } finally {
+    stmt.free();
+  }
+  const any = db.prepare("SELECT id FROM project LIMIT 1");
+  try {
+    if (any.step()) return any.getAsObject().id;
+  } finally {
+    any.free();
+  }
+  const now = Date.now();
+  db.run(
+    `INSERT INTO project (id, worktree, time_created, time_updated, sandboxes) VALUES (?, ?, ?, ?, ?)`,
+    ["global", "/", now, now, "[]"]
+  );
+  return "global";
+}
+function pickTitle(session) {
+  for (const m2 of session.messages) {
+    if (m2.role !== "user") continue;
+    for (const b2 of m2.blocks) {
+      if (b2.type === "text" && b2.text.trim()) {
+        return b2.text.replace(/\s+/g, " ").slice(0, 60).trim();
+      }
+    }
+  }
+  return `Imported from ${session.sourceRuntime} via strait`;
+}
+function makeSlug() {
+  const a2 = ["bright", "glowing", "calm", "swift", "quiet", "wild", "ancient", "hidden", "open", "rolling"];
+  const b2 = ["harbor", "strait", "passage", "tide", "channel", "sound", "current", "wake", "shore", "horizon"];
+  return a2[Math.floor(Math.random() * a2.length)] + "-" + b2[Math.floor(Math.random() * b2.length)];
+}
+var ID_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+function generateId(prefix) {
+  let out = prefix + "_";
+  for (let i2 = 0; i2 < 25; i2++) {
+    out += ID_ALPHABET[Math.floor(Math.random() * ID_ALPHABET.length)];
+  }
+  return out;
+}
+
+// src/interactive.ts
+import * as fs9 from "fs";
+import * as path9 from "path";
+import { spawn } from "child_process";
 
 // src/anim.ts
 var SHIP = "\u26F5";
@@ -11414,6 +11417,31 @@ async function findOpencodeRefById(id) {
   return null;
 }
 
+// src/history.ts
+import * as fs8 from "fs";
+import * as path8 from "path";
+import * as os6 from "os";
+var HISTORY_PATH = path8.join(os6.homedir(), ".strait", "history.jsonl");
+function appendHistory(entry) {
+  try {
+    fs8.mkdirSync(path8.dirname(HISTORY_PATH), { recursive: true });
+    fs8.appendFileSync(HISTORY_PATH, JSON.stringify(entry) + "\n");
+  } catch {
+  }
+}
+function readHistory() {
+  if (!fs8.existsSync(HISTORY_PATH)) return [];
+  const out = [];
+  for (const line of fs8.readFileSync(HISTORY_PATH, "utf8").split("\n")) {
+    if (!line.trim()) continue;
+    try {
+      out.push(JSON.parse(line));
+    } catch {
+    }
+  }
+  return out;
+}
+
 // src/interactive.ts
 var claudeColor2 = source_default.hex("#FF8C42");
 var codexColor2 = source_default.hex("#3B82F6");
@@ -11432,10 +11460,10 @@ async function buildEntries(runtime, limit) {
     }));
   }
   const all = runtime === "claude" ? listAllClaudeSessions() : listAllCodexSessions();
-  const files = all.map((f3) => ({ f: f3, m: fs8.statSync(f3).mtimeMs })).sort((a2, b2) => b2.m - a2.m).slice(0, limit);
+  const files = all.map((f3) => ({ f: f3, m: fs9.statSync(f3).mtimeMs })).sort((a2, b2) => b2.m - a2.m).slice(0, limit);
   const entries = [];
   for (const { f: f3, m: m2 } of files) {
-    const base = path8.basename(f3, ".jsonl");
+    const base = path9.basename(f3, ".jsonl");
     const id = base.replace(/^rollout-[\d\-T]+-/, "");
     let preview = "";
     let msgCount = 0;
@@ -11580,12 +11608,12 @@ async function runSync(opts) {
   for (const w2 of parseRes.warnings) console.log(source_default.yellow.dim(`  \u26A0 ${w2}`));
   let outputPath;
   if (dryRun) {
-    fs8.mkdirSync("tmp", { recursive: true });
+    fs9.mkdirSync("tmp", { recursive: true });
     const ext = to === "opencode" ? "db" : "jsonl";
-    outputPath = path8.join("tmp", `dry-run-${to}-${Date.now()}.${ext}`);
+    outputPath = path9.join("tmp", `dry-run-${to}-${Date.now()}.${ext}`);
     if (to === "opencode") {
       const real = OPENCODE_DB;
-      if (fs8.existsSync(real)) fs8.copyFileSync(real, outputPath);
+      if (fs9.existsSync(real)) fs9.copyFileSync(real, outputPath);
     }
   }
   let result;
@@ -11599,6 +11627,17 @@ async function runSync(opts) {
   }
   const targetTint = colorFor2(to);
   console.log(source_default.dim(`  wrote ${targetTint(result.outputPath)}`));
+  appendHistory({
+    ts: (/* @__PURE__ */ new Date()).toISOString(),
+    from,
+    to,
+    srcId: entry.id,
+    tgtId: result.sessionId,
+    messages: parseRes.session.messages.length,
+    toolCalls,
+    dryRun,
+    outputPath: result.outputPath
+  });
   const resumeCmd = to === "codex" ? `codex resume ${targetTint(result.sessionId)}` : to === "claude" ? `claude --resume ${targetTint(result.sessionId)}` : `opencode --session ${targetTint(result.sessionId)}`;
   console.log("");
   console.log(`${source_default.green("\u2713")} Done. Resume command: ${source_default.bold(resumeCmd)}`);
@@ -11643,8 +11682,33 @@ function cap(s2) {
   return s2.charAt(0).toUpperCase() + s2.slice(1);
 }
 
+// src/version.ts
+import * as fs10 from "fs";
+import * as path10 from "path";
+import { fileURLToPath as fileURLToPath2 } from "url";
+function findVersion() {
+  const here = path10.dirname(fileURLToPath2(import.meta.url));
+  let dir = here;
+  for (let i2 = 0; i2 < 6; i2++) {
+    const candidate = path10.join(dir, "package.json");
+    if (fs10.existsSync(candidate)) {
+      try {
+        const pkg = JSON.parse(fs10.readFileSync(candidate, "utf8"));
+        if (pkg.name === "strait-cli" && typeof pkg.version === "string") {
+          return pkg.version;
+        }
+      } catch {
+      }
+    }
+    const parent = path10.dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+  return "0.0.0";
+}
+var VERSION = findVersion();
+
 // src/index.ts
-var VERSION = "0.0.1";
 var BANNER = `${source_default.bold("strait")}${source_default.dim(` v${VERSION} \u2014 session portability for AI agents`)}`;
 var claudeColor3 = source_default.hex("#FF8C42");
 var codexColor3 = source_default.hex("#3B82F6");
@@ -11711,7 +11775,7 @@ var sync = defineCommand({
     } catch (e2) {
       reportError(lookup, e2, "Couldn't parse session");
     }
-    const srcId = args.from === "opencode" ? filePath.replace(/^opencode:\/\//, "") : path9.basename(filePath, ".jsonl");
+    const srcId = args.from === "opencode" ? filePath.replace(/^opencode:\/\//, "") : path11.basename(filePath, ".jsonl");
     const created = parseRes.session.createdAt.slice(0, 10);
     const srcTint = colorForRuntime(args.from);
     lookup.succeed(
@@ -11740,12 +11804,12 @@ var sync = defineCommand({
     }
     let outputPath;
     if (args["dry-run"]) {
-      fs9.mkdirSync("tmp", { recursive: true });
+      fs11.mkdirSync("tmp", { recursive: true });
       const ext = args.to === "opencode" ? "db" : "jsonl";
-      outputPath = path9.join("tmp", `dry-run-${args.to}-${Date.now()}.${ext}`);
+      outputPath = path11.join("tmp", `dry-run-${args.to}-${Date.now()}.${ext}`);
       if (args.to === "opencode") {
-        const real = path9.join(os6.homedir(), ".local", "share", "opencode", "opencode.db");
-        if (fs9.existsSync(real)) fs9.copyFileSync(real, outputPath);
+        const real = path11.join(os7.homedir(), ".local", "share", "opencode", "opencode.db");
+        if (fs11.existsSync(real)) fs11.copyFileSync(real, outputPath);
       }
     }
     let result;
@@ -11758,6 +11822,17 @@ var sync = defineCommand({
     }
     const tgtTint = colorForRuntime(args.to);
     console.log(source_default.dim(`  wrote ${tgtTint(result.outputPath)}`));
+    appendHistory({
+      ts: (/* @__PURE__ */ new Date()).toISOString(),
+      from: args.from,
+      to: args.to,
+      srcId,
+      tgtId: result.sessionId,
+      messages: parseRes.session.messages.length,
+      toolCalls,
+      dryRun: !!args["dry-run"],
+      outputPath: result.outputPath
+    });
     const resumeCmd = args.to === "codex" ? `codex resume ${tgtTint(result.sessionId)}` : args.to === "claude" ? `claude --resume ${tgtTint(result.sessionId)}` : `opencode --session ${tgtTint(result.sessionId)}`;
     console.log("");
     console.log(`${source_default.green("\u2713")} Done. Resume with: ${source_default.bold(resumeCmd)}`);
@@ -11796,9 +11871,9 @@ var list = defineCommand({
       console.error(source_default.yellow(`No ${rt} sessions found.`));
       return;
     }
-    const ranked = files.map((f3) => ({ f: f3, m: fs9.statSync(f3).mtimeMs })).sort((a2, b2) => b2.m - a2.m).slice(0, 10);
+    const ranked = files.map((f3) => ({ f: f3, m: fs11.statSync(f3).mtimeMs })).sort((a2, b2) => b2.m - a2.m).slice(0, 10);
     for (const { f: f3, m: m2 } of ranked) {
-      const id = path9.basename(f3, ".jsonl").replace(/^rollout-[\d\-T]+-/, "");
+      const id = path11.basename(f3, ".jsonl").replace(/^rollout-[\d\-T]+-/, "");
       const date = new Date(m2).toISOString().slice(0, 16).replace("T", " ");
       let preview = "";
       let count = 0;
@@ -11815,9 +11890,393 @@ var list = defineCommand({
     }
   }
 });
+function resumeCommandFor(rt, id) {
+  if (rt === "claude") return { cmd: "claude", args: ["--resume", id] };
+  if (rt === "codex") return { cmd: "codex", args: ["resume", id] };
+  if (rt === "opencode") return { cmd: "opencode", args: ["--session", id] };
+  return null;
+}
+async function pickAndResume(rows, promptMsg = "Pick a session to resume") {
+  if (!rows.length) return;
+  if (!process.stdin.isTTY) {
+    console.log(source_default.dim("\n(run in a TTY to pick and resume one of these)"));
+    return;
+  }
+  let choice;
+  try {
+    choice = await esm_default3({
+      message: promptMsg,
+      choices: [
+        ...rows.map((r4) => ({ name: r4.label, value: `${r4.rt}:${r4.id}` })),
+        { name: source_default.dim("cancel"), value: "__cancel__" }
+      ],
+      pageSize: Math.min(15, rows.length + 1)
+    });
+  } catch {
+    return;
+  }
+  if (choice === "__cancel__") return;
+  const [rt, id] = choice.split(":");
+  const r3 = resumeCommandFor(rt, id);
+  if (!r3) return;
+  console.log(source_default.dim(`
+\u2192 ${r3.cmd} ${r3.args.join(" ")}
+`));
+  const child = spawn2(r3.cmd, r3.args, { stdio: "inherit" });
+  await new Promise((resolve) => {
+    child.on("exit", () => resolve());
+    child.on("error", (e2) => {
+      console.error(source_default.red(`Failed to launch ${r3.cmd}: ${e2.message}`));
+      console.error(source_default.dim(`Is "${r3.cmd}" installed and on your PATH?`));
+      resolve();
+    });
+  });
+}
+function dirSize(p) {
+  let total = 0;
+  const stack = [p];
+  while (stack.length) {
+    const cur = stack.pop();
+    let entries;
+    try {
+      entries = fs11.readdirSync(cur, { withFileTypes: true });
+    } catch {
+      continue;
+    }
+    for (const e2 of entries) {
+      const sub = path11.join(cur, e2.name);
+      if (e2.isDirectory()) stack.push(sub);
+      else if (e2.isFile()) {
+        try {
+          total += fs11.statSync(sub).size;
+        } catch {
+        }
+      }
+    }
+  }
+  return total;
+}
+function humanBytes(n2) {
+  if (n2 < 1024) return `${n2} B`;
+  if (n2 < 1024 ** 2) return `${(n2 / 1024).toFixed(1)} KB`;
+  if (n2 < 1024 ** 3) return `${(n2 / 1024 ** 2).toFixed(1)} MB`;
+  return `${(n2 / 1024 ** 3).toFixed(2)} GB`;
+}
+var CLAUDE_DIR = path11.join(os7.homedir(), ".claude", "projects");
+var CODEX_DIR = path11.join(os7.homedir(), ".codex", "sessions");
+var OPENCODE_DIR = path11.join(os7.homedir(), ".local", "share", "opencode");
+var status = defineCommand({
+  meta: { name: "status", description: "Show what's installed and where sessions live" },
+  async run() {
+    console.log(BANNER);
+    console.log("");
+    const claudeFiles = listAllClaudeSessions();
+    const codexFiles = listAllCodexSessions();
+    const opencodeRows = fs11.existsSync(path11.join(OPENCODE_DIR, "opencode.db")) ? await listAllOpencodeSessions() : [];
+    const rows = [
+      {
+        rt: "claude",
+        dir: CLAUDE_DIR,
+        present: fs11.existsSync(CLAUDE_DIR),
+        sessions: claudeFiles.length,
+        latest: claudeFiles.length ? Math.max(...claudeFiles.map((f3) => fs11.statSync(f3).mtimeMs)) : 0,
+        size: fs11.existsSync(CLAUDE_DIR) ? dirSize(CLAUDE_DIR) : 0
+      },
+      {
+        rt: "codex",
+        dir: CODEX_DIR,
+        present: fs11.existsSync(CODEX_DIR),
+        sessions: codexFiles.length,
+        latest: codexFiles.length ? Math.max(...codexFiles.map((f3) => fs11.statSync(f3).mtimeMs)) : 0,
+        size: fs11.existsSync(CODEX_DIR) ? dirSize(CODEX_DIR) : 0
+      },
+      {
+        rt: "opencode",
+        dir: OPENCODE_DIR,
+        present: fs11.existsSync(OPENCODE_DIR),
+        sessions: opencodeRows.length,
+        latest: opencodeRows.length ? opencodeRows[0].mtime : 0,
+        size: fs11.existsSync(OPENCODE_DIR) ? dirSize(OPENCODE_DIR) : 0
+      }
+    ];
+    for (const r3 of rows) {
+      const tint = colorForRuntime(r3.rt);
+      const mark = r3.present ? source_default.green("\u25CF") : source_default.dim("\u25CB");
+      const head = `${mark} ${tint(cap2(r3.rt).padEnd(9))}`;
+      if (!r3.present) {
+        console.log(`${head} ${source_default.dim("not installed")}  ${source_default.dim(r3.dir)}`);
+        continue;
+      }
+      const last = r3.latest ? new Date(r3.latest).toISOString().slice(0, 16).replace("T", " ") : "\u2014";
+      console.log(
+        `${head} ${source_default.bold(String(r3.sessions).padStart(5))} sessions  ${source_default.dim("latest")} ${last}  ${source_default.dim("size")} ${humanBytes(r3.size).padStart(8)}  ${source_default.dim(r3.dir)}`
+      );
+    }
+    const hist = readHistory();
+    console.log("");
+    console.log(`${source_default.dim("conversions logged:")} ${source_default.bold(String(hist.length))}  ${source_default.dim(HISTORY_PATH)}`);
+  }
+});
+async function gatherAllSessions() {
+  const rows = [];
+  for (const f3 of listAllClaudeSessions()) {
+    let mtime = 0;
+    try {
+      mtime = fs11.statSync(f3).mtimeMs;
+    } catch {
+    }
+    rows.push({ rt: "claude", id: path11.basename(f3, ".jsonl"), mtime, preview: "", messages: 0 });
+  }
+  for (const f3 of listAllCodexSessions()) {
+    let mtime = 0;
+    try {
+      mtime = fs11.statSync(f3).mtimeMs;
+    } catch {
+    }
+    const base = path11.basename(f3, ".jsonl");
+    const id = base.replace(/^rollout-[\d\-T]+-/, "");
+    rows.push({ rt: "codex", id, mtime, preview: "", messages: 0 });
+  }
+  if (fs11.existsSync(path11.join(OPENCODE_DIR, "opencode.db"))) {
+    for (const r3 of await listAllOpencodeSessions()) {
+      rows.push({ rt: "opencode", id: r3.id, mtime: r3.mtime, preview: r3.title ?? "", messages: 0 });
+    }
+  }
+  return rows.sort((a2, b2) => b2.mtime - a2.mtime);
+}
+var listAll = defineCommand({
+  meta: { name: "list-all", description: "Merge sessions from every runtime, newest first" },
+  args: { limit: { type: "string", description: "max rows (default 20)" } },
+  async run({ args }) {
+    console.log(BANNER);
+    const rows = await gatherAllSessions();
+    if (!rows.length) {
+      console.log(source_default.yellow("No sessions found in any runtime."));
+      return;
+    }
+    const limit = Number(args.limit) > 0 ? Number(args.limit) : 20;
+    const shown = rows.slice(0, limit);
+    for (const r3 of shown) {
+      const tint = colorForRuntime(r3.rt);
+      const when = r3.mtime ? new Date(r3.mtime).toISOString().slice(0, 16).replace("T", " ") : "\u2014";
+      const preview = r3.preview.replace(/\s+/g, " ").slice(0, 50);
+      console.log(`${tint(cap2(r3.rt).padEnd(9))} ${source_default.dim(when)}  ${tint(r3.id.slice(0, 12))}${source_default.dim("\u2026")}  ${source_default.dim(preview)}`);
+    }
+    console.log(source_default.dim(`
+${rows.length} total across all runtimes`));
+    await pickAndResume(
+      shown.map((r3) => {
+        const tint = colorForRuntime(r3.rt);
+        const when = r3.mtime ? new Date(r3.mtime).toISOString().slice(0, 16).replace("T", " ") : "\u2014";
+        const preview = r3.preview.replace(/\s+/g, " ").slice(0, 50);
+        return { rt: r3.rt, id: r3.id, label: `${tint(cap2(r3.rt).padEnd(9))} ${source_default.dim(when)}  ${preview || source_default.dim(r3.id.slice(0, 12) + "\u2026")}` };
+      })
+    );
+  }
+});
+function firstUserText(rt, filePath) {
+  try {
+    const fd = fs11.openSync(filePath, "r");
+    const buf = Buffer.alloc(32 * 1024);
+    const n2 = fs11.readSync(fd, buf, 0, buf.length, 0);
+    fs11.closeSync(fd);
+    const head = buf.slice(0, n2).toString("utf8");
+    for (const line of head.split("\n")) {
+      if (!line.trim()) continue;
+      try {
+        const obj = JSON.parse(line);
+        if (rt === "claude" && obj.type === "user" && obj.message?.content) {
+          const c3 = obj.message.content;
+          if (typeof c3 === "string") return c3;
+          if (Array.isArray(c3)) {
+            const t2 = c3.find((b2) => b2.type === "text");
+            if (t2?.text) return t2.text;
+          }
+        }
+        if (rt === "codex" && obj.type === "message" && obj.role === "user") {
+          const t2 = (obj.content ?? []).find((b2) => b2.type === "input_text" || b2.type === "text");
+          if (t2?.text) return t2.text;
+        }
+      } catch {
+      }
+    }
+  } catch {
+  }
+  return null;
+}
+var search = defineCommand({
+  meta: { name: "search", description: "Search the first user message of every session" },
+  args: {
+    query: { type: "positional", required: true, description: "case-insensitive substring" },
+    limit: { type: "string", description: "max matches (default 20)" }
+  },
+  async run({ args }) {
+    console.log(BANNER);
+    const q2 = String(args.query).toLowerCase();
+    const limit = Number(args.limit) > 0 ? Number(args.limit) : 20;
+    const hits = [];
+    for (const f3 of listAllClaudeSessions()) {
+      const text = firstUserText("claude", f3);
+      if (text && text.toLowerCase().includes(q2)) {
+        hits.push({ rt: "claude", id: path11.basename(f3, ".jsonl"), mtime: fs11.statSync(f3).mtimeMs, preview: text });
+      }
+    }
+    for (const f3 of listAllCodexSessions()) {
+      const text = firstUserText("codex", f3);
+      if (text && text.toLowerCase().includes(q2)) {
+        const id = path11.basename(f3, ".jsonl").replace(/^rollout-[\d\-T]+-/, "");
+        hits.push({ rt: "codex", id, mtime: fs11.statSync(f3).mtimeMs, preview: text });
+      }
+    }
+    if (fs11.existsSync(path11.join(OPENCODE_DIR, "opencode.db"))) {
+      for (const r3 of await listAllOpencodeSessions()) {
+        if ((r3.title ?? "").toLowerCase().includes(q2)) {
+          hits.push({ rt: "opencode", id: r3.id, mtime: r3.mtime, preview: r3.title });
+        }
+      }
+    }
+    hits.sort((a2, b2) => b2.mtime - a2.mtime);
+    if (!hits.length) {
+      console.log(source_default.yellow(`No matches for "${q2}".`));
+      return;
+    }
+    const shown = hits.slice(0, limit);
+    for (const h2 of shown) {
+      const tint = colorForRuntime(h2.rt);
+      const when = new Date(h2.mtime).toISOString().slice(0, 16).replace("T", " ");
+      const preview = h2.preview.replace(/\s+/g, " ").slice(0, 70);
+      console.log(`${tint(cap2(h2.rt).padEnd(9))} ${source_default.dim(when)}  ${tint(h2.id.slice(0, 12))}${source_default.dim("\u2026")}  ${preview}`);
+    }
+    if (hits.length > limit) console.log(source_default.dim(`
+\u2026and ${hits.length - limit} more.`));
+    await pickAndResume(
+      shown.map((h2) => {
+        const tint = colorForRuntime(h2.rt);
+        const when = new Date(h2.mtime).toISOString().slice(0, 16).replace("T", " ");
+        const preview = h2.preview.replace(/\s+/g, " ").slice(0, 70);
+        return { rt: h2.rt, id: h2.id, label: `${tint(cap2(h2.rt).padEnd(9))} ${source_default.dim(when)}  ${preview}` };
+      }),
+      `Resume one of these matches for "${q2}"?`
+    );
+  }
+});
+var open = defineCommand({
+  meta: { name: "open", description: "Find a session by ID and resume it" },
+  args: {
+    id: { type: "positional", required: true, description: "session id (full or prefix)" },
+    "print-only": { type: "boolean", description: "print the resume command instead of launching" }
+  },
+  async run({ args }) {
+    console.log(BANNER);
+    const id = String(args.id);
+    let hit = null;
+    const claudeHit = listAllClaudeSessions().find((f3) => path11.basename(f3, ".jsonl").startsWith(id));
+    if (claudeHit) {
+      hit = { rt: "claude", id: path11.basename(claudeHit, ".jsonl"), meta: claudeHit };
+    } else {
+      const codexHit = listAllCodexSessions().find((f3) => path11.basename(f3, ".jsonl").includes(id));
+      if (codexHit) {
+        const sid = path11.basename(codexHit, ".jsonl").replace(/^rollout-[\d\-T]+-/, "");
+        hit = { rt: "codex", id: sid, meta: codexHit };
+      } else if (fs11.existsSync(path11.join(OPENCODE_DIR, "opencode.db"))) {
+        const ocHit = (await listAllOpencodeSessions()).find((r4) => r4.id.startsWith(id));
+        if (ocHit) hit = { rt: "opencode", id: ocHit.id, meta: ocHit.title ?? "" };
+      }
+    }
+    if (!hit) {
+      console.log(source_default.red(`No session found matching "${id}" in any runtime.`));
+      process.exit(1);
+    }
+    const r3 = resumeCommandFor(hit.rt, hit.id);
+    const tint = colorForRuntime(hit.rt);
+    console.log(`${tint(cap2(hit.rt))}  ${source_default.bold(`${r3.cmd} ${r3.args.join(" ")}`)}`);
+    if (hit.meta) console.log(source_default.dim(`  ${hit.meta}`));
+    if (args["print-only"] || !process.stdin.isTTY) return;
+    console.log("");
+    const child = spawn2(r3.cmd, r3.args, { stdio: "inherit" });
+    await new Promise((resolve) => {
+      child.on("exit", () => resolve());
+      child.on("error", (e2) => {
+        console.error(source_default.red(`Failed to launch ${r3.cmd}: ${e2.message}`));
+        console.error(source_default.dim(`Is "${r3.cmd}" installed and on your PATH?`));
+        resolve();
+      });
+    });
+  }
+});
+var stats = defineCommand({
+  meta: { name: "stats", description: "Aggregate counts across all runtimes" },
+  async run() {
+    console.log(BANNER);
+    const claudeFiles = listAllClaudeSessions();
+    const codexFiles = listAllCodexSessions();
+    const opencodeRows = fs11.existsSync(path11.join(OPENCODE_DIR, "opencode.db")) ? await listAllOpencodeSessions() : [];
+    const hist = readHistory();
+    const total = claudeFiles.length + codexFiles.length + opencodeRows.length;
+    console.log("");
+    console.log(`${source_default.bold("sessions")}`);
+    console.log(`  ${claudeColor3("claude")}   ${source_default.bold(String(claudeFiles.length).padStart(6))}`);
+    console.log(`  ${codexColor3("codex")}    ${source_default.bold(String(codexFiles.length).padStart(6))}`);
+    console.log(`  ${opencodeColor2("opencode")} ${source_default.bold(String(opencodeRows.length).padStart(6))}`);
+    console.log(`  ${source_default.dim("total")}    ${source_default.bold(String(total).padStart(6))}`);
+    console.log("");
+    console.log(`${source_default.bold("conversions")} ${source_default.dim(`(${hist.length} total)`)}`);
+    if (hist.length) {
+      const byDir = {};
+      let totalMsgs = 0, totalTools = 0;
+      for (const e2 of hist) {
+        const k2 = `${e2.from}->${e2.to}`;
+        byDir[k2] = (byDir[k2] ?? 0) + 1;
+        totalMsgs += e2.messages;
+        totalTools += e2.toolCalls;
+      }
+      for (const [k2, n2] of Object.entries(byDir).sort((a2, b2) => b2[1] - a2[1])) {
+        const [f3, t2] = k2.split("->");
+        console.log(`  ${colorForRuntime(f3)(f3)} ${source_default.dim("\u2192")} ${colorForRuntime(t2)(t2)}  ${source_default.bold(String(n2).padStart(4))}`);
+      }
+      console.log(source_default.dim(`  ${totalMsgs} messages translated \xB7 ${totalTools} tool calls`));
+    } else {
+      console.log(source_default.dim("  none yet \u2014 run `strait sync` first"));
+    }
+  }
+});
+var history = defineCommand({
+  meta: { name: "history", description: "Show past sync conversions" },
+  args: {
+    limit: { type: "string", description: "max entries to show (default 20)" },
+    clear: { type: "boolean", description: "delete the history log" }
+  },
+  async run({ args }) {
+    console.log(BANNER);
+    if (args.clear) {
+      if (fs11.existsSync(HISTORY_PATH)) fs11.rmSync(HISTORY_PATH);
+      console.log(source_default.dim("history cleared."));
+      return;
+    }
+    const entries = readHistory();
+    if (!entries.length) {
+      console.log(source_default.yellow("No conversions yet. Run `strait sync` first."));
+      return;
+    }
+    const limit = Number(args.limit) > 0 ? Number(args.limit) : 20;
+    const recent = entries.slice(-limit).reverse();
+    const resumable = [];
+    for (const e2 of recent) {
+      const when = e2.ts.slice(0, 16).replace("T", " ");
+      const fromTint = colorForRuntime(e2.from);
+      const toTint = colorForRuntime(e2.to);
+      const arrow = `${fromTint(e2.from)} ${source_default.dim("\u2192")} ${toTint(e2.to)}`;
+      const flag = e2.dryRun ? source_default.yellow(" [dry-run]") : "";
+      const line = `${source_default.dim(when)}  ${arrow}${flag}  ${source_default.dim(`${e2.messages} msgs, ${e2.toolCalls} tools`)}  ${fromTint(e2.srcId.slice(0, 8))}${source_default.dim("\u2026")} ${source_default.dim("\u21A6")} ${toTint(e2.tgtId.slice(0, 8))}${source_default.dim("\u2026")}`;
+      console.log(line);
+      if (!e2.dryRun) resumable.push({ rt: e2.to, id: e2.tgtId, label: line });
+    }
+    await pickAndResume(resumable, "Resume one of these conversions?");
+  }
+});
 var main2 = defineCommand({
   meta: { name: "strait", version: VERSION, description: "Move AI agent sessions between Claude Code and Codex" },
-  subCommands: { sync, list },
+  subCommands: { sync, list, "list-all": listAll, status, search, open, stats, history },
   async run({ args }) {
     if (args._?.length) return;
     if (!process.stdin.isTTY) {
@@ -11829,6 +12288,12 @@ var main2 = defineCommand({
       console.log("  strait sync opencode claude|codex --latest");
       console.log("  strait sync <from> <to> --session <id>");
       console.log("  strait list claude | codex | opencode");
+      console.log("  strait list-all [--limit 20]");
+      console.log("  strait status");
+      console.log("  strait search <query> [--limit 20]");
+      console.log("  strait open <session-id>");
+      console.log("  strait stats");
+      console.log("  strait history [--limit 20] [--clear]");
       console.log("");
       console.log(`Run ${source_default.cyan("strait")} in a TTY for interactive mode.`);
       return;

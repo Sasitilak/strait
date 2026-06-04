@@ -1,6 +1,6 @@
 {
   "name": "strait-cli",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "Move your AI agent sessions between Claude Code, Codex, and OpenCode",
   "type": "module",
   "bin": {

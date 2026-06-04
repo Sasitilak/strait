@@ -3,8 +3,9 @@
  *
  * Writes IR back into ~/.local/share/opencode/opencode.db. Strategy:
  *
- *   1. Refuse if any process holds opencode.db open (lsof check). OpenCode
- *      is usually running and a concurrent write would race / corrupt.
+ *   1. Refuse if another process holds the SQLite write lock (BEGIN IMMEDIATE
+ *      probe). OpenCode takes that lock while running and a concurrent write
+ *      would race / corrupt.
  *   2. Load the DB into memory via sql.js (read-only handle).
  *   3. INSERT one session row, one message row per IR Message, one part row
  *      per IR ContentBlock — using OpenCode's native JSON shapes.
@@ -22,14 +23,14 @@
  *   image        → dropped (deferred)
  */
 import * as fs from "node:fs";
-import { execSync, execFileSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import type { Session, ContentBlock } from "../ir.js";
 import { OPENCODE_DB } from "../parsers/opencode.js";
 import { openDatabase } from "../sqlite.js";
 
 export interface EmitOptions {
   outputPath?: string;
-  /** Skip the lsof safety check (caller has confirmed OpenCode is closed). */
+  /** Skip the write-lock probe (caller has confirmed OpenCode is closed). */
   force?: boolean;
 }
 
@@ -58,9 +59,9 @@ export async function writeOpencodeSession(
     );
   }
 
-  if (!options.force && isDatabaseInUse(dbPath)) {
+  if (!options.force && isDatabaseLocked(dbPath)) {
     throw new Error(
-      `OpenCode appears to be running (database is open by another process). Quit OpenCode and try again, or pass --force.`,
+      `OpenCode appears to be running (database write lock is held). Quit OpenCode and try again, or pass --force.`,
     );
   }
 
@@ -269,16 +270,23 @@ function verifyIntegrity(dbPath: string): boolean {
   }
 }
 
-function isDatabaseInUse(dbPath: string): boolean {
+function isDatabaseLocked(dbPath: string): boolean {
+  // Probe the actual SQLite write lock instead of asking "does any process
+  // have an fd open?" — the latter false-positives on Spotlight, Time Machine,
+  // Finder previews, and crashed-OpenCode shm mappings. BEGIN IMMEDIATE takes
+  // the RESERVED lock OpenCode itself holds while running; if we can grab it
+  // and roll back, no writer is contending.
   try {
-    const out = execSync(`lsof -- ${JSON.stringify(dbPath)} 2>/dev/null`, {
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "ignore"],
+    execFileSync("sqlite3", [dbPath, "BEGIN IMMEDIATE; ROLLBACK;"], {
+      stdio: ["ignore", "ignore", "pipe"],
+      timeout: 2000,
     });
-    // First line is the lsof header; any subsequent non-empty line means a holder.
-    return out.split("\n").slice(1).some((l) => l.trim().length > 0);
-  } catch {
-    // lsof exits non-zero when no processes hold the file — that's the safe path.
+    return false;
+  } catch (err: any) {
+    const stderr = String(err?.stderr ?? "");
+    if (/database is locked|is busy/i.test(stderr)) return true;
+    // sqlite3 binary missing or some other failure — don't block the user.
+    // The post-write PRAGMA integrity_check still guards against corruption.
     return false;
   }
 }
