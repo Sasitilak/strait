@@ -7,7 +7,7 @@ Hit a Claude rate limit mid-task? Want to swap to Codex without losing context? 
 **Status:** alpha. All three runtimes (Claude Code, Codex, OpenCode) are bidirectional and resume-verified end-to-end.
 
 ```
-strait v0.0.1 — session portability for AI agents
+strait v0.1.0 — session portability for AI agents
 ? What do you want to do? Sync Claude → Codex
 ? Pick a claude session: 5f1e23a6  2026-04-28 (103 msgs)  # the build plan
 ? Where should the translated session be written? Real
@@ -65,6 +65,19 @@ strait list codex
 strait list opencode
 ```
 
+### Discovery & history
+
+```bash
+strait status                  # what's installed, session counts, disk usage
+strait list-all                # sessions from every runtime, merged, newest first
+strait search "auth bug"       # grep the first user message of every session
+strait open <id>               # find a session by id prefix and launch resume
+strait stats                   # per-runtime counts + per-direction conversions
+strait history                 # past syncs (logged to ~/.strait/history.jsonl)
+```
+
+`search`, `list-all`, and `history` end with an interactive picker — pick an entry and strait spawns the right runtime (`claude --resume` / `codex resume` / `opencode --session`) for you.
+
 `--dry-run` writes to `./tmp/` instead of the real target dir so you can inspect output before committing it. `--verbose` logs each message as it's translated.
 
 After a sync, strait can launch the resume command for you (in the original session's cwd) — pick "Run resume now" in interactive mode.
@@ -92,7 +105,7 @@ codex    ↔  opencode
 - Multi-block assistant messages (text + tool_use + text + tool_use, in order)
 - `tool_result` content as either string or array of text parts
 - Streaming line-by-line read (Claude/Codex) and indexed SQLite read/write (OpenCode)
-- Atomic write to OpenCode's SQLite DB with WAL checkpoint, integrity check, and sidecar cleanup — refuses to write if OpenCode is running
+- Atomic write to OpenCode's SQLite DB with WAL checkpoint, integrity check, and sidecar cleanup — probes the SQLite write lock to refuse a write only when OpenCode is actually holding it (no false positives from Spotlight or Finder)
 - Auto-cd into the imported session's original cwd when launching resume
 - Auto-launch with the right resume flag per runtime (`codex resume <id>`, `claude --resume <id>`, `opencode --session <id>`)
 - Filters out Codex's `<environment_context>` synthetic user turns
