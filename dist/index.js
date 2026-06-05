@@ -12025,7 +12025,7 @@ async function gatherAllSessions() {
       mtime = fs11.statSync(f3).mtimeMs;
     } catch {
     }
-    rows.push({ rt: "claude", id: path11.basename(f3, ".jsonl"), mtime, preview: "", messages: 0 });
+    rows.push({ rt: "claude", id: path11.basename(f3, ".jsonl"), mtime, preview: "", messages: 0, filePath: f3 });
   }
   for (const f3 of listAllCodexSessions()) {
     let mtime = 0;
@@ -12035,7 +12035,7 @@ async function gatherAllSessions() {
     }
     const base = path11.basename(f3, ".jsonl");
     const id = base.replace(/^rollout-[\d\-T]+-/, "");
-    rows.push({ rt: "codex", id, mtime, preview: "", messages: 0 });
+    rows.push({ rt: "codex", id, mtime, preview: "", messages: 0, filePath: f3 });
   }
   if (fs11.existsSync(path11.join(OPENCODE_DIR, "opencode.db"))) {
     for (const r3 of await listAllOpencodeSessions()) {
@@ -12056,6 +12056,11 @@ var listAll = defineCommand({
     }
     const limit = Number(args.limit) > 0 ? Number(args.limit) : 20;
     const shown = rows.slice(0, limit);
+    for (const r3 of shown) {
+      if (!r3.preview && r3.filePath && (r3.rt === "claude" || r3.rt === "codex")) {
+        r3.preview = firstUserText(r3.rt, r3.filePath) ?? "";
+      }
+    }
     for (const r3 of shown) {
       const tint = colorForRuntime(r3.rt);
       const when = r3.mtime ? new Date(r3.mtime).toISOString().slice(0, 16).replace("T", " ") : "\u2014";
