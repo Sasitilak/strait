@@ -359,19 +359,19 @@ const status = defineCommand({
   },
 });
 
-interface UnifiedRow { rt: string; id: string; mtime: number; preview: string; messages: number; }
+interface UnifiedRow { rt: string; id: string; mtime: number; preview: string; messages: number; filePath?: string; }
 
 async function gatherAllSessions(): Promise<UnifiedRow[]> {
   const rows: UnifiedRow[] = [];
   for (const f of listAllClaudeSessions()) {
     let mtime = 0; try { mtime = fs.statSync(f).mtimeMs; } catch {}
-    rows.push({ rt: "claude", id: path.basename(f, ".jsonl"), mtime, preview: "", messages: 0 });
+    rows.push({ rt: "claude", id: path.basename(f, ".jsonl"), mtime, preview: "", messages: 0, filePath: f });
   }
   for (const f of listAllCodexSessions()) {
     let mtime = 0; try { mtime = fs.statSync(f).mtimeMs; } catch {}
     const base = path.basename(f, ".jsonl");
     const id = base.replace(/^rollout-[\d\-T]+-/, "");
-    rows.push({ rt: "codex", id, mtime, preview: "", messages: 0 });
+    rows.push({ rt: "codex", id, mtime, preview: "", messages: 0, filePath: f });
   }
   if (fs.existsSync(path.join(OPENCODE_DIR, "opencode.db"))) {
     for (const r of await listAllOpencodeSessions()) {
@@ -390,6 +390,11 @@ const listAll = defineCommand({
     if (!rows.length) { console.log(chalk.yellow("No sessions found in any runtime.")); return; }
     const limit = Number(args.limit) > 0 ? Number(args.limit) : 20;
     const shown = rows.slice(0, limit);
+    for (const r of shown) {
+      if (!r.preview && r.filePath && (r.rt === "claude" || r.rt === "codex")) {
+        r.preview = firstUserText(r.rt, r.filePath) ?? "";
+      }
+    }
     for (const r of shown) {
       const tint = colorForRuntime(r.rt);
       const when = r.mtime ? new Date(r.mtime).toISOString().slice(0, 16).replace("T", " ") : "—";
