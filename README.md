@@ -2,12 +2,12 @@
 
 > Move your AI agent sessions between Claude Code, Codex, and OpenCode.
 
-Hit a Claude rate limit mid-task? Want to swap to Codex without losing context? Stuck in OpenCode and want your history elsewhere? `strait` translates sessions between agents, one shot, with full conversation history preserved.
+Hit a Claude rate limit mid-task? Want to swap to Codex without losing context? `strait` translates sessions between Claude Code, Codex, and OpenCode — with full history preserved — and gives you one CLI to search, resume, and track every conversation across all three.
 
 **Status:** alpha. All three runtimes (Claude Code, Codex, OpenCode) are bidirectional and resume-verified end-to-end.
 
 ```
-strait v0.1.0 — session portability for AI agents
+strait — session portability for AI agents
 ? What do you want to do? Sync Claude → Codex
 ? Pick a claude session: 5f1e23a6  2026-04-28 (103 msgs)  # the build plan
 ? Where should the translated session be written? Real
@@ -65,6 +65,10 @@ strait list codex
 strait list opencode
 ```
 
+`--dry-run` writes to `./tmp/` instead of the real target dir so you can inspect output before committing it. `--verbose` logs each message as it's translated.
+
+After a sync, strait can launch the resume command for you (in the original session's cwd) — pick "Run resume now" in interactive mode.
+
 ### Discovery & history
 
 ```bash
@@ -77,10 +81,6 @@ strait history                 # past syncs (logged to ~/.strait/history.jsonl)
 ```
 
 `search`, `list-all`, and `history` end with an interactive picker — pick an entry and strait spawns the right runtime (`claude --resume` / `codex resume` / `opencode --session`) for you.
-
-`--dry-run` writes to `./tmp/` instead of the real target dir so you can inspect output before committing it. `--verbose` logs each message as it's translated.
-
-After a sync, strait can launch the resume command for you (in the original session's cwd) — pick "Run resume now" in interactive mode.
 
 ## Supported runtimes
 
@@ -116,7 +116,7 @@ codex    ↔  opencode
 - **Tool names pass through verbatim.** Resume will display the original tool calls (e.g. `Bash`), but the receiving runtime won't re-execute them unless that name is also one of its registered tools. The transcript is intact; new turns use the receiving runtime's own tools.
 - **Codex resume logs a non-fatal "thread not found" warning** on imported sessions. This is a Codex-internal cache issue for rollouts it didn't create itself — the conversation context still loads correctly and new turns persist.
 - **Cloud-only agents are not supported** — Antigravity, Cursor cloud agents, ChatGPT, Devin, Replit Agent, etc. don't store sessions on disk, so there's nothing for `strait` to read.
-- **Format is unstable.** Schemas change between releases. v1 targets Claude 2.1.x, Codex 0.114–0.125, OpenCode current.
+- **Format is unstable.** Schemas change between releases. Current release targets Claude Code 2.1.x, Codex 0.114–0.125, and OpenCode (latest).
 - **No tests yet.** Verified by running against real sessions.
 
 ## Contributing
