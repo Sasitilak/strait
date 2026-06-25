@@ -82,6 +82,22 @@ strait history                 # past syncs (logged to ~/.strait/history.jsonl)
 
 `search`, `list-all`, and `history` end with an interactive picker — pick an entry and strait spawns the right runtime (`claude --resume` / `codex resume` / `opencode --session`) for you.
 
+### Insights & analytics
+
+`strait insights` aggregates your usage across every runtime — tools, MCP servers, skills, models, token usage, and when you actually work — entirely **offline**. Nothing leaves your machine.
+
+```bash
+strait insights                       # full local report
+strait insights --runtime claude      # one runtime (repeatable)
+strait insights --since 2026-01-01    # only sessions on/after a date
+strait insights --days 30 --top 15    # widen the activity window / tables
+strait insights --json                # raw MetadataSnapshot (machine-readable)
+```
+
+What you get: top tools, MCP servers (parsed from `mcp__<server>__<tool>`), installed skills, models, **token usage** (fresh input+output shown separately from cache reuse), a day-by-day activity chart, and a local time-of-day "when you work" histogram.
+
+`--json` emits a metadata-only snapshot — tool/MCP/skill/model **names**, counts, dates, token totals, and time-of-day histograms. It **never** contains message text, code, file contents, tool arguments, or file paths. Everything runs locally; nothing is uploaded anywhere.
+
 ## Supported runtimes
 
 | Runtime       | Read | Write | Resume verified |
@@ -109,15 +125,6 @@ codex    ↔  opencode
 - Auto-cd into the imported session's original cwd when launching resume
 - Auto-launch with the right resume flag per runtime (`codex resume <id>`, `claude --resume <id>`, `opencode --session <id>`)
 - Filters out Codex's `<environment_context>` synthetic user turns
-
-## Known limitations
-
-- **Thinking blocks are dropped.** Both Claude and Codex store reasoning in formats the other can't reconstruct (Codex uses encrypted blobs, Claude requires a valid signature). Tool calls and final outputs are preserved; the model just doesn't see its own prior chain-of-thought.
-- **Tool names pass through verbatim.** Resume will display the original tool calls (e.g. `Bash`), but the receiving runtime won't re-execute them unless that name is also one of its registered tools. The transcript is intact; new turns use the receiving runtime's own tools.
-- **Codex resume logs a non-fatal "thread not found" warning** on imported sessions. This is a Codex-internal cache issue for rollouts it didn't create itself — the conversation context still loads correctly and new turns persist.
-- **Cloud-only agents are not supported** — Antigravity, Cursor cloud agents, ChatGPT, Devin, Replit Agent, etc. don't store sessions on disk, so there's nothing for `strait` to read.
-- **Format is unstable.** Schemas change between releases. Current release targets Claude Code 2.1.x, Codex 0.114–0.125, and OpenCode (latest).
-- **No tests yet.** Verified by running against real sessions.
 
 ## Contributing
 

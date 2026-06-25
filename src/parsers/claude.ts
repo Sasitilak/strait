@@ -19,7 +19,7 @@
 import * as fs from "node:fs";
 import * as readline from "node:readline";
 import * as path from "node:path";
-import type { Session, Message, ContentBlock } from "../ir.js";
+import type { Session, Message, ContentBlock, TokenUsage } from "../ir.js";
 
 const SKIP_TYPES = new Set([
   "permission-mode",
@@ -42,6 +42,9 @@ export async function parseClaudeSession(filePath: string): Promise<ParseResult>
   let cwd: string | undefined;
   let sessionId: string | undefined;
   let firstTimestamp: string | undefined;
+  // Token usage accumulates across all assistant messages in the file.
+  const usage: TokenUsage = { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, reasoning: 0, total: 0 };
+  let sawUsage = false;
 
   const stream = fs.createReadStream(filePath, { encoding: "utf8" });
   const rl = readline.createInterface({ input: stream, crlfDelay: Infinity });
@@ -62,6 +65,15 @@ export async function parseClaudeSession(filePath: string): Promise<ParseResult>
     if (!cwd && typeof obj.cwd === "string") cwd = obj.cwd;
     if (!firstTimestamp && typeof obj.timestamp === "string") firstTimestamp = obj.timestamp;
     if (!model && obj.message?.model) model = obj.message.model;
+
+    const u = obj.message?.usage;
+    if (u && typeof u === "object") {
+      sawUsage = true;
+      usage.input += num(u.input_tokens);
+      usage.output += num(u.output_tokens);
+      usage.cacheRead += num(u.cache_read_input_tokens);
+      usage.cacheWrite += num(u.cache_creation_input_tokens);
+    }
 
     if (SKIP_TYPES.has(obj.type)) continue;
     if (obj.type !== "user" && obj.type !== "assistant") continue;
@@ -101,6 +113,8 @@ export async function parseClaudeSession(filePath: string): Promise<ParseResult>
     sessionId = path.basename(filePath, ".jsonl");
   }
 
+  if (sawUsage) usage.total = usage.input + usage.output + usage.cacheRead + usage.cacheWrite;
+
   return {
     session: {
       id: sessionId,
@@ -108,10 +122,15 @@ export async function parseClaudeSession(filePath: string): Promise<ParseResult>
       createdAt: firstTimestamp ?? new Date().toISOString(),
       model,
       workingDirectory: cwd,
+      usage: sawUsage ? usage : undefined,
       messages,
     },
     warnings,
   };
+}
+
+function num(v: unknown): number {
+  return typeof v === "number" && Number.isFinite(v) ? v : 0;
 }
 
 function mapBlock(b: any, unknown: Set<string>): ContentBlock | null {

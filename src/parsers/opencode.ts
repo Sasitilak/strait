@@ -25,7 +25,7 @@ import * as os from "node:os";
 import * as path from "node:path";
 import { randomUUID } from "node:crypto";
 import { openDatabase } from "../sqlite.js";
-import type { Session, Message, ContentBlock } from "../ir.js";
+import type { Session, Message, ContentBlock, TokenUsage } from "../ir.js";
 
 export const OPENCODE_DB = path.join(os.homedir(), ".local", "share", "opencode", "opencode.db");
 export const OPENCODE_PREFIX = "opencode://";
@@ -82,12 +82,24 @@ export async function parseOpencodeSession(ref: string): Promise<ParseResult> {
     const skipCounts = new Map<string, number>();
     let model: string | undefined;
     let prevId: string | undefined;
+    const usage: TokenUsage = { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, reasoning: 0, total: 0 };
+    let sawUsage = false;
 
     for (const m of messageRows) {
       let mdata: any;
       try { mdata = JSON.parse(m.data); }
       catch { warnings.push(`message ${m.id}: invalid JSON, skipped`); continue; }
       if (!model && typeof mdata.modelID === "string") model = mdata.modelID;
+
+      const t = mdata.tokens;
+      if (t && typeof t === "object") {
+        sawUsage = true;
+        usage.input += num(t.input);
+        usage.output += num(t.output);
+        usage.reasoning += num(t.reasoning);
+        usage.cacheRead += num(t.cache?.read);
+        usage.cacheWrite += num(t.cache?.write);
+      }
 
       const role = mdata.role === "assistant" ? "assistant" : "user";
       const parts = partsByMessage.get(m.id) ?? [];
@@ -183,6 +195,8 @@ export async function parseOpencodeSession(ref: string): Promise<ParseResult> {
       warnings.push(`skipped ${n} ${k} ${n === 1 ? "part" : "parts"}`);
     }
 
+    if (sawUsage) usage.total = usage.input + usage.output + usage.cacheRead + usage.cacheWrite;
+
     return {
       session: {
         id: row.id,
@@ -190,6 +204,7 @@ export async function parseOpencodeSession(ref: string): Promise<ParseResult> {
         createdAt: new Date(row.time_created).toISOString(),
         model,
         workingDirectory: row.directory,
+        usage: sawUsage ? usage : undefined,
         messages,
       },
       warnings,
@@ -201,6 +216,10 @@ export async function parseOpencodeSession(ref: string): Promise<ParseResult> {
 
 function bump(m: Map<string, number>, k: string) {
   m.set(k, (m.get(k) ?? 0) + 1);
+}
+
+function num(v: unknown): number {
+  return typeof v === "number" && Number.isFinite(v) ? v : 0;
 }
 
 // Tiny shim over sql.js so the parser code reads like better-sqlite3 did.

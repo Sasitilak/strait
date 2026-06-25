@@ -20,7 +20,7 @@ import * as fs from "node:fs";
 import * as readline from "node:readline";
 import * as path from "node:path";
 import { randomUUID } from "node:crypto";
-import type { Session, Message, ContentBlock } from "../ir.js";
+import type { Session, Message, ContentBlock, TokenUsage } from "../ir.js";
 
 export interface ParseResult {
   session: Session;
@@ -35,6 +35,9 @@ export async function parseCodexSession(filePath: string): Promise<ParseResult> 
   let cwd: string | undefined;
   let model: string | undefined;
   let firstTimestamp: string | undefined;
+  // Codex emits `token_count` events whose `total_token_usage` is cumulative
+  // for the whole session. The last one we see is the session total.
+  let lastTokenUsage: any;
 
   const stream = fs.createReadStream(filePath, { encoding: "utf8" });
   const rl = readline.createInterface({ input: stream, crlfDelay: Infinity });
@@ -61,7 +64,12 @@ export async function parseCodexSession(filePath: string): Promise<ParseResult> 
       continue;
     }
     if (obj.type !== "response_item") {
-      // event_msg etc. — skip silently
+      // event_msg etc. — skip silently, except token_count which carries the
+      // session's cumulative usage.
+      if (obj.type === "event_msg" && obj.payload?.type === "token_count") {
+        const tot = obj.payload?.info?.total_token_usage;
+        if (tot && typeof tot === "object") lastTokenUsage = tot;
+      }
       continue;
     }
 
@@ -151,10 +159,29 @@ export async function parseCodexSession(filePath: string): Promise<ParseResult> 
       createdAt: firstTimestamp ?? new Date().toISOString(),
       model,
       workingDirectory: cwd,
+      usage: codexUsage(lastTokenUsage),
       messages,
     },
     warnings,
   };
+}
+
+/**
+ * Codex's `input_tokens` includes cached input, so we subtract `cached_input_tokens`
+ * to get the non-cached input and keep `total = input + output + cacheRead`.
+ */
+function codexUsage(tot: any): TokenUsage | undefined {
+  if (!tot || typeof tot !== "object") return undefined;
+  const cacheRead = num(tot.cached_input_tokens);
+  const input = Math.max(0, num(tot.input_tokens) - cacheRead);
+  const output = num(tot.output_tokens);
+  const reasoning = num(tot.reasoning_output_tokens);
+  const cacheWrite = 0; // Codex doesn't report cache-creation separately.
+  return { input, output, cacheRead, cacheWrite, reasoning, total: input + output + cacheRead + cacheWrite };
+}
+
+function num(v: unknown): number {
+  return typeof v === "number" && Number.isFinite(v) ? v : 0;
 }
 
 function bump(m: Map<string, number>, k: string) {

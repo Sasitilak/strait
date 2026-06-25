@@ -2566,9 +2566,9 @@ var require_cli_width = __commonJS({
   }
 });
 
-// node_modules/wrap-ansi/node_modules/strip-ansi/node_modules/ansi-regex/index.js
+// node_modules/wrap-ansi/node_modules/ansi-regex/index.js
 var require_ansi_regex = __commonJS({
-  "node_modules/wrap-ansi/node_modules/strip-ansi/node_modules/ansi-regex/index.js"(exports, module) {
+  "node_modules/wrap-ansi/node_modules/ansi-regex/index.js"(exports, module) {
     "use strict";
     module.exports = ({ onlyFirst = false } = {}) => {
       const pattern = [
@@ -2622,9 +2622,9 @@ var require_is_fullwidth_code_point = __commonJS({
   }
 });
 
-// node_modules/wrap-ansi/node_modules/string-width/node_modules/emoji-regex/index.js
+// node_modules/wrap-ansi/node_modules/emoji-regex/index.js
 var require_emoji_regex = __commonJS({
-  "node_modules/wrap-ansi/node_modules/string-width/node_modules/emoji-regex/index.js"(exports, module) {
+  "node_modules/wrap-ansi/node_modules/emoji-regex/index.js"(exports, module) {
     "use strict";
     module.exports = function() {
       return /\uD83C\uDFF4\uDB40\uDC67\uDB40\uDC62(?:\uDB40\uDC65\uDB40\uDC6E\uDB40\uDC67|\uDB40\uDC73\uDB40\uDC63\uDB40\uDC74|\uDB40\uDC77\uDB40\uDC6C\uDB40\uDC73)\uDB40\uDC7F|\uD83D\uDC68(?:\uD83C\uDFFC\u200D(?:\uD83E\uDD1D\u200D\uD83D\uDC68\uD83C\uDFFB|\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFF\u200D(?:\uD83E\uDD1D\u200D\uD83D\uDC68(?:\uD83C[\uDFFB-\uDFFE])|\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFE\u200D(?:\uD83E\uDD1D\u200D\uD83D\uDC68(?:\uD83C[\uDFFB-\uDFFD])|\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFD\u200D(?:\uD83E\uDD1D\u200D\uD83D\uDC68(?:\uD83C[\uDFFB\uDFFC])|\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\u200D(?:\u2764\uFE0F\u200D(?:\uD83D\uDC8B\u200D)?\uD83D\uDC68|(?:\uD83D[\uDC68\uDC69])\u200D(?:\uD83D\uDC66\u200D\uD83D\uDC66|\uD83D\uDC67\u200D(?:\uD83D[\uDC66\uDC67]))|\uD83D\uDC66\u200D\uD83D\uDC66|\uD83D\uDC67\u200D(?:\uD83D[\uDC66\uDC67])|(?:\uD83D[\uDC68\uDC69])\u200D(?:\uD83D[\uDC66\uDC67])|[\u2695\u2696\u2708]\uFE0F|\uD83D[\uDC66\uDC67]|\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|(?:\uD83C\uDFFB\u200D[\u2695\u2696\u2708]|\uD83C\uDFFF\u200D[\u2695\u2696\u2708]|\uD83C\uDFFE\u200D[\u2695\u2696\u2708]|\uD83C\uDFFD\u200D[\u2695\u2696\u2708]|\uD83C\uDFFC\u200D[\u2695\u2696\u2708])\uFE0F|\uD83C\uDFFB\u200D(?:\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C[\uDFFB-\uDFFF])|(?:\uD83E\uDDD1\uD83C\uDFFB\u200D\uD83E\uDD1D\u200D\uD83E\uDDD1|\uD83D\uDC69\uD83C\uDFFC\u200D\uD83E\uDD1D\u200D\uD83D\uDC69)\uD83C\uDFFB|\uD83E\uDDD1(?:\uD83C\uDFFF\u200D\uD83E\uDD1D\u200D\uD83E\uDDD1(?:\uD83C[\uDFFB-\uDFFF])|\u200D\uD83E\uDD1D\u200D\uD83E\uDDD1)|(?:\uD83E\uDDD1\uD83C\uDFFE\u200D\uD83E\uDD1D\u200D\uD83E\uDDD1|\uD83D\uDC69\uD83C\uDFFF\u200D\uD83E\uDD1D\u200D(?:\uD83D[\uDC68\uDC69]))(?:\uD83C[\uDFFB-\uDFFE])|(?:\uD83E\uDDD1\uD83C\uDFFC\u200D\uD83E\uDD1D\u200D\uD83E\uDDD1|\uD83D\uDC69\uD83C\uDFFD\u200D\uD83E\uDD1D\u200D\uD83D\uDC69)(?:\uD83C[\uDFFB\uDFFC])|\uD83D\uDC69(?:\uD83C\uDFFE\u200D(?:\uD83E\uDD1D\u200D\uD83D\uDC68(?:\uD83C[\uDFFB-\uDFFD\uDFFF])|\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFC\u200D(?:\uD83E\uDD1D\u200D\uD83D\uDC68(?:\uD83C[\uDFFB\uDFFD-\uDFFF])|\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFB\u200D(?:\uD83E\uDD1D\u200D\uD83D\uDC68(?:\uD83C[\uDFFC-\uDFFF])|\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFD\u200D(?:\uD83E\uDD1D\u200D\uD83D\uDC68(?:\uD83C[\uDFFB\uDFFC\uDFFE\uDFFF])|\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\u200D(?:\u2764\uFE0F\u200D(?:\uD83D\uDC8B\u200D(?:\uD83D[\uDC68\uDC69])|\uD83D[\uDC68\uDC69])|\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD])|\uD83C\uDFFF\u200D(?:\uD83C[\uDF3E\uDF73\uDF93\uDFA4\uDFA8\uDFEB\uDFED]|\uD83D[\uDCBB\uDCBC\uDD27\uDD2C\uDE80\uDE92]|\uD83E[\uDDAF-\uDDB3\uDDBC\uDDBD]))|\uD83D\uDC69\u200D\uD83D\uDC69\u200D(?:\uD83D\uDC66\u200D\uD83D\uDC66|\uD83D\uDC67\u200D(?:\uD83D[\uDC66\uDC67]))|(?:\uD83E\uDDD1\uD83C\uDFFD\u200D\uD83E\uDD1D\u200D\uD83E\uDDD1|\uD83D\uDC69\uD83C\uDFFE\u200D\uD83E\uDD1D\u200D\uD83D\uDC69)(?:\uD83C[\uDFFB-\uDFFD])|\uD83D\uDC69\u200D\uD83D\uDC66\u200D\uD83D\uDC66|\uD83D\uDC69\u200D\uD83D\uDC69\u200D(?:\uD83D[\uDC66\uDC67])|(?:\uD83D\uDC41\uFE0F\u200D\uD83D\uDDE8|\uD83D\uDC69(?:\uD83C\uDFFF\u200D[\u2695\u2696\u2708]|\uD83C\uDFFE\u200D[\u2695\u2696\u2708]|\uD83C\uDFFC\u200D[\u2695\u2696\u2708]|\uD83C\uDFFB\u200D[\u2695\u2696\u2708]|\uD83C\uDFFD\u200D[\u2695\u2696\u2708]|\u200D[\u2695\u2696\u2708])|(?:(?:\u26F9|\uD83C[\uDFCB\uDFCC]|\uD83D\uDD75)\uFE0F|\uD83D\uDC6F|\uD83E[\uDD3C\uDDDE\uDDDF])\u200D[\u2640\u2642]|(?:\u26F9|\uD83C[\uDFCB\uDFCC]|\uD83D\uDD75)(?:\uD83C[\uDFFB-\uDFFF])\u200D[\u2640\u2642]|(?:\uD83C[\uDFC3\uDFC4\uDFCA]|\uD83D[\uDC6E\uDC71\uDC73\uDC77\uDC81\uDC82\uDC86\uDC87\uDE45-\uDE47\uDE4B\uDE4D\uDE4E\uDEA3\uDEB4-\uDEB6]|\uD83E[\uDD26\uDD37-\uDD39\uDD3D\uDD3E\uDDB8\uDDB9\uDDCD-\uDDCF\uDDD6-\uDDDD])(?:(?:\uD83C[\uDFFB-\uDFFF])\u200D[\u2640\u2642]|\u200D[\u2640\u2642])|\uD83C\uDFF4\u200D\u2620)\uFE0F|\uD83D\uDC69\u200D\uD83D\uDC67\u200D(?:\uD83D[\uDC66\uDC67])|\uD83C\uDFF3\uFE0F\u200D\uD83C\uDF08|\uD83D\uDC15\u200D\uD83E\uDDBA|\uD83D\uDC69\u200D\uD83D\uDC66|\uD83D\uDC69\u200D\uD83D\uDC67|\uD83C\uDDFD\uD83C\uDDF0|\uD83C\uDDF4\uD83C\uDDF2|\uD83C\uDDF6\uD83C\uDDE6|[#\*0-9]\uFE0F\u20E3|\uD83C\uDDE7(?:\uD83C[\uDDE6\uDDE7\uDDE9-\uDDEF\uDDF1-\uDDF4\uDDF6-\uDDF9\uDDFB\uDDFC\uDDFE\uDDFF])|\uD83C\uDDF9(?:\uD83C[\uDDE6\uDDE8\uDDE9\uDDEB-\uDDED\uDDEF-\uDDF4\uDDF7\uDDF9\uDDFB\uDDFC\uDDFF])|\uD83C\uDDEA(?:\uD83C[\uDDE6\uDDE8\uDDEA\uDDEC\uDDED\uDDF7-\uDDFA])|\uD83E\uDDD1(?:\uD83C[\uDFFB-\uDFFF])|\uD83C\uDDF7(?:\uD83C[\uDDEA\uDDF4\uDDF8\uDDFA\uDDFC])|\uD83D\uDC69(?:\uD83C[\uDFFB-\uDFFF])|\uD83C\uDDF2(?:\uD83C[\uDDE6\uDDE8-\uDDED\uDDF0-\uDDFF])|\uD83C\uDDE6(?:\uD83C[\uDDE8-\uDDEC\uDDEE\uDDF1\uDDF2\uDDF4\uDDF6-\uDDFA\uDDFC\uDDFD\uDDFF])|\uD83C\uDDF0(?:\uD83C[\uDDEA\uDDEC-\uDDEE\uDDF2\uDDF3\uDDF5\uDDF7\uDDFC\uDDFE\uDDFF])|\uD83C\uDDED(?:\uD83C[\uDDF0\uDDF2\uDDF3\uDDF7\uDDF9\uDDFA])|\uD83C\uDDE9(?:\uD83C[\uDDEA\uDDEC\uDDEF\uDDF0\uDDF2\uDDF4\uDDFF])|\uD83C\uDDFE(?:\uD83C[\uDDEA\uDDF9])|\uD83C\uDDEC(?:\uD83C[\uDDE6\uDDE7\uDDE9-\uDDEE\uDDF1-\uDDF3\uDDF5-\uDDFA\uDDFC\uDDFE])|\uD83C\uDDF8(?:\uD83C[\uDDE6-\uDDEA\uDDEC-\uDDF4\uDDF7-\uDDF9\uDDFB\uDDFD-\uDDFF])|\uD83C\uDDEB(?:\uD83C[\uDDEE-\uDDF0\uDDF2\uDDF4\uDDF7])|\uD83C\uDDF5(?:\uD83C[\uDDE6\uDDEA-\uDDED\uDDF0-\uDDF3\uDDF7-\uDDF9\uDDFC\uDDFE])|\uD83C\uDDFB(?:\uD83C[\uDDE6\uDDE8\uDDEA\uDDEC\uDDEE\uDDF3\uDDFA])|\uD83C\uDDF3(?:\uD83C[\uDDE6\uDDE8\uDDEA-\uDDEC\uDDEE\uDDF1\uDDF4\uDDF5\uDDF7\uDDFA\uDDFF])|\uD83C\uDDE8(?:\uD83C[\uDDE6\uDDE8\uDDE9\uDDEB-\uDDEE\uDDF0-\uDDF5\uDDF7\uDDFA-\uDDFF])|\uD83C\uDDF1(?:\uD83C[\uDDE6-\uDDE8\uDDEE\uDDF0\uDDF7-\uDDFB\uDDFE])|\uD83C\uDDFF(?:\uD83C[\uDDE6\uDDF2\uDDFC])|\uD83C\uDDFC(?:\uD83C[\uDDEB\uDDF8])|\uD83C\uDDFA(?:\uD83C[\uDDE6\uDDEC\uDDF2\uDDF3\uDDF8\uDDFE\uDDFF])|\uD83C\uDDEE(?:\uD83C[\uDDE8-\uDDEA\uDDF1-\uDDF4\uDDF6-\uDDF9])|\uD83C\uDDEF(?:\uD83C[\uDDEA\uDDF2\uDDF4\uDDF5])|(?:\uD83C[\uDFC3\uDFC4\uDFCA]|\uD83D[\uDC6E\uDC71\uDC73\uDC77\uDC81\uDC82\uDC86\uDC87\uDE45-\uDE47\uDE4B\uDE4D\uDE4E\uDEA3\uDEB4-\uDEB6]|\uD83E[\uDD26\uDD37-\uDD39\uDD3D\uDD3E\uDDB8\uDDB9\uDDCD-\uDDCF\uDDD6-\uDDDD])(?:\uD83C[\uDFFB-\uDFFF])|(?:\u26F9|\uD83C[\uDFCB\uDFCC]|\uD83D\uDD75)(?:\uD83C[\uDFFB-\uDFFF])|(?:[\u261D\u270A-\u270D]|\uD83C[\uDF85\uDFC2\uDFC7]|\uD83D[\uDC42\uDC43\uDC46-\uDC50\uDC66\uDC67\uDC6B-\uDC6D\uDC70\uDC72\uDC74-\uDC76\uDC78\uDC7C\uDC83\uDC85\uDCAA\uDD74\uDD7A\uDD90\uDD95\uDD96\uDE4C\uDE4F\uDEC0\uDECC]|\uD83E[\uDD0F\uDD18-\uDD1C\uDD1E\uDD1F\uDD30-\uDD36\uDDB5\uDDB6\uDDBB\uDDD2-\uDDD5])(?:\uD83C[\uDFFB-\uDFFF])|(?:[\u231A\u231B\u23E9-\u23EC\u23F0\u23F3\u25FD\u25FE\u2614\u2615\u2648-\u2653\u267F\u2693\u26A1\u26AA\u26AB\u26BD\u26BE\u26C4\u26C5\u26CE\u26D4\u26EA\u26F2\u26F3\u26F5\u26FA\u26FD\u2705\u270A\u270B\u2728\u274C\u274E\u2753-\u2755\u2757\u2795-\u2797\u27B0\u27BF\u2B1B\u2B1C\u2B50\u2B55]|\uD83C[\uDC04\uDCCF\uDD8E\uDD91-\uDD9A\uDDE6-\uDDFF\uDE01\uDE1A\uDE2F\uDE32-\uDE36\uDE38-\uDE3A\uDE50\uDE51\uDF00-\uDF20\uDF2D-\uDF35\uDF37-\uDF7C\uDF7E-\uDF93\uDFA0-\uDFCA\uDFCF-\uDFD3\uDFE0-\uDFF0\uDFF4\uDFF8-\uDFFF]|\uD83D[\uDC00-\uDC3E\uDC40\uDC42-\uDCFC\uDCFF-\uDD3D\uDD4B-\uDD4E\uDD50-\uDD67\uDD7A\uDD95\uDD96\uDDA4\uDDFB-\uDE4F\uDE80-\uDEC5\uDECC\uDED0-\uDED2\uDED5\uDEEB\uDEEC\uDEF4-\uDEFA\uDFE0-\uDFEB]|\uD83E[\uDD0D-\uDD3A\uDD3C-\uDD45\uDD47-\uDD71\uDD73-\uDD76\uDD7A-\uDDA2\uDDA5-\uDDAA\uDDAE-\uDDCA\uDDCD-\uDDFF\uDE70-\uDE73\uDE78-\uDE7A\uDE80-\uDE82\uDE90-\uDE95])|(?:[#\*0-9\xA9\xAE\u203C\u2049\u2122\u2139\u2194-\u2199\u21A9\u21AA\u231A\u231B\u2328\u23CF\u23E9-\u23F3\u23F8-\u23FA\u24C2\u25AA\u25AB\u25B6\u25C0\u25FB-\u25FE\u2600-\u2604\u260E\u2611\u2614\u2615\u2618\u261D\u2620\u2622\u2623\u2626\u262A\u262E\u262F\u2638-\u263A\u2640\u2642\u2648-\u2653\u265F\u2660\u2663\u2665\u2666\u2668\u267B\u267E\u267F\u2692-\u2697\u2699\u269B\u269C\u26A0\u26A1\u26AA\u26AB\u26B0\u26B1\u26BD\u26BE\u26C4\u26C5\u26C8\u26CE\u26CF\u26D1\u26D3\u26D4\u26E9\u26EA\u26F0-\u26F5\u26F7-\u26FA\u26FD\u2702\u2705\u2708-\u270D\u270F\u2712\u2714\u2716\u271D\u2721\u2728\u2733\u2734\u2744\u2747\u274C\u274E\u2753-\u2755\u2757\u2763\u2764\u2795-\u2797\u27A1\u27B0\u27BF\u2934\u2935\u2B05-\u2B07\u2B1B\u2B1C\u2B50\u2B55\u3030\u303D\u3297\u3299]|\uD83C[\uDC04\uDCCF\uDD70\uDD71\uDD7E\uDD7F\uDD8E\uDD91-\uDD9A\uDDE6-\uDDFF\uDE01\uDE02\uDE1A\uDE2F\uDE32-\uDE3A\uDE50\uDE51\uDF00-\uDF21\uDF24-\uDF93\uDF96\uDF97\uDF99-\uDF9B\uDF9E-\uDFF0\uDFF3-\uDFF5\uDFF7-\uDFFF]|\uD83D[\uDC00-\uDCFD\uDCFF-\uDD3D\uDD49-\uDD4E\uDD50-\uDD67\uDD6F\uDD70\uDD73-\uDD7A\uDD87\uDD8A-\uDD8D\uDD90\uDD95\uDD96\uDDA4\uDDA5\uDDA8\uDDB1\uDDB2\uDDBC\uDDC2-\uDDC4\uDDD1-\uDDD3\uDDDC-\uDDDE\uDDE1\uDDE3\uDDE8\uDDEF\uDDF3\uDDFA-\uDE4F\uDE80-\uDEC5\uDECB-\uDED2\uDED5\uDEE0-\uDEE5\uDEE9\uDEEB\uDEEC\uDEF0\uDEF3-\uDEFA\uDFE0-\uDFEB]|\uD83E[\uDD0D-\uDD3A\uDD3C-\uDD45\uDD47-\uDD71\uDD73-\uDD76\uDD7A-\uDDA2\uDDA5-\uDDAA\uDDAE-\uDDCA\uDDCD-\uDDFF\uDE70-\uDE73\uDE78-\uDE7A\uDE80-\uDE82\uDE90-\uDE95])\uFE0F|(?:[\u261D\u26F9\u270A-\u270D]|\uD83C[\uDF85\uDFC2-\uDFC4\uDFC7\uDFCA-\uDFCC]|\uD83D[\uDC42\uDC43\uDC46-\uDC50\uDC66-\uDC78\uDC7C\uDC81-\uDC83\uDC85-\uDC87\uDC8F\uDC91\uDCAA\uDD74\uDD75\uDD7A\uDD90\uDD95\uDD96\uDE45-\uDE47\uDE4B-\uDE4F\uDEA3\uDEB4-\uDEB6\uDEC0\uDECC]|\uD83E[\uDD0F\uDD18-\uDD1F\uDD26\uDD30-\uDD39\uDD3C-\uDD3E\uDDB5\uDDB6\uDDB8\uDDB9\uDDBB\uDDCD-\uDDCF\uDDD1-\uDDDD])/g;
@@ -3541,15 +3541,15 @@ var require_route = __commonJS({
       };
     }
     function wrapConversion(toModel, graph) {
-      const path12 = [graph[toModel].parent, toModel];
+      const path14 = [graph[toModel].parent, toModel];
       let fn = conversions[graph[toModel].parent][toModel];
       let cur = graph[toModel].parent;
       while (graph[cur].parent) {
-        path12.unshift(graph[cur].parent);
+        path14.unshift(graph[cur].parent);
         fn = link(conversions[graph[cur].parent][cur], fn);
         cur = graph[cur].parent;
       }
-      fn.conversion = path12;
+      fn.conversion = path14;
       return fn;
     }
     module.exports = function(fromModel) {
@@ -4029,9 +4029,9 @@ var require_lib = __commonJS({
   }
 });
 
-// node_modules/@inquirer/core/node_modules/strip-ansi/node_modules/ansi-regex/index.js
+// node_modules/@inquirer/core/node_modules/ansi-regex/index.js
 var require_ansi_regex2 = __commonJS({
-  "node_modules/@inquirer/core/node_modules/strip-ansi/node_modules/ansi-regex/index.js"(exports, module) {
+  "node_modules/@inquirer/core/node_modules/ansi-regex/index.js"(exports, module) {
     "use strict";
     module.exports = ({ onlyFirst = false } = {}) => {
       const pattern = [
@@ -4712,15 +4712,15 @@ var require_sql_wasm = __commonJS({
         "undefined" != typeof __filename ? ya = __filename : ba && (ya = self.location.href);
         var za = "", Aa, Ba;
         if (ca) {
-          var fs12 = __require("fs");
+          var fs14 = __require("fs");
           za = __dirname + "/";
           Ba = (a2) => {
             a2 = Ca(a2) ? new URL(a2) : a2;
-            return fs12.readFileSync(a2);
+            return fs14.readFileSync(a2);
           };
           Aa = async (a2) => {
             a2 = Ca(a2) ? new URL(a2) : a2;
-            return fs12.readFileSync(a2, void 0);
+            return fs14.readFileSync(a2, void 0);
           };
           1 < process.argv.length && (wa = process.argv[1].replace(/\\/g, "/"));
           process.argv.slice(2);
@@ -5002,7 +5002,7 @@ var require_sql_wasm = __commonJS({
               if (ca) {
                 var b2 = Buffer.alloc(256), c3 = 0, d2 = process.stdin.fd;
                 try {
-                  c3 = fs12.readSync(d2, b2, 0, 256);
+                  c3 = fs14.readSync(d2, b2, 0, 256);
                 } catch (e2) {
                   if (e2.toString().includes("EOF")) c3 = 0;
                   else throw e2;
@@ -9829,12 +9829,12 @@ function usePrefix({ status: status2 = "idle", theme }) {
   useEffect(() => {
     if (status2 === "loading") {
       let tickInterval;
-      let inc = -1;
+      let inc2 = -1;
       const delayTimeout = setTimeout(AsyncResource2.bind(() => {
         setShowLoader(true);
         tickInterval = setInterval(AsyncResource2.bind(() => {
-          inc = inc + 1;
-          setTick(inc % spinner.frames.length);
+          inc2 = inc2 + 1;
+          setTick(inc2 % spinner.frames.length);
         }), spinner.interval);
       }), 300);
       return () => {
@@ -10075,7 +10075,7 @@ var PromisePolyfill = class extends Promise {
 
 // node_modules/@inquirer/core/dist/esm/lib/create-prompt.mjs
 function createPrompt(view) {
-  const prompt2 = (config, context = {}) => {
+  const prompt2 = (config2, context = {}) => {
     const { input = process.stdin, signal } = context;
     const cleanups = /* @__PURE__ */ new Set();
     const output = new import_mute_stream.default();
@@ -10109,7 +10109,7 @@ function createPrompt(view) {
       cleanups.add(() => rl.removeListener("close", hooksCleanup));
       cycle(() => {
         try {
-          const nextView = view(config, (value) => {
+          const nextView = view(config2, (value) => {
             setImmediate(() => resolve(value));
           });
           const [content, bottomContent] = typeof nextView === "string" ? [nextView] : nextView;
@@ -10151,15 +10151,15 @@ var Separator = class {
 };
 
 // node_modules/@inquirer/confirm/dist/esm/index.mjs
-var esm_default2 = createPrompt((config, done) => {
-  const { transformer = (answer) => answer ? "yes" : "no" } = config;
+var esm_default2 = createPrompt((config2, done) => {
+  const { transformer = (answer) => answer ? "yes" : "no" } = config2;
   const [status2, setStatus] = useState("pending");
   const [value, setValue] = useState("");
-  const theme = makeTheme(config.theme);
+  const theme = makeTheme(config2.theme);
   const prefix = usePrefix({ theme });
   useKeypress((key, rl) => {
     if (isEnterKey(key)) {
-      let answer = config.default !== false;
+      let answer = config2.default !== false;
       if (/^(y|yes)/i.test(value))
         answer = true;
       else if (/^(n|no)/i.test(value))
@@ -10176,9 +10176,9 @@ var esm_default2 = createPrompt((config, done) => {
   if (status2 === "done") {
     formattedValue = theme.style.answer(value);
   } else {
-    defaultValue = ` ${theme.style.defaultAnswer(config.default === false ? "y/N" : "Y/n")}`;
+    defaultValue = ` ${theme.style.defaultAnswer(config2.default === false ? "y/N" : "Y/n")}`;
   }
-  const message = theme.style.message(config.message);
+  const message = theme.style.message(config2.message);
   return `${prefix} ${message}${defaultValue} ${formattedValue}`;
 });
 
@@ -10218,14 +10218,14 @@ function normalizeChoices(choices) {
     };
   });
 }
-var esm_default3 = createPrompt((config, done) => {
-  const { loop = true, pageSize = 7 } = config;
+var esm_default3 = createPrompt((config2, done) => {
+  const { loop = true, pageSize = 7 } = config2;
   const firstRender = useRef(true);
-  const theme = makeTheme(selectTheme, config.theme);
+  const theme = makeTheme(selectTheme, config2.theme);
   const prefix = usePrefix({ theme });
   const [status2, setStatus] = useState("pending");
   const searchTimeoutRef = useRef();
-  const items = useMemo(() => normalizeChoices(config.choices), [config.choices]);
+  const items = useMemo(() => normalizeChoices(config2.choices), [config2.choices]);
   const bounds = useMemo(() => {
     const first = items.findIndex(isSelectable);
     const last = items.findLastIndex(isSelectable);
@@ -10235,10 +10235,10 @@ var esm_default3 = createPrompt((config, done) => {
     return { first, last };
   }, [items]);
   const defaultItemIndex = useMemo(() => {
-    if (!("default" in config))
+    if (!("default" in config2))
       return -1;
-    return items.findIndex((item) => isSelectable(item) && item.value === config.default);
-  }, [config.default, items]);
+    return items.findIndex((item) => isSelectable(item) && item.value === config2.default);
+  }, [config2.default, items]);
   const [active, setActive] = useState(defaultItemIndex === -1 ? bounds.first : defaultItemIndex);
   const selectedChoice = items[active];
   useKeypress((key, rl) => {
@@ -10283,7 +10283,7 @@ var esm_default3 = createPrompt((config, done) => {
   useEffect(() => () => {
     clearTimeout(searchTimeoutRef.current);
   }, []);
-  const message = theme.style.message(config.message);
+  const message = theme.style.message(config2.message);
   let helpTipTop = "";
   let helpTipBottom = "";
   if (theme.helpMode === "always" || theme.helpMode === "auto" && firstRender.current) {
@@ -10324,9 +10324,9 @@ ${page}${helpTipBottom}${choiceDescription}${import_ansi_escapes2.default.cursor
 
 // src/index.ts
 import { spawn as spawn2 } from "child_process";
-import * as fs11 from "fs";
-import * as path11 from "path";
-import * as os7 from "os";
+import * as fs13 from "fs";
+import * as path13 from "path";
+import * as os9 from "os";
 
 // src/parsers/claude.ts
 import * as fs from "fs";
@@ -10347,6 +10347,8 @@ async function parseClaudeSession(filePath) {
   let cwd;
   let sessionId;
   let firstTimestamp;
+  const usage = { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, reasoning: 0, total: 0 };
+  let sawUsage = false;
   const stream = fs.createReadStream(filePath, { encoding: "utf8" });
   const rl = readline3.createInterface({ input: stream, crlfDelay: Infinity });
   let lineNo = 0;
@@ -10364,6 +10366,14 @@ async function parseClaudeSession(filePath) {
     if (!cwd && typeof obj.cwd === "string") cwd = obj.cwd;
     if (!firstTimestamp && typeof obj.timestamp === "string") firstTimestamp = obj.timestamp;
     if (!model && obj.message?.model) model = obj.message.model;
+    const u3 = obj.message?.usage;
+    if (u3 && typeof u3 === "object") {
+      sawUsage = true;
+      usage.input += num(u3.input_tokens);
+      usage.output += num(u3.output_tokens);
+      usage.cacheRead += num(u3.cache_read_input_tokens);
+      usage.cacheWrite += num(u3.cache_creation_input_tokens);
+    }
     if (SKIP_TYPES.has(obj.type)) continue;
     if (obj.type !== "user" && obj.type !== "assistant") continue;
     const role = obj.message?.role === "assistant" ? "assistant" : "user";
@@ -10395,6 +10405,7 @@ async function parseClaudeSession(filePath) {
   if (!sessionId) {
     sessionId = path.basename(filePath, ".jsonl");
   }
+  if (sawUsage) usage.total = usage.input + usage.output + usage.cacheRead + usage.cacheWrite;
   return {
     session: {
       id: sessionId,
@@ -10402,10 +10413,14 @@ async function parseClaudeSession(filePath) {
       createdAt: firstTimestamp ?? (/* @__PURE__ */ new Date()).toISOString(),
       model,
       workingDirectory: cwd,
+      usage: sawUsage ? usage : void 0,
       messages
     },
     warnings
   };
+}
+function num(v2) {
+  return typeof v2 === "number" && Number.isFinite(v2) ? v2 : 0;
 }
 function mapBlock(b2, unknown) {
   if (!b2 || typeof b2 !== "object") return null;
@@ -10459,6 +10474,7 @@ async function parseCodexSession(filePath) {
   let cwd;
   let model;
   let firstTimestamp;
+  let lastTokenUsage;
   const stream = fs2.createReadStream(filePath, { encoding: "utf8" });
   const rl = readline4.createInterface({ input: stream, crlfDelay: Infinity });
   let lineNo = 0;
@@ -10485,6 +10501,10 @@ async function parseCodexSession(filePath) {
       continue;
     }
     if (obj.type !== "response_item") {
+      if (obj.type === "event_msg" && obj.payload?.type === "token_count") {
+        const tot = obj.payload?.info?.total_token_usage;
+        if (tot && typeof tot === "object") lastTokenUsage = tot;
+      }
       continue;
     }
     const p = obj.payload;
@@ -10571,10 +10591,23 @@ async function parseCodexSession(filePath) {
       createdAt: firstTimestamp ?? (/* @__PURE__ */ new Date()).toISOString(),
       model,
       workingDirectory: cwd,
+      usage: codexUsage(lastTokenUsage),
       messages
     },
     warnings
   };
+}
+function codexUsage(tot) {
+  if (!tot || typeof tot !== "object") return void 0;
+  const cacheRead = num2(tot.cached_input_tokens);
+  const input = Math.max(0, num2(tot.input_tokens) - cacheRead);
+  const output = num2(tot.output_tokens);
+  const reasoning = num2(tot.reasoning_output_tokens);
+  const cacheWrite = 0;
+  return { input, output, cacheRead, cacheWrite, reasoning, total: input + output + cacheRead + cacheWrite };
+}
+function num2(v2) {
+  return typeof v2 === "number" && Number.isFinite(v2) ? v2 : 0;
 }
 function bump(m2, k2) {
   m2.set(k2, (m2.get(k2) ?? 0) + 1);
@@ -10667,6 +10700,8 @@ async function parseOpencodeSession(ref) {
     const skipCounts = /* @__PURE__ */ new Map();
     let model;
     let prevId;
+    const usage = { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, reasoning: 0, total: 0 };
+    let sawUsage = false;
     for (const m2 of messageRows) {
       let mdata;
       try {
@@ -10676,6 +10711,15 @@ async function parseOpencodeSession(ref) {
         continue;
       }
       if (!model && typeof mdata.modelID === "string") model = mdata.modelID;
+      const t2 = mdata.tokens;
+      if (t2 && typeof t2 === "object") {
+        sawUsage = true;
+        usage.input += num3(t2.input);
+        usage.output += num3(t2.output);
+        usage.reasoning += num3(t2.reasoning);
+        usage.cacheRead += num3(t2.cache?.read);
+        usage.cacheWrite += num3(t2.cache?.write);
+      }
       const role = mdata.role === "assistant" ? "assistant" : "user";
       const parts = partsByMessage.get(m2.id) ?? [];
       for (const p of parts) {
@@ -10780,6 +10824,7 @@ async function parseOpencodeSession(ref) {
     for (const [k2, n2] of skipCounts) {
       warnings.push(`skipped ${n2} ${k2} ${n2 === 1 ? "part" : "parts"}`);
     }
+    if (sawUsage) usage.total = usage.input + usage.output + usage.cacheRead + usage.cacheWrite;
     return {
       session: {
         id: row.id,
@@ -10787,6 +10832,7 @@ async function parseOpencodeSession(ref) {
         createdAt: new Date(row.time_created).toISOString(),
         model,
         workingDirectory: row.directory,
+        usage: sawUsage ? usage : void 0,
         messages
       },
       warnings
@@ -10797,6 +10843,9 @@ async function parseOpencodeSession(ref) {
 }
 function bump2(m2, k2) {
   m2.set(k2, (m2.get(k2) ?? 0) + 1);
+}
+function num3(v2) {
+  return typeof v2 === "number" && Number.isFinite(v2) ? v2 : 0;
 }
 function queryAll(db, sql, params) {
   const stmt = db.prepare(sql);
@@ -11708,6 +11757,256 @@ function findVersion() {
 }
 var VERSION = findVersion();
 
+// src/aggregate.ts
+import * as fs11 from "fs";
+import * as path11 from "path";
+import * as os7 from "os";
+import { createHash } from "crypto";
+
+// src/analytics.ts
+var SNAPSHOT_SCHEMA_VERSION = 1;
+function freshTokens(u3) {
+  return u3.input + u3.output;
+}
+function mcpServerOf(toolName) {
+  if (!toolName.startsWith("mcp__")) return null;
+  const rest = toolName.slice(5);
+  const sep2 = rest.indexOf("__");
+  if (sep2 <= 0) return null;
+  return rest.slice(0, sep2);
+}
+function emptyUsage() {
+  return { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, reasoning: 0, total: 0 };
+}
+function addUsage(into, from) {
+  into.input += from.input;
+  into.output += from.output;
+  into.cacheRead += from.cacheRead;
+  into.cacheWrite += from.cacheWrite;
+  into.reasoning += from.reasoning;
+  into.total += from.total;
+}
+
+// src/aggregate.ts
+var ALL_RUNTIMES = ["claude", "codex", "opencode"];
+var CLAUDE_SKILLS_DIR = path11.join(os7.homedir(), ".claude", "skills");
+function foldSession(acc, session) {
+  const rt = session.sourceRuntime;
+  const day = (session.createdAt || "").slice(0, 10) || "unknown";
+  const dayAcc = getDay(acc.byDay, day);
+  const rb = getRuntime(acc.byRuntime, rt);
+  acc.totalSessions++;
+  rb.sessions++;
+  dayAcc.sessions++;
+  if (session.model) inc(acc.modelCounts, session.model);
+  if (session.workingDirectory) {
+    acc.projects.add(hashBasename(session.workingDirectory));
+  }
+  if (session.usage) {
+    addUsage(acc.tokenTotals, session.usage);
+    addUsage(rb.tokens, session.usage);
+    dayAcc.tokens += session.usage.total;
+  }
+  for (const m2 of session.messages) {
+    acc.totalMessages++;
+    rb.messages++;
+    dayAcc.messages++;
+    const ms = Date.parse(m2.timestamp);
+    if (!Number.isNaN(ms)) {
+      const d2 = new Date(ms);
+      acc.byWeekday[d2.getDay()]++;
+      acc.byHour[d2.getHours()]++;
+    }
+    for (const b2 of m2.blocks) {
+      if (b2.type !== "tool_call") continue;
+      acc.totalToolCalls++;
+      rb.toolCalls++;
+      dayAcc.toolCalls++;
+      inc(acc.toolCounts, b2.name);
+      const server = mcpServerOf(b2.name);
+      if (server) inc(acc.mcpServerCounts, server);
+    }
+  }
+}
+async function buildSnapshot(opts = {}) {
+  const runtimes = opts.runtimes?.length ? opts.runtimes : ALL_RUNTIMES;
+  const sinceMs = opts.since ? Date.parse(opts.since) : NaN;
+  const concurrency = opts.concurrency && opts.concurrency > 0 ? opts.concurrency : 8;
+  const tasks = [];
+  if (runtimes.includes("claude")) {
+    for (const f3 of listAllClaudeSessions()) {
+      if (skipByMtime(f3, sinceMs)) continue;
+      tasks.push(async () => (await parseClaudeSession(f3)).session);
+    }
+  }
+  if (runtimes.includes("codex")) {
+    for (const f3 of listAllCodexSessions()) {
+      if (skipByMtime(f3, sinceMs)) continue;
+      tasks.push(async () => (await parseCodexSession(f3)).session);
+    }
+  }
+  if (runtimes.includes("opencode") && fs11.existsSync(OPENCODE_DB)) {
+    for (const r3 of await listAllOpencodeSessions()) {
+      if (!Number.isNaN(sinceMs) && r3.mtime < sinceMs) continue;
+      tasks.push(async () => (await parseOpencodeSession(r3.ref)).session);
+    }
+  }
+  const acc = {
+    toolCounts: /* @__PURE__ */ new Map(),
+    mcpServerCounts: /* @__PURE__ */ new Map(),
+    modelCounts: /* @__PURE__ */ new Map(),
+    tokenTotals: emptyUsage(),
+    byRuntime: /* @__PURE__ */ new Map(),
+    byDay: /* @__PURE__ */ new Map(),
+    byWeekday: new Array(7).fill(0),
+    byHour: new Array(24).fill(0),
+    projects: /* @__PURE__ */ new Set(),
+    totalSessions: 0,
+    totalMessages: 0,
+    totalToolCalls: 0
+  };
+  const total = tasks.length;
+  let done = 0;
+  let next = 0;
+  async function worker() {
+    while (next < tasks.length) {
+      const i2 = next++;
+      try {
+        const session = await tasks[i2]();
+        if (session && passesSince(session, sinceMs)) foldSession(acc, session);
+      } catch {
+      }
+      opts.onProgress?.(++done, total);
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(concurrency, tasks.length) }, worker));
+  return finalize(acc, runtimes);
+}
+function finalize(acc, runtimes) {
+  const activity = [...acc.byDay.entries()].filter(([d2]) => d2 !== "unknown").sort((a2, b2) => a2[0] < b2[0] ? -1 : 1).map(([date, d2]) => ({ date, sessions: d2.sessions, messages: d2.messages, toolCalls: d2.toolCalls, tokens: d2.tokens }));
+  const runtimeBreakdown = runtimes.map((rt) => acc.byRuntime.get(rt)).filter((rb) => !!rb);
+  const skillUsage = readInstalledSkills();
+  return {
+    schemaVersion: SNAPSHOT_SCHEMA_VERSION,
+    generatedAt: (/* @__PURE__ */ new Date()).toISOString(),
+    generatedBy: `strait-cli@${VERSION}`,
+    toolCounts: sortedRecord(acc.toolCounts),
+    mcpServerCounts: sortedRecord(acc.mcpServerCounts),
+    skillUsage,
+    modelCounts: sortedRecord(acc.modelCounts),
+    tokenTotals: acc.tokenTotals,
+    runtimeBreakdown,
+    activity,
+    timePatterns: { byWeekday: acc.byWeekday, byHour: acc.byHour },
+    totals: {
+      sessions: acc.totalSessions,
+      messages: acc.totalMessages,
+      toolCalls: acc.totalToolCalls,
+      distinctTools: acc.toolCounts.size,
+      distinctMcpServers: acc.mcpServerCounts.size,
+      distinctSkills: Object.keys(skillUsage).length,
+      firstActivity: activity.length ? activity[0].date : null,
+      lastActivity: activity.length ? activity[activity.length - 1].date : null
+    },
+    projectCount: acc.projects.size
+  };
+}
+function getDay(m2, day) {
+  let d2 = m2.get(day);
+  if (!d2) {
+    d2 = { sessions: 0, messages: 0, toolCalls: 0, tokens: 0 };
+    m2.set(day, d2);
+  }
+  return d2;
+}
+function getRuntime(m2, rt) {
+  let rb = m2.get(rt);
+  if (!rb) {
+    rb = { runtime: rt, sessions: 0, messages: 0, toolCalls: 0, tokens: emptyUsage() };
+    m2.set(rt, rb);
+  }
+  return rb;
+}
+function inc(m2, k2) {
+  m2.set(k2, (m2.get(k2) ?? 0) + 1);
+}
+function sortedRecord(m2) {
+  const out = {};
+  for (const [k2, v2] of [...m2.entries()].sort((a2, b2) => b2[1] - a2[1])) out[k2] = v2;
+  return out;
+}
+function hashBasename(cwd) {
+  const base = path11.basename(cwd) || cwd;
+  return createHash("sha256").update(base).digest("hex").slice(0, 12);
+}
+function skipByMtime(file, sinceMs) {
+  if (Number.isNaN(sinceMs)) return false;
+  try {
+    return fs11.statSync(file).mtimeMs < sinceMs;
+  } catch {
+    return false;
+  }
+}
+function passesSince(session, sinceMs) {
+  if (Number.isNaN(sinceMs)) return true;
+  const t2 = Date.parse(session.createdAt);
+  return Number.isNaN(t2) || t2 >= sinceMs;
+}
+function readInstalledSkills() {
+  const out = {};
+  let entries;
+  try {
+    entries = fs11.readdirSync(CLAUDE_SKILLS_DIR, { withFileTypes: true });
+  } catch {
+    return out;
+  }
+  for (const e2 of entries) {
+    if (!e2.isDirectory()) continue;
+    const skillFile = path11.join(CLAUDE_SKILLS_DIR, e2.name, "SKILL.md");
+    if (!fs11.existsSync(skillFile)) continue;
+    out[frontmatterName(skillFile) ?? e2.name] = 1;
+  }
+  return out;
+}
+function frontmatterName(file) {
+  try {
+    const head = fs11.readFileSync(file, "utf8").slice(0, 2048);
+    const fence = /^---\r?\n([\s\S]*?)\r?\n---/.exec(head);
+    if (!fence) return null;
+    const m2 = /^name:\s*(.+?)\s*$/m.exec(fence[1]);
+    return m2 ? m2[1].replace(/^["']|["']$/g, "") : null;
+  } catch {
+    return null;
+  }
+}
+
+// src/config.ts
+import * as fs12 from "fs";
+import * as path12 from "path";
+import * as os8 from "os";
+import { randomUUID as randomUUID5 } from "crypto";
+var CONFIG_PATH = path12.join(os8.homedir(), ".strait", "config.json");
+function loadConfig() {
+  let raw = {};
+  try {
+    raw = JSON.parse(fs12.readFileSync(CONFIG_PATH, "utf8"));
+  } catch {
+  }
+  if (!raw.deviceId || typeof raw.deviceId !== "string") {
+    const cfg = { ...raw, deviceId: randomUUID5() };
+    saveConfig(cfg);
+    return cfg;
+  }
+  return raw;
+}
+function saveConfig(cfg) {
+  try {
+    fs12.mkdirSync(path12.dirname(CONFIG_PATH), { recursive: true });
+    fs12.writeFileSync(CONFIG_PATH, JSON.stringify(cfg, null, 2) + "\n");
+  } catch {
+  }
+}
+
 // src/index.ts
 var BANNER = `${source_default.bold("strait")}${source_default.dim(` v${VERSION} \u2014 session portability for AI agents`)}`;
 var claudeColor3 = source_default.hex("#FF8C42");
@@ -11775,7 +12074,7 @@ var sync = defineCommand({
     } catch (e2) {
       reportError(lookup, e2, "Couldn't parse session");
     }
-    const srcId = args.from === "opencode" ? filePath.replace(/^opencode:\/\//, "") : path11.basename(filePath, ".jsonl");
+    const srcId = args.from === "opencode" ? filePath.replace(/^opencode:\/\//, "") : path13.basename(filePath, ".jsonl");
     const created = parseRes.session.createdAt.slice(0, 10);
     const srcTint = colorForRuntime(args.from);
     lookup.succeed(
@@ -11804,12 +12103,12 @@ var sync = defineCommand({
     }
     let outputPath;
     if (args["dry-run"]) {
-      fs11.mkdirSync("tmp", { recursive: true });
+      fs13.mkdirSync("tmp", { recursive: true });
       const ext = args.to === "opencode" ? "db" : "jsonl";
-      outputPath = path11.join("tmp", `dry-run-${args.to}-${Date.now()}.${ext}`);
+      outputPath = path13.join("tmp", `dry-run-${args.to}-${Date.now()}.${ext}`);
       if (args.to === "opencode") {
-        const real = path11.join(os7.homedir(), ".local", "share", "opencode", "opencode.db");
-        if (fs11.existsSync(real)) fs11.copyFileSync(real, outputPath);
+        const real = path13.join(os9.homedir(), ".local", "share", "opencode", "opencode.db");
+        if (fs13.existsSync(real)) fs13.copyFileSync(real, outputPath);
       }
     }
     let result;
@@ -11871,9 +12170,9 @@ var list = defineCommand({
       console.error(source_default.yellow(`No ${rt} sessions found.`));
       return;
     }
-    const ranked = files.map((f3) => ({ f: f3, m: fs11.statSync(f3).mtimeMs })).sort((a2, b2) => b2.m - a2.m).slice(0, 10);
+    const ranked = files.map((f3) => ({ f: f3, m: fs13.statSync(f3).mtimeMs })).sort((a2, b2) => b2.m - a2.m).slice(0, 10);
     for (const { f: f3, m: m2 } of ranked) {
-      const id = path11.basename(f3, ".jsonl").replace(/^rollout-[\d\-T]+-/, "");
+      const id = path13.basename(f3, ".jsonl").replace(/^rollout-[\d\-T]+-/, "");
       const date = new Date(m2).toISOString().slice(0, 16).replace("T", " ");
       let preview = "";
       let count = 0;
@@ -11939,16 +12238,16 @@ function dirSize(p) {
     const cur = stack.pop();
     let entries;
     try {
-      entries = fs11.readdirSync(cur, { withFileTypes: true });
+      entries = fs13.readdirSync(cur, { withFileTypes: true });
     } catch {
       continue;
     }
     for (const e2 of entries) {
-      const sub = path11.join(cur, e2.name);
+      const sub = path13.join(cur, e2.name);
       if (e2.isDirectory()) stack.push(sub);
       else if (e2.isFile()) {
         try {
-          total += fs11.statSync(sub).size;
+          total += fs13.statSync(sub).size;
         } catch {
         }
       }
@@ -11962,9 +12261,9 @@ function humanBytes(n2) {
   if (n2 < 1024 ** 3) return `${(n2 / 1024 ** 2).toFixed(1)} MB`;
   return `${(n2 / 1024 ** 3).toFixed(2)} GB`;
 }
-var CLAUDE_DIR = path11.join(os7.homedir(), ".claude", "projects");
-var CODEX_DIR = path11.join(os7.homedir(), ".codex", "sessions");
-var OPENCODE_DIR = path11.join(os7.homedir(), ".local", "share", "opencode");
+var CLAUDE_DIR = path13.join(os9.homedir(), ".claude", "projects");
+var CODEX_DIR = path13.join(os9.homedir(), ".codex", "sessions");
+var OPENCODE_DIR = path13.join(os9.homedir(), ".local", "share", "opencode");
 var status = defineCommand({
   meta: { name: "status", description: "Show what's installed and where sessions live" },
   async run() {
@@ -11972,31 +12271,31 @@ var status = defineCommand({
     console.log("");
     const claudeFiles = listAllClaudeSessions();
     const codexFiles = listAllCodexSessions();
-    const opencodeRows = fs11.existsSync(path11.join(OPENCODE_DIR, "opencode.db")) ? await listAllOpencodeSessions() : [];
+    const opencodeRows = fs13.existsSync(path13.join(OPENCODE_DIR, "opencode.db")) ? await listAllOpencodeSessions() : [];
     const rows = [
       {
         rt: "claude",
         dir: CLAUDE_DIR,
-        present: fs11.existsSync(CLAUDE_DIR),
+        present: fs13.existsSync(CLAUDE_DIR),
         sessions: claudeFiles.length,
-        latest: claudeFiles.length ? Math.max(...claudeFiles.map((f3) => fs11.statSync(f3).mtimeMs)) : 0,
-        size: fs11.existsSync(CLAUDE_DIR) ? dirSize(CLAUDE_DIR) : 0
+        latest: claudeFiles.length ? Math.max(...claudeFiles.map((f3) => fs13.statSync(f3).mtimeMs)) : 0,
+        size: fs13.existsSync(CLAUDE_DIR) ? dirSize(CLAUDE_DIR) : 0
       },
       {
         rt: "codex",
         dir: CODEX_DIR,
-        present: fs11.existsSync(CODEX_DIR),
+        present: fs13.existsSync(CODEX_DIR),
         sessions: codexFiles.length,
-        latest: codexFiles.length ? Math.max(...codexFiles.map((f3) => fs11.statSync(f3).mtimeMs)) : 0,
-        size: fs11.existsSync(CODEX_DIR) ? dirSize(CODEX_DIR) : 0
+        latest: codexFiles.length ? Math.max(...codexFiles.map((f3) => fs13.statSync(f3).mtimeMs)) : 0,
+        size: fs13.existsSync(CODEX_DIR) ? dirSize(CODEX_DIR) : 0
       },
       {
         rt: "opencode",
         dir: OPENCODE_DIR,
-        present: fs11.existsSync(OPENCODE_DIR),
+        present: fs13.existsSync(OPENCODE_DIR),
         sessions: opencodeRows.length,
         latest: opencodeRows.length ? opencodeRows[0].mtime : 0,
-        size: fs11.existsSync(OPENCODE_DIR) ? dirSize(OPENCODE_DIR) : 0
+        size: fs13.existsSync(OPENCODE_DIR) ? dirSize(OPENCODE_DIR) : 0
       }
     ];
     for (const r3 of rows) {
@@ -12022,22 +12321,22 @@ async function gatherAllSessions() {
   for (const f3 of listAllClaudeSessions()) {
     let mtime = 0;
     try {
-      mtime = fs11.statSync(f3).mtimeMs;
+      mtime = fs13.statSync(f3).mtimeMs;
     } catch {
     }
-    rows.push({ rt: "claude", id: path11.basename(f3, ".jsonl"), mtime, preview: "", messages: 0, filePath: f3 });
+    rows.push({ rt: "claude", id: path13.basename(f3, ".jsonl"), mtime, preview: "", messages: 0, filePath: f3 });
   }
   for (const f3 of listAllCodexSessions()) {
     let mtime = 0;
     try {
-      mtime = fs11.statSync(f3).mtimeMs;
+      mtime = fs13.statSync(f3).mtimeMs;
     } catch {
     }
-    const base = path11.basename(f3, ".jsonl");
+    const base = path13.basename(f3, ".jsonl");
     const id = base.replace(/^rollout-[\d\-T]+-/, "");
     rows.push({ rt: "codex", id, mtime, preview: "", messages: 0, filePath: f3 });
   }
-  if (fs11.existsSync(path11.join(OPENCODE_DIR, "opencode.db"))) {
+  if (fs13.existsSync(path13.join(OPENCODE_DIR, "opencode.db"))) {
     for (const r3 of await listAllOpencodeSessions()) {
       rows.push({ rt: "opencode", id: r3.id, mtime: r3.mtime, preview: r3.title ?? "", messages: 0 });
     }
@@ -12081,10 +12380,10 @@ ${rows.length} total across all runtimes`));
 });
 function firstUserText(rt, filePath) {
   try {
-    const fd = fs11.openSync(filePath, "r");
+    const fd = fs13.openSync(filePath, "r");
     const buf = Buffer.alloc(32 * 1024);
-    const n2 = fs11.readSync(fd, buf, 0, buf.length, 0);
-    fs11.closeSync(fd);
+    const n2 = fs13.readSync(fd, buf, 0, buf.length, 0);
+    fs13.closeSync(fd);
     const head = buf.slice(0, n2).toString("utf8");
     for (const line of head.split("\n")) {
       if (!line.trim()) continue;
@@ -12123,17 +12422,17 @@ var search = defineCommand({
     for (const f3 of listAllClaudeSessions()) {
       const text = firstUserText("claude", f3);
       if (text && text.toLowerCase().includes(q2)) {
-        hits.push({ rt: "claude", id: path11.basename(f3, ".jsonl"), mtime: fs11.statSync(f3).mtimeMs, preview: text });
+        hits.push({ rt: "claude", id: path13.basename(f3, ".jsonl"), mtime: fs13.statSync(f3).mtimeMs, preview: text });
       }
     }
     for (const f3 of listAllCodexSessions()) {
       const text = firstUserText("codex", f3);
       if (text && text.toLowerCase().includes(q2)) {
-        const id = path11.basename(f3, ".jsonl").replace(/^rollout-[\d\-T]+-/, "");
-        hits.push({ rt: "codex", id, mtime: fs11.statSync(f3).mtimeMs, preview: text });
+        const id = path13.basename(f3, ".jsonl").replace(/^rollout-[\d\-T]+-/, "");
+        hits.push({ rt: "codex", id, mtime: fs13.statSync(f3).mtimeMs, preview: text });
       }
     }
-    if (fs11.existsSync(path11.join(OPENCODE_DIR, "opencode.db"))) {
+    if (fs13.existsSync(path13.join(OPENCODE_DIR, "opencode.db"))) {
       for (const r3 of await listAllOpencodeSessions()) {
         if ((r3.title ?? "").toLowerCase().includes(q2)) {
           hits.push({ rt: "opencode", id: r3.id, mtime: r3.mtime, preview: r3.title });
@@ -12175,15 +12474,15 @@ var open = defineCommand({
     console.log(BANNER);
     const id = String(args.id);
     let hit = null;
-    const claudeHit = listAllClaudeSessions().find((f3) => path11.basename(f3, ".jsonl").startsWith(id));
+    const claudeHit = listAllClaudeSessions().find((f3) => path13.basename(f3, ".jsonl").startsWith(id));
     if (claudeHit) {
-      hit = { rt: "claude", id: path11.basename(claudeHit, ".jsonl"), meta: claudeHit };
+      hit = { rt: "claude", id: path13.basename(claudeHit, ".jsonl"), meta: claudeHit };
     } else {
-      const codexHit = listAllCodexSessions().find((f3) => path11.basename(f3, ".jsonl").includes(id));
+      const codexHit = listAllCodexSessions().find((f3) => path13.basename(f3, ".jsonl").includes(id));
       if (codexHit) {
-        const sid = path11.basename(codexHit, ".jsonl").replace(/^rollout-[\d\-T]+-/, "");
+        const sid = path13.basename(codexHit, ".jsonl").replace(/^rollout-[\d\-T]+-/, "");
         hit = { rt: "codex", id: sid, meta: codexHit };
-      } else if (fs11.existsSync(path11.join(OPENCODE_DIR, "opencode.db"))) {
+      } else if (fs13.existsSync(path13.join(OPENCODE_DIR, "opencode.db"))) {
         const ocHit = (await listAllOpencodeSessions()).find((r4) => r4.id.startsWith(id));
         if (ocHit) hit = { rt: "opencode", id: ocHit.id, meta: ocHit.title ?? "" };
       }
@@ -12215,7 +12514,7 @@ var stats = defineCommand({
     console.log(BANNER);
     const claudeFiles = listAllClaudeSessions();
     const codexFiles = listAllCodexSessions();
-    const opencodeRows = fs11.existsSync(path11.join(OPENCODE_DIR, "opencode.db")) ? await listAllOpencodeSessions() : [];
+    const opencodeRows = fs13.existsSync(path13.join(OPENCODE_DIR, "opencode.db")) ? await listAllOpencodeSessions() : [];
     const hist = readHistory();
     const total = claudeFiles.length + codexFiles.length + opencodeRows.length;
     console.log("");
@@ -12254,7 +12553,7 @@ var history = defineCommand({
   async run({ args }) {
     console.log(BANNER);
     if (args.clear) {
-      if (fs11.existsSync(HISTORY_PATH)) fs11.rmSync(HISTORY_PATH);
+      if (fs13.existsSync(HISTORY_PATH)) fs13.rmSync(HISTORY_PATH);
       console.log(source_default.dim("history cleared."));
       return;
     }
@@ -12279,9 +12578,245 @@ var history = defineCommand({
     await pickAndResume(resumable, "Resume one of these conversions?");
   }
 });
+var VALID_RUNTIMES = ["claude", "codex", "opencode"];
+function parseRuntimeArg(v2) {
+  if (v2 == null) return void 0;
+  const list2 = (Array.isArray(v2) ? v2 : [v2]).map(String);
+  const bad = list2.filter((r3) => !VALID_RUNTIMES.includes(r3));
+  if (bad.length) throw new Error(`unknown runtime(s): ${bad.join(", ")} \u2014 use claude|codex|opencode`);
+  return list2;
+}
+function parseSinceArg(v2) {
+  if (v2 == null || v2 === "") return void 0;
+  const s2 = String(v2);
+  if (Number.isNaN(Date.parse(s2))) throw new Error(`invalid --since "${s2}" \u2014 use a date like YYYY-MM-DD`);
+  return s2;
+}
+var insights = defineCommand({
+  meta: { name: "insights", description: "Aggregate local usage metadata across all runtimes" },
+  args: {
+    runtime: { type: "string", description: "limit to claude|codex|opencode (repeatable)" },
+    since: { type: "string", description: "only sessions on/after YYYY-MM-DD" },
+    days: { type: "string", description: "activity window to chart (default 14)" },
+    top: { type: "string", description: "rows per table (default 10)" },
+    json: { type: "boolean", description: "print the raw MetadataSnapshot JSON" }
+  },
+  async run({ args }) {
+    const runtimes = parseRuntimeArg(args.runtime);
+    const since = parseSinceArg(args.since);
+    const spinner = args.json ? null : ora("Aggregating sessions\u2026").start();
+    const snap = await buildSnapshot({
+      runtimes,
+      since,
+      onProgress: spinner ? (d2, t2) => {
+        spinner.text = `Aggregating sessions\u2026 ${d2}/${t2}`;
+      } : void 0
+    });
+    spinner?.stop();
+    if (args.json) {
+      console.log(JSON.stringify(snap, null, 2));
+      return;
+    }
+    renderInsights(snap, Number(args.top) > 0 ? Number(args.top) : 10, Number(args.days) > 0 ? Number(args.days) : 14);
+  }
+});
+function renderInsights(s2, top, days) {
+  console.log(BANNER);
+  if (s2.totals.sessions === 0) {
+    console.log(source_default.yellow("\nNo sessions found for the given filters."));
+    return;
+  }
+  const t2 = s2.totals;
+  const span = t2.firstActivity ? `${t2.firstActivity} \u2192 ${t2.lastActivity}` : "";
+  console.log("");
+  console.log(`${source_default.bold("totals")}  ${source_default.dim(span)}`);
+  console.log(
+    `  ${source_default.bold(humanNum(t2.sessions))} sessions \xB7 ${source_default.bold(humanNum(t2.messages))} messages \xB7 ${source_default.bold(humanNum(t2.toolCalls))} tool calls \xB7 ${source_default.bold(humanNum(freshTokens(s2.tokenTotals)))} tokens ${source_default.dim("(fresh)")} \xB7 ${source_default.bold(humanNum(s2.projectCount))} projects`
+  );
+  console.log("");
+  console.log(source_default.bold("sessions by runtime"));
+  for (const rb of s2.runtimeBreakdown) {
+    const tint = colorForRuntime(rb.runtime);
+    console.log(
+      `  ${tint(cap2(rb.runtime).padEnd(9))} ${source_default.bold(String(rb.sessions).padStart(6))} sessions  ${source_default.dim(String(rb.toolCalls).padStart(7) + " tools")}  ${source_default.dim(humanNum(freshTokens(rb.tokens)).padStart(12) + " fresh tk")}`
+    );
+  }
+  console.log("");
+  console.log(`${source_default.bold("tokens")} ${source_default.dim("(fresh = input + output, the real work)")}`);
+  const tk = s2.tokenTotals;
+  console.log(
+    `  ${source_default.dim("fresh")} ${source_default.bold(humanNum(freshTokens(tk)))}  ${source_default.dim("\xB7 input")} ${humanNum(tk.input)}  ${source_default.dim("output")} ${humanNum(tk.output)}  ${source_default.dim("reasoning")} ${humanNum(tk.reasoning)}`
+  );
+  console.log(
+    `  ${source_default.dim("context reuse")}  ${source_default.dim("cache read")} ${humanNum(tk.cacheRead)}  ${source_default.dim("cache write")} ${humanNum(tk.cacheWrite)}`
+  );
+  printCountTable("top tools", s2.toolCounts, top);
+  printCountTable("mcp servers", s2.mcpServerCounts, top);
+  printCountTable("models", s2.modelCounts, top);
+  const skills = Object.keys(s2.skillUsage);
+  console.log("");
+  console.log(`${source_default.bold("installed skills")} ${source_default.dim(`(${skills.length})`)}`);
+  console.log(skills.length ? `  ${skills.map((k2) => source_default.cyan(k2)).join(source_default.dim(", "))}` : source_default.dim("  none found"));
+  printActivity(s2, days);
+  printTimePatterns(s2);
+}
+var WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+function printTimePatterns(s2) {
+  const { byWeekday, byHour } = s2.timePatterns;
+  const totalW = byWeekday.reduce((a2, b2) => a2 + b2, 0);
+  if (!totalW) return;
+  console.log("");
+  console.log(`${source_default.bold("when you work")} ${source_default.dim("(local time, by message)")}`);
+  const maxW = Math.max(...byWeekday);
+  for (let i2 = 0; i2 < 7; i2++) {
+    const bar = "\u2588".repeat(maxW ? Math.round(byWeekday[i2] / maxW * 20) : 0);
+    console.log(`  ${source_default.dim(WEEKDAYS[i2])}  ${source_default.cyan(bar)} ${source_default.dim(humanNum(byWeekday[i2]))}`);
+  }
+  const maxH = Math.max(...byHour);
+  const blocks = "\u2581\u2582\u2583\u2584\u2585\u2586\u2587\u2588";
+  const spark = byHour.map((n2) => blocks[maxH ? Math.round(n2 / maxH * (blocks.length - 1)) : 0]).join("");
+  const peak = byHour.indexOf(maxH);
+  console.log(`  ${source_default.dim("hour")} ${source_default.cyan(spark)}  ${source_default.dim(`peak ${String(peak).padStart(2, "0")}:00`)}`);
+  console.log(`       ${source_default.dim("0           6          12          18        23")}`);
+}
+function printCountTable(title, counts, top) {
+  const rows = Object.entries(counts).slice(0, top);
+  console.log("");
+  console.log(`${source_default.bold(title)} ${source_default.dim(`(${Object.keys(counts).length})`)}`);
+  if (!rows.length) {
+    console.log(source_default.dim("  none"));
+    return;
+  }
+  const width = Math.max(...rows.map(([k2]) => k2.length));
+  for (const [k2, n2] of rows) {
+    console.log(`  ${k2.padEnd(width)}  ${source_default.bold(String(n2).padStart(6))}`);
+  }
+}
+function printActivity(s2, days) {
+  const recent = s2.activity.slice(-days);
+  console.log("");
+  console.log(`${source_default.bold("activity")} ${source_default.dim(`(last ${recent.length} active days)`)}`);
+  if (!recent.length) return;
+  const max = Math.max(...recent.map((d2) => d2.sessions));
+  const blocks = "\u2581\u2582\u2583\u2584\u2585\u2586\u2587\u2588";
+  for (const d2 of recent) {
+    const h2 = max ? Math.round(d2.sessions / max * (blocks.length - 1)) : 0;
+    const bar = blocks[h2].repeat(Math.max(1, Math.round(d2.sessions / Math.max(max, 1) * 24)));
+    console.log(`  ${source_default.dim(d2.date)}  ${source_default.green(bar)} ${source_default.bold(String(d2.sessions))} ${source_default.dim("sessions")}`);
+  }
+}
+var PRIVACY_LINES = [
+  "Sends only: tool/MCP/skill/model names, counts, dates, token totals, and time-of-day histograms.",
+  "Never sends: message text, code, file contents, tool arguments, or file paths."
+];
+function printPrivacyNote() {
+  console.log(source_default.dim("privacy:"));
+  for (const l2 of PRIVACY_LINES) console.log(source_default.dim(`  \u2022 ${l2}`));
+}
+var push = defineCommand({
+  meta: { name: "push", description: "Upload your anonymized metadata snapshot to the configured endpoint" },
+  args: {
+    "dry-run": { type: "boolean", description: "print the exact JSON payload; send nothing" },
+    endpoint: { type: "string", description: "override the configured endpoint" },
+    runtime: { type: "string", description: "limit to claude|codex|opencode (repeatable)" },
+    since: { type: "string", description: "only sessions on/after YYYY-MM-DD" },
+    yes: { type: "boolean", description: "skip the confirmation prompt" }
+  },
+  async run({ args }) {
+    console.log(BANNER);
+    const cfg = loadConfig();
+    const runtimes = parseRuntimeArg(args.runtime);
+    const since = parseSinceArg(args.since);
+    const spinner = ora("Aggregating sessions\u2026").start();
+    const snapshot = await buildSnapshot({ runtimes, since });
+    spinner.stop();
+    const payload = { deviceId: cfg.deviceId, userId: cfg.userId, snapshot };
+    console.log("");
+    printPrivacyNote();
+    console.log("");
+    if (args["dry-run"]) {
+      console.log(JSON.stringify(payload, null, 2));
+      return;
+    }
+    const endpoint = args.endpoint || cfg.endpoint;
+    if (!endpoint) {
+      console.log(source_default.yellow("No endpoint configured."));
+      console.log(source_default.dim("Set one with `strait config set endpoint <url>` or pass --endpoint <url>."));
+      console.log(source_default.dim("Use `strait push --dry-run` to preview exactly what would be sent."));
+      return;
+    }
+    if (!args.yes && process.stdin.isTTY) {
+      const ok = await esm_default3({
+        message: `Upload snapshot (${snapshot.totals.sessions} sessions) to ${endpoint}?`,
+        choices: [{ name: "Yes, upload", value: true }, { name: "Cancel", value: false }]
+      });
+      if (!ok) {
+        console.log(source_default.dim("Cancelled."));
+        return;
+      }
+    }
+    const send = ora(`Uploading to ${endpoint}\u2026`).start();
+    try {
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "x-strait-device": cfg.deviceId,
+          "x-strait-version": VERSION
+        },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) {
+        send.fail(`Upload failed: ${res.status} ${res.statusText}`);
+        return;
+      }
+      send.succeed(`Uploaded ${snapshot.totals.sessions} sessions' metadata.`);
+    } catch (err) {
+      send.fail(`Upload failed: ${err.message}`);
+    }
+  }
+});
+var config = defineCommand({
+  meta: { name: "config", description: "Get or set strait config (endpoint, userId)" },
+  args: {
+    action: { type: "positional", required: false, description: "get | set" },
+    key: { type: "positional", required: false, description: "endpoint | userId" },
+    value: { type: "positional", required: false, description: "value (for set)" }
+  },
+  async run({ args }) {
+    console.log(BANNER);
+    const cfg = loadConfig();
+    const action = args.action;
+    if (!action || action === "get") {
+      console.log("");
+      console.log(`  ${source_default.dim("deviceId")} ${cfg.deviceId}`);
+      console.log(`  ${source_default.dim("endpoint")} ${cfg.endpoint ?? source_default.dim("(unset)")}`);
+      console.log(`  ${source_default.dim("userId")}   ${cfg.userId ?? source_default.dim("(unset)")}`);
+      console.log(source_default.dim(`
+  ${CONFIG_PATH}`));
+      return;
+    }
+    if (action === "set") {
+      const key = args.key;
+      if (key !== "endpoint" && key !== "userId") {
+        console.log(source_default.yellow("Usage: strait config set endpoint|userId <value>"));
+        return;
+      }
+      if (args.value == null || args.value === "") {
+        console.log(source_default.yellow(`Missing value. Usage: strait config set ${key} <value>`));
+        return;
+      }
+      cfg[key] = args.value;
+      saveConfig(cfg);
+      console.log(source_default.green(`set ${key} = ${args.value}`));
+      return;
+    }
+    console.log(source_default.yellow("Usage: strait config get | strait config set <key> <value>"));
+  }
+});
 var main2 = defineCommand({
   meta: { name: "strait", version: VERSION, description: "Move AI agent sessions between Claude Code and Codex" },
-  subCommands: { sync, list, "list-all": listAll, status, search, open, stats, history },
+  subCommands: { sync, list, "list-all": listAll, status, search, open, stats, history, insights, push, config },
   async run({ args }) {
     if (args._?.length) return;
     if (!process.stdin.isTTY) {
@@ -12299,6 +12834,9 @@ var main2 = defineCommand({
       console.log("  strait open <session-id>");
       console.log("  strait stats");
       console.log("  strait history [--limit 20] [--clear]");
+      console.log("  strait insights [--runtime claude] [--since YYYY-MM-DD] [--days 14] [--json]");
+      console.log("  strait push [--dry-run] [--endpoint <url>] [--yes]");
+      console.log("  strait config get | set endpoint <url>");
       console.log("");
       console.log(`Run ${source_default.cyan("strait")} in a TTY for interactive mode.`);
       return;
@@ -12308,6 +12846,9 @@ var main2 = defineCommand({
 });
 function cap2(s2) {
   return s2.charAt(0).toUpperCase() + s2.slice(1);
+}
+function humanNum(n2) {
+  return n2.toLocaleString("en-US");
 }
 runMain(main2);
 //# sourceMappingURL=index.js.map

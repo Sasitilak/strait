@@ -133,7 +133,7 @@ function toClaudeBlock(b: ContentBlock, stats: EmitResult["stats"]): unknown | n
 function defaultClaudePath(cwd: string, sessionId: string): string {
   // Claude Code encodes the cwd into a project-dir slug by replacing every
   // non-alphanumeric character with `-`, including spaces, `_`, `.`, `:`, `\`).
-  // e.g. /Users/ravi.tilak/Documents/strait → -Users-ravi-tilak-Documents-strait
+  // e.g. /Users/you/Documents/strait → -Users-you-Documents-strait
   const dashed = cwd.replace(/[^a-zA-Z0-9]/g, "-");
   return path.join(os.homedir(), ".claude", "projects", dashed, `${sessionId}.jsonl`);
 }

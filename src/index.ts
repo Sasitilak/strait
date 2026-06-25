@@ -16,6 +16,10 @@ import { runInteractive } from "./interactive.js";
 import { ferry } from "./anim.js";
 import { VERSION } from "./version.js";
 import { appendHistory, readHistory, HISTORY_PATH } from "./history.js";
+import { buildSnapshot } from "./aggregate.js";
+import type { Runtime, MetadataSnapshot, CountMap } from "./analytics.js";
+import { freshTokens } from "./analytics.js";
+import { loadConfig, saveConfig, CONFIG_PATH } from "./config.js";
 import {
   listAllClaudeSessions,
   findLatestClaudeSession,
@@ -625,9 +629,267 @@ const history = defineCommand({
   },
 });
 
+const VALID_RUNTIMES: Runtime[] = ["claude", "codex", "opencode"];
+
+function parseRuntimeArg(v: unknown): Runtime[] | undefined {
+  if (v == null) return undefined;
+  const list = (Array.isArray(v) ? v : [v]).map(String) as Runtime[];
+  const bad = list.filter((r) => !VALID_RUNTIMES.includes(r));
+  if (bad.length) throw new Error(`unknown runtime(s): ${bad.join(", ")} — use claude|codex|opencode`);
+  return list;
+}
+
+function parseSinceArg(v: unknown): string | undefined {
+  if (v == null || v === "") return undefined;
+  const s = String(v);
+  if (Number.isNaN(Date.parse(s))) throw new Error(`invalid --since "${s}" — use a date like YYYY-MM-DD`);
+  return s;
+}
+
+const insights = defineCommand({
+  meta: { name: "insights", description: "Aggregate local usage metadata across all runtimes" },
+  args: {
+    runtime: { type: "string", description: "limit to claude|codex|opencode (repeatable)" },
+    since: { type: "string", description: "only sessions on/after YYYY-MM-DD" },
+    days: { type: "string", description: "activity window to chart (default 14)" },
+    top: { type: "string", description: "rows per table (default 10)" },
+    json: { type: "boolean", description: "print the raw MetadataSnapshot JSON" },
+  },
+  async run({ args }) {
+    const runtimes = parseRuntimeArg((args as any).runtime);
+    const since = parseSinceArg(args.since);
+    const spinner = args.json ? null : ora("Aggregating sessions…").start();
+    const snap = await buildSnapshot({
+      runtimes,
+      since,
+      onProgress: spinner ? (d, t) => { spinner.text = `Aggregating sessions… ${d}/${t}`; } : undefined,
+    });
+    spinner?.stop();
+
+    if (args.json) { console.log(JSON.stringify(snap, null, 2)); return; }
+    renderInsights(snap, Number(args.top) > 0 ? Number(args.top) : 10, Number(args.days) > 0 ? Number(args.days) : 14);
+  },
+});
+
+function renderInsights(s: MetadataSnapshot, top: number, days: number) {
+  console.log(BANNER);
+  if (s.totals.sessions === 0) {
+    console.log(chalk.yellow("\nNo sessions found for the given filters."));
+    return;
+  }
+  const t = s.totals;
+  const span = t.firstActivity ? `${t.firstActivity} → ${t.lastActivity}` : "";
+  console.log("");
+  console.log(`${chalk.bold("totals")}  ${chalk.dim(span)}`);
+  console.log(
+    `  ${chalk.bold(humanNum(t.sessions))} sessions · ${chalk.bold(humanNum(t.messages))} messages · ` +
+    `${chalk.bold(humanNum(t.toolCalls))} tool calls · ${chalk.bold(humanNum(freshTokens(s.tokenTotals)))} tokens ${chalk.dim("(fresh)")} · ` +
+    `${chalk.bold(humanNum(s.projectCount))} projects`,
+  );
+
+  console.log("");
+  console.log(chalk.bold("sessions by runtime"));
+  for (const rb of s.runtimeBreakdown) {
+    const tint = colorForRuntime(rb.runtime);
+    console.log(
+      `  ${tint(cap(rb.runtime).padEnd(9))} ${chalk.bold(String(rb.sessions).padStart(6))} sessions  ` +
+      `${chalk.dim(String(rb.toolCalls).padStart(7) + " tools")}  ` +
+      `${chalk.dim(humanNum(freshTokens(rb.tokens)).padStart(12) + " fresh tk")}`,
+    );
+  }
+
+  console.log("");
+  console.log(`${chalk.bold("tokens")} ${chalk.dim("(fresh = input + output, the real work)")}`);
+  const tk = s.tokenTotals;
+  console.log(
+    `  ${chalk.dim("fresh")} ${chalk.bold(humanNum(freshTokens(tk)))}  ` +
+    `${chalk.dim("· input")} ${humanNum(tk.input)}  ${chalk.dim("output")} ${humanNum(tk.output)}  ` +
+    `${chalk.dim("reasoning")} ${humanNum(tk.reasoning)}`,
+  );
+  console.log(
+    `  ${chalk.dim("context reuse")}  ${chalk.dim("cache read")} ${humanNum(tk.cacheRead)}  ` +
+    `${chalk.dim("cache write")} ${humanNum(tk.cacheWrite)}`,
+  );
+
+  printCountTable("top tools", s.toolCounts, top);
+  printCountTable("mcp servers", s.mcpServerCounts, top);
+  printCountTable("models", s.modelCounts, top);
+
+  const skills = Object.keys(s.skillUsage);
+  console.log("");
+  console.log(`${chalk.bold("installed skills")} ${chalk.dim(`(${skills.length})`)}`);
+  console.log(skills.length ? `  ${skills.map((k) => chalk.cyan(k)).join(chalk.dim(", "))}` : chalk.dim("  none found"));
+
+  printActivity(s, days);
+  printTimePatterns(s);
+}
+
+const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+function printTimePatterns(s: MetadataSnapshot) {
+  const { byWeekday, byHour } = s.timePatterns;
+  const totalW = byWeekday.reduce((a, b) => a + b, 0);
+  if (!totalW) return;
+
+  console.log("");
+  console.log(`${chalk.bold("when you work")} ${chalk.dim("(local time, by message)")}`);
+  const maxW = Math.max(...byWeekday);
+  for (let i = 0; i < 7; i++) {
+    const bar = "█".repeat(maxW ? Math.round((byWeekday[i] / maxW) * 20) : 0);
+    console.log(`  ${chalk.dim(WEEKDAYS[i])}  ${chalk.cyan(bar)} ${chalk.dim(humanNum(byWeekday[i]))}`);
+  }
+
+  // Hour-of-day sparkline (0–23) plus the peak hour.
+  const maxH = Math.max(...byHour);
+  const blocks = "▁▂▃▄▅▆▇█";
+  const spark = byHour.map((n) => blocks[maxH ? Math.round((n / maxH) * (blocks.length - 1)) : 0]).join("");
+  const peak = byHour.indexOf(maxH);
+  console.log(`  ${chalk.dim("hour")} ${chalk.cyan(spark)}  ${chalk.dim(`peak ${String(peak).padStart(2, "0")}:00`)}`);
+  console.log(`       ${chalk.dim("0           6          12          18        23")}`);
+}
+
+function printCountTable(title: string, counts: CountMap, top: number) {
+  const rows = Object.entries(counts).slice(0, top); // already sorted desc by the aggregator
+  console.log("");
+  console.log(`${chalk.bold(title)} ${chalk.dim(`(${Object.keys(counts).length})`)}`);
+  if (!rows.length) { console.log(chalk.dim("  none")); return; }
+  const width = Math.max(...rows.map(([k]) => k.length));
+  for (const [k, n] of rows) {
+    console.log(`  ${k.padEnd(width)}  ${chalk.bold(String(n).padStart(6))}`);
+  }
+}
+
+function printActivity(s: MetadataSnapshot, days: number) {
+  const recent = s.activity.slice(-days);
+  console.log("");
+  console.log(`${chalk.bold("activity")} ${chalk.dim(`(last ${recent.length} active days)`)}`);
+  if (!recent.length) return;
+  const max = Math.max(...recent.map((d) => d.sessions));
+  const blocks = "▁▂▃▄▅▆▇█";
+  for (const d of recent) {
+    const h = max ? Math.round((d.sessions / max) * (blocks.length - 1)) : 0;
+    const bar = blocks[h].repeat(Math.max(1, Math.round((d.sessions / Math.max(max, 1)) * 24)));
+    console.log(`  ${chalk.dim(d.date)}  ${chalk.green(bar)} ${chalk.bold(String(d.sessions))} ${chalk.dim("sessions")}`);
+  }
+}
+
+const PRIVACY_LINES = [
+  "Sends only: tool/MCP/skill/model names, counts, dates, token totals, and time-of-day histograms.",
+  "Never sends: message text, code, file contents, tool arguments, or file paths.",
+];
+
+function printPrivacyNote() {
+  console.log(chalk.dim("privacy:"));
+  for (const l of PRIVACY_LINES) console.log(chalk.dim(`  • ${l}`));
+}
+
+const push = defineCommand({
+  meta: { name: "push", description: "Upload your anonymized metadata snapshot to the configured endpoint" },
+  args: {
+    "dry-run": { type: "boolean", description: "print the exact JSON payload; send nothing" },
+    endpoint: { type: "string", description: "override the configured endpoint" },
+    runtime: { type: "string", description: "limit to claude|codex|opencode (repeatable)" },
+    since: { type: "string", description: "only sessions on/after YYYY-MM-DD" },
+    yes: { type: "boolean", description: "skip the confirmation prompt" },
+  },
+  async run({ args }) {
+    console.log(BANNER);
+    const cfg = loadConfig();
+    const runtimes = parseRuntimeArg((args as any).runtime);
+    const since = parseSinceArg(args.since);
+    const spinner = ora("Aggregating sessions…").start();
+    const snapshot = await buildSnapshot({ runtimes, since });
+    spinner.stop();
+    const payload = { deviceId: cfg.deviceId, userId: cfg.userId, snapshot };
+
+    console.log("");
+    printPrivacyNote();
+    console.log("");
+
+    if (args["dry-run"]) {
+      console.log(JSON.stringify(payload, null, 2));
+      return;
+    }
+
+    const endpoint = (args.endpoint as string) || cfg.endpoint;
+    if (!endpoint) {
+      console.log(chalk.yellow("No endpoint configured."));
+      console.log(chalk.dim("Set one with `strait config set endpoint <url>` or pass --endpoint <url>."));
+      console.log(chalk.dim("Use `strait push --dry-run` to preview exactly what would be sent."));
+      return;
+    }
+
+    if (!args.yes && process.stdin.isTTY) {
+      const ok = await select({
+        message: `Upload snapshot (${snapshot.totals.sessions} sessions) to ${endpoint}?`,
+        choices: [{ name: "Yes, upload", value: true }, { name: "Cancel", value: false }],
+      });
+      if (!ok) { console.log(chalk.dim("Cancelled.")); return; }
+    }
+
+    const send = ora(`Uploading to ${endpoint}…`).start();
+    try {
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "x-strait-device": cfg.deviceId,
+          "x-strait-version": VERSION,
+        },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        send.fail(`Upload failed: ${res.status} ${res.statusText}`);
+        return;
+      }
+      send.succeed(`Uploaded ${snapshot.totals.sessions} sessions' metadata.`);
+    } catch (err) {
+      send.fail(`Upload failed: ${(err as Error).message}`);
+    }
+  },
+});
+
+const config = defineCommand({
+  meta: { name: "config", description: "Get or set strait config (endpoint, userId)" },
+  args: {
+    action: { type: "positional", required: false, description: "get | set" },
+    key: { type: "positional", required: false, description: "endpoint | userId" },
+    value: { type: "positional", required: false, description: "value (for set)" },
+  },
+  async run({ args }) {
+    console.log(BANNER);
+    const cfg = loadConfig();
+    const action = args.action;
+    if (!action || action === "get") {
+      console.log("");
+      console.log(`  ${chalk.dim("deviceId")} ${cfg.deviceId}`);
+      console.log(`  ${chalk.dim("endpoint")} ${cfg.endpoint ?? chalk.dim("(unset)")}`);
+      console.log(`  ${chalk.dim("userId")}   ${cfg.userId ?? chalk.dim("(unset)")}`);
+      console.log(chalk.dim(`\n  ${CONFIG_PATH}`));
+      return;
+    }
+    if (action === "set") {
+      const key = args.key;
+      if (key !== "endpoint" && key !== "userId") {
+        console.log(chalk.yellow("Usage: strait config set endpoint|userId <value>"));
+        return;
+      }
+      if (args.value == null || args.value === "") {
+        console.log(chalk.yellow(`Missing value. Usage: strait config set ${key} <value>`));
+        return;
+      }
+      (cfg as any)[key] = args.value;
+      saveConfig(cfg);
+      console.log(chalk.green(`set ${key} = ${args.value}`));
+      return;
+    }
+    console.log(chalk.yellow("Usage: strait config get | strait config set <key> <value>"));
+  },
+});
+
 const main = defineCommand({
   meta: { name: "strait", version: VERSION, description: "Move AI agent sessions between Claude Code and Codex" },
-  subCommands: { sync, list, "list-all": listAll, status, search, open, stats, history },
+  subCommands: { sync, list, "list-all": listAll, status, search, open, stats, history, insights, push, config },
   async run({ args }) {
     if (args._?.length) return;
     if (!process.stdin.isTTY) {
@@ -645,6 +907,9 @@ const main = defineCommand({
       console.log("  strait open <session-id>");
       console.log("  strait stats");
       console.log("  strait history [--limit 20] [--clear]");
+      console.log("  strait insights [--runtime claude] [--since YYYY-MM-DD] [--days 14] [--json]");
+      console.log("  strait push [--dry-run] [--endpoint <url>] [--yes]");
+      console.log("  strait config get | set endpoint <url>");
       console.log("");
       console.log(`Run ${chalk.cyan("strait")} in a TTY for interactive mode.`);
       return;
@@ -654,5 +919,6 @@ const main = defineCommand({
 });
 
 function cap(s: string) { return s.charAt(0).toUpperCase() + s.slice(1); }
+function humanNum(n: number): string { return n.toLocaleString("en-US"); }
 
 runMain(main);

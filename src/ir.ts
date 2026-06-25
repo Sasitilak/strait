@@ -13,7 +13,29 @@ export interface Session {
   createdAt: string;
   model?: string;
   workingDirectory?: string;
+  /**
+   * Session-level token totals, normalized across runtimes. Optional because
+   * not every session/format reports usage. Populated by parsers; consumed by
+   * the analytics aggregator. Never sent or surfaced as message content.
+   */
+  usage?: TokenUsage;
   messages: Message[];
+}
+
+/**
+ * Normalized token usage. Each runtime reports tokens differently
+ * (Claude: per-message `usage`; Codex: cumulative `token_count` events;
+ * OpenCode: per-message `tokens`); parsers map all of them into this shape.
+ * `input` is the non-cached input; cached reads are tracked separately so
+ * `total = input + output + cacheRead + cacheWrite` holds for every runtime.
+ */
+export interface TokenUsage {
+  input: number;
+  output: number;
+  cacheRead: number;
+  cacheWrite: number;
+  reasoning: number;
+  total: number;
 }
 
 export type SourceRuntime = "claude" | "codex" | "opencode";
