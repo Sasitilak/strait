@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/Sasitilak/strait/compare/v0.2.0...v0.3.0) (2026-06-25)
+
+
+### Features
+
+* **analytics:** local insights engine with token usage + time patterns ([ac63cb3](https://github.com/Sasitilak/strait/commit/ac63cb32bdb7b0585178340cb534c371ee07143d))
+
 ## [0.2.0](https://github.com/Sasitilak/strait/compare/v0.1.2...v0.2.0) (2026-06-13)
 
 
